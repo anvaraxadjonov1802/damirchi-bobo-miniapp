@@ -1,11 +1,11 @@
-# Damirchi BOBO Telegram Mini App Frontend
+# Damirchi Telegram Mini App Frontend
 
 Premium restaurant ordering frontend for Telegram Mini App. Built with React, Vite and Tailwind CSS. The app connects to the existing Django REST API and sends orders to the backend/bot flow.
 
 ## What is improved in this version
 
 - Premium dark brown/gold restaurant identity
-- Stronger Damirchi BOBO hero section
+- Stronger Damirchi hero section
 - Brand trust ribbon for operator/payment/service quality
 - Horizontal featured products carousel
 - Category cards with optional category images

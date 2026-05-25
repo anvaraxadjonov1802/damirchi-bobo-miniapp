@@ -96,7 +96,7 @@ export default function ProductCard({ product, quantity = 0, onAdd, onIncrease, 
               {product.name_uz}
             </h3>
             <p className="text-[#A8988C] text-[11px] leading-relaxed mt-1.5 line-clamp-2 font-medium">
-              {product.description_uz || 'Damirchi BOBO oshxonasi uslubida tayyorlangan mazali taom.'}
+              {product.description_uz || 'Damirchi oshxonasi uslubida tayyorlangan mazali taom.'}
             </p>
           </div>
 

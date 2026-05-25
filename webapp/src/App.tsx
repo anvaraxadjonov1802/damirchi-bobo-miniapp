@@ -106,7 +106,7 @@ export default function App() {
       setRestaurantSettings(settings || DEFAULT_RESTAURANT_SETTINGS);
     } catch (err) {
       console.error("Menu fetch exception:", err);
-      setError("Damirchi BOBO menyusini yuklashda xatolik yuz berdi. Iltimos, qayta urinib ko‘ring.");
+      setError("Damirchi menyusini yuklashda xatolik yuz berdi. Iltimos, qayta urinib ko‘ring.");
     } finally {
       setIsLoading(false);
     }

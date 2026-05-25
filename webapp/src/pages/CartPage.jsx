@@ -47,7 +47,7 @@ export default function CartPage({
       <div className="px-5 py-8">
         <EmptyState
           title="Savat hozircha bo‘sh"
-          description="Siz savatingizga hech qanday taom qo‘shmadingiz. Damirchi BOBO menyusidan mazali taomlarni tanlashga marhamat!"
+          description="Siz savatingizga hech qanday taom qo‘shmadingiz. Damirchi menyusidan mazali taomlarni tanlashga marhamat!"
           buttonText="Menyuga qaytish"
           onAction={onGoToMenu}
         />
