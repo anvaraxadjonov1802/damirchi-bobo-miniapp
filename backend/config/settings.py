@@ -173,14 +173,13 @@ REST_FRAMEWORK = {
     ],
 }
 
-BOT_TOKEN = os.getenv("BOT_TOKEN", "")
 TELEGRAM_INIT_DATA_MAX_AGE_SECONDS = int(
     os.getenv("TELEGRAM_INIT_DATA_MAX_AGE_SECONDS", "86400")
 )
-ALLOW_UNVERIFIED_TELEGRAM_IN_DEBUG = os.getenv(
-    "ALLOW_UNVERIFIED_TELEGRAM_IN_DEBUG", "true"
-).lower() == "true"
+
+BOT_TOKEN = os.getenv("BOT_TOKEN", "")
 
 ALLOW_UNVERIFIED_TELEGRAM_IN_DEBUG = (
     os.getenv("ALLOW_UNVERIFIED_TELEGRAM_IN_DEBUG", "False") == "True"
 )
+
