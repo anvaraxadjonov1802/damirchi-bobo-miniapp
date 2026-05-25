@@ -2,9 +2,8 @@
  * Damirchi BOBO Django REST API Client
  * Real API first. Mock data is available only when VITE_USE_MOCK_DATA=true.
  */
-
-const API_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000/api";
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://127.0.0.1:8000";
+const API_URL = import.meta.env.VITE_API_URL;
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 const USE_MOCK_DATA = import.meta.env.VITE_USE_MOCK_DATA === "true";
 
 const FALLBACK_IMAGES = {
@@ -136,20 +135,29 @@ function normalizeListResponse(data) {
 }
 
 async function request(endpoint, options = {}) {
+  const { headers: customHeaders = {}, ...restOptions } = options;
+
   const response = await fetch(`${API_URL}${endpoint}`, {
+    ...restOptions,
     headers: {
       Accept: "application/json",
-      ...(options.body ? { "Content-Type": "application/json" } : {}),
-      ...options.headers
+      ...(restOptions.body ? { "Content-Type": "application/json" } : {}),
+      "ngrok-skip-browser-warning": "1",
+      ...customHeaders,
     },
-    ...options
   });
 
   const contentType = response.headers.get("content-type") || "";
   const data = contentType.includes("application/json") ? await response.json() : null;
 
   if (!response.ok) {
-    const apiMessage = data?.detail || data?.message || JSON.stringify(data || {});
+    const apiMessage =
+      data?.detail ||
+      data?.message ||
+      data?.items ||
+      data?.non_field_errors ||
+      JSON.stringify(data || {});
+
     throw new Error(apiMessage || `API xatolik: ${response.status}`);
   }
 
@@ -194,7 +202,7 @@ export const client = {
     }
   },
 
-  async createOrder(payload) {
+  async createOrder(payload) {  
     if (USE_MOCK_DATA) {
       await new Promise((resolve) => setTimeout(resolve, 800));
       return {
