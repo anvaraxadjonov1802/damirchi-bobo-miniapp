@@ -17,7 +17,7 @@ import { initTelegramApp, hapticFeedback, showAlert, configureBackButton } from 
 const CART_STORAGE_KEY = 'damirchi_bobo_cart_v1';
 
 const DEFAULT_RESTAURANT_SETTINGS = {
-  restaurant_name: 'Damirchi BOBO',
+  restaurant_name: 'Damirchi ',
   tagline: 'Mazali taomlar, tezkor buyurtma',
   phone: '+998 XX XXX XX XX',
   address: 'Toshkent, Sergeli',
@@ -106,7 +106,7 @@ export default function App() {
       setRestaurantSettings(settings || DEFAULT_RESTAURANT_SETTINGS);
     } catch (err) {
       console.error("Menu fetch exception:", err);
-      setError("Damirchi menyusini yuklashda xatolik yuz berdi. Iltimos, qayta urinib ko‘ring.");
+      setError("Damirchi  menyusini yuklashda xatolik yuz berdi. Iltimos, qayta urinib ko‘ring.");
     } finally {
       setIsLoading(false);
     }

@@ -22,7 +22,7 @@ export default function LoadingScreen() {
         </div>
         
         <h1 className="font-serif text-3xl font-light italic mb-2">
-          Damirchi <span className="font-bold text-[#D99A2B] not-italic">BOBO</span>
+          Damirchi <span className="font-bold text-[#D99A2B] not-italic"></span>
         </h1>
         <p className="text-[#D99A2B] text-[10px] font-black uppercase tracking-[0.2em] mb-6">
           Milliy & Turk Taomlari

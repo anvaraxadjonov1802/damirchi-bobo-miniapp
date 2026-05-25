@@ -1,5 +1,5 @@
 /**
- * Damirchi BOBO Django REST API Client
+ * Damirchi  Django REST API Client
  * Real API first. Mock data is available only when VITE_USE_MOCK_DATA=true.
  */
 
@@ -86,7 +86,7 @@ const MOCK_PRODUCTS = [
     name_uz: "Mol go‘shti shashlik",
     name_ru: "Шашлык из говядины",
     description_uz:
-      "Sershira mol go‘shti, piyoz va Damirchi BOBO maxsus ziravorlari bilan pishirilgan premium shashlik.",
+      "Sershira mol go‘shti, piyoz va Damirchi  maxsus ziravorlari bilan pishirilgan premium shashlik.",
     price: 35000,
     image: FALLBACK_IMAGES.shashlik_beef,
     is_available: true,
@@ -166,7 +166,7 @@ const MOCK_PRODUCTS = [
 ];
 
 const DEFAULT_SETTINGS = {
-  restaurant_name: "Damirchi BOBO",
+  restaurant_name: "Damirchi ",
   tagline: "Mazali taomlar, tezkor buyurtma",
   phone: "+998 XX XXX XX XX",
   address: "Toshkent, Sergeli",

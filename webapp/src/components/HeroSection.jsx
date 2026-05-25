@@ -9,7 +9,7 @@ const highlights = [
 ];
 
 export default function HeroSection({ settings }) {
-  const restaurantName = settings?.restaurant_name || 'Damirchi BOBO';
+  const restaurantName = settings?.restaurant_name || 'Damirchi ';
   const tagline = settings?.tagline || 'Mazali taomlar, tezkor buyurtma';
   const address = settings?.address || 'Toshkent';
   const deliveryPrice = Number(settings?.delivery_price ?? 15000);
@@ -40,9 +40,9 @@ export default function HeroSection({ settings }) {
             </div>
 
             <h1 className="font-serif text-[2.25rem] leading-[0.92] font-light italic tracking-tight">
-              {restaurantName.replace(' BOBO', '')}
+              {restaurantName.replace(' ', '')}
               <br />
-              <span className="font-black not-italic text-[#D99A2B]">{restaurantName.includes('BOBO') ? 'BOBO' : 'Restaurant'}</span>
+              <span className="font-black not-italic text-[#D99A2B]">{restaurantName.includes('') ? '' : 'Restaurant'}</span>
             </h1>
 
             <p className="text-[13px] leading-relaxed text-[#F5EFE6] font-black mt-3.5">

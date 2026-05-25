@@ -20,7 +20,7 @@ export default function AppHeader({ cartCount, onCartClick, currentScreen, onBac
   };
 
   const showBackButton = currentScreen !== 'menu';
-  const restaurantName = settings?.restaurant_name || 'Damirchi BOBO';
+  const restaurantName = settings?.restaurant_name || 'Damirchi ';
   const isOpen = settings?.is_open !== false;
   const statusLabel = isOpen ? 'Ochiq · buyurtma qabul qilinadi' : 'Yopiq · hozir buyurtma olinmaydi';
 
