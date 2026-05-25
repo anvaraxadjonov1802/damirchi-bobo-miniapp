@@ -112,3 +112,65 @@ button, input, textarea {
   background: rgba(217, 154, 43, 0.35);
   color: #F5EFE6;
 }
+
+/* Readable checkout typography */
+.checkout-readable input,
+.checkout-readable textarea,
+.checkout-readable button {
+  font-size: 1rem;
+}
+
+/* Leaflet/Yandex-like map picker polish */
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+  font-family: var(--font-sans);
+  background: #120E0B;
+}
+
+.damirchi-map-marker {
+  background: transparent;
+  border: 0;
+}
+
+.damirchi-map-pin {
+  width: 42px;
+  height: 42px;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  background: #D99A2B;
+  border: 3px solid #120E0B;
+  box-shadow: 0 10px 30px rgba(0,0,0,.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 19px;
+}
+
+.damirchi-map-pin::before {
+  content: '';
+  width: 11px;
+  height: 11px;
+  background: #120E0B;
+  border-radius: 50%;
+  position: absolute;
+}
+
+.damirchi-map-pin {
+  color: transparent;
+}
+
+.leaflet-control-zoom a {
+  background: #1C1511 !important;
+  color: #F5EFE6 !important;
+  border-color: rgba(217,154,43,.2) !important;
+}
+
+@keyframes mapSheet {
+  from { transform: translateY(24px); opacity: .4; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.animate-map-sheet {
+  animation: mapSheet .2s ease-out both;
+}

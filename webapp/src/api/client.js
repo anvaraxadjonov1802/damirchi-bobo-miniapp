@@ -136,20 +136,28 @@ function normalizeListResponse(data) {
 }
 
 async function request(endpoint, options = {}) {
+  const { headers: customHeaders = {}, ...restOptions } = options;
+
   const response = await fetch(`${API_URL}${endpoint}`, {
+    ...restOptions,
     headers: {
       Accept: "application/json",
-      ...(options.body ? { "Content-Type": "application/json" } : {}),
-      ...options.headers
-    },
-    ...options
+      ...(restOptions.body ? { "Content-Type": "application/json" } : {}),
+      "ngrok-skip-browser-warning": "1",
+      ...customHeaders
+    }
   });
 
   const contentType = response.headers.get("content-type") || "";
   const data = contentType.includes("application/json") ? await response.json() : null;
 
   if (!response.ok) {
-    const apiMessage = data?.detail || data?.message || JSON.stringify(data || {});
+    const apiMessage =
+      data?.detail ||
+      data?.message ||
+      data?.items ||
+      data?.non_field_errors ||
+      JSON.stringify(data || {});
     throw new Error(apiMessage || `API xatolik: ${response.status}`);
   }
 
