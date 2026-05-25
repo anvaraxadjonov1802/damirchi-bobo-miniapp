@@ -1,0 +1,93 @@
+# =========================
+# Python / Django
+# =========================
+__pycache__/
+*.py[cod]
+*$py.class
+
+venv/
+env/
+.venv/
+ENV/
+
+*.sqlite3
+db.sqlite3
+
+media/
+staticfiles/
+
+*.log
+*.pot
+*.pyc
+
+# Django local files
+.env
+.env.*
+!.env.example
+
+# Migrations cache
+*/migrations/__pycache__/
+
+# =========================
+# Node / React / Vite
+# =========================
+node_modules/
+dist/
+build/
+.vite/
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Local env files
+webapp/.env
+webapp/.env.*
+damirchi_ai/.env
+damirchi_ai/.env.*
+!.env.example
+!webapp/.env.example
+!damirchi_ai/.env.example
+
+# =========================
+# Bot
+# =========================
+bot/.env
+bot/.env.*
+!bot/.env.example
+
+# =========================
+# IDE / Editor
+# =========================
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# =========================
+# OS files
+# =========================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# =========================
+# Coverage / Tests
+# =========================
+.coverage
+htmlcov/
+.pytest_cache/
+.cache/
+
+# =========================
+# Vercel
+# =========================
+.vercel/
+
+# =========================
+# Misc
+# =========================
+*.zip
+*.rar
+*.7z
