@@ -12,7 +12,7 @@ urlpatterns = [
     path("api/", include("orders.urls")),
 ]
 
-# Demo uchun media files serve qilish
+# Demo/test uchun media files serve qilish
 urlpatterns += [
     re_path(
         r"^media/(?P<path>.*)$",
