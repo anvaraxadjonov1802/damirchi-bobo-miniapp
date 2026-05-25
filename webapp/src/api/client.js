@@ -2,8 +2,9 @@
  * Damirchi BOBO Django REST API Client
  * Real API first. Mock data is available only when VITE_USE_MOCK_DATA=true.
  */
-const API_URL = import.meta.env.VITE_API_URL;
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+
+const API_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000/api";
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://127.0.0.1:8000";
 const USE_MOCK_DATA = import.meta.env.VITE_USE_MOCK_DATA === "true";
 
 const FALLBACK_IMAGES = {
@@ -193,7 +194,7 @@ export const client = {
     }
   },
 
-  async createOrder(payload) {  
+  async createOrder(payload) {
     if (USE_MOCK_DATA) {
       await new Promise((resolve) => setTimeout(resolve, 800));
       return {
