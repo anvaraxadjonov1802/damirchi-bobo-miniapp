@@ -1,67 +1,87 @@
-import React, { useMemo, useState } from 'react';
-import { Truck, MapPin, Phone, CreditCard, DollarSign, MessageSquare, ArrowRight, Loader2, ShieldCheck, MapPinned } from 'lucide-react';
-import OptionSelector from '../components/OptionSelector';
-import PriceSummary from '../components/PriceSummary';
-import SectionCard from '../components/SectionCard';
-import MapPickerModal from '../components/MapPickerModal';
-import { getTelegramUser, getTelegramInitData, showAlert, hapticFeedback } from '../telegram/telegram';
+import React, { useMemo, useState } from "react";
+import {
+  Truck,
+  MapPin,
+  Phone,
+  CreditCard,
+  DollarSign,
+  MessageSquare,
+  ArrowRight,
+  Loader2,
+  ShieldCheck,
+  MapPinned,
+} from "lucide-react";
+
+import OptionSelector from "../components/OptionSelector";
+import PriceSummary from "../components/PriceSummary";
+import SectionCard from "../components/SectionCard";
+import MapPickerModal from "../components/MapPickerModal";
+
+import {
+  getTelegramUser,
+  getTelegramInitData,
+  hapticFeedback,
+} from "../telegram/telegram";
 
 export default function CheckoutPage({
   cart,
   onSubmitOrder,
   isSubmitting,
   onGoBack,
-  settings
+  settings,
 }) {
   const telegramUser = useMemo(() => getTelegramUser(), []);
 
-  const [orderType, setOrderType] = useState('delivery');
-  const [paymentType, setPaymentType] = useState('cash');
-  const [phone, setPhone] = useState('');
-  const [address, setAddress] = useState('');
-  const [latitude, setLatitude] = useState('');
-  const [longitude, setLongitude] = useState('');
-  const [comment, setComment] = useState('');
+  const [orderType, setOrderType] = useState("delivery");
+  const [paymentType, setPaymentType] = useState("cash");
+  const [phone, setPhone] = useState("");
+  const [address, setAddress] = useState("");
+  const [latitude, setLatitude] = useState("");
+  const [longitude, setLongitude] = useState("");
+  const [comment, setComment] = useState("");
   const [isMapOpen, setIsMapOpen] = useState(false);
-  const [validationError, setValidationError] = useState('');
+  const [validationError, setValidationError] = useState("");
 
   const cartItems = useMemo(() => Object.values(cart), [cart]);
 
   const subtotal = useMemo(() => {
-    return cartItems.reduce((acc, item) => acc + (item.product.price * item.quantity), 0);
+    return cartItems.reduce(
+      (acc, item) => acc + item.product.price * item.quantity,
+      0
+    );
   }, [cartItems]);
 
   const isOpen = settings?.is_open !== false;
   const backendDeliveryPrice = Number(settings?.delivery_price ?? 15000);
   const minOrderAmount = Number(settings?.min_order_amount || 0);
-  const deliveryPrice = orderType === 'delivery' ? backendDeliveryPrice : 0;
+  const deliveryPrice = orderType === "delivery" ? backendDeliveryPrice : 0;
   const totalItemCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
   const hasLocation = Boolean(latitude && longitude);
 
   const orderTypeOptions = [
-    { value: 'delivery', label: 'Dastavka', icon: Truck },
-    { value: 'pickup', label: 'Olib ketish', icon: MapPin }
+    { value: "delivery", label: "Dastavka", icon: Truck },
+    { value: "pickup", label: "Olib ketish", icon: MapPin },
   ];
 
   const paymentTypeOptions = [
-    { value: 'cash', label: 'Naqd', icon: DollarSign },
-    { value: 'card', label: 'Karta', icon: CreditCard }
+    { value: "cash", label: "Naqd", icon: DollarSign },
+    { value: "card", label: "Karta", icon: CreditCard },
   ];
 
   const handleMapSelect = ({ latitude: lat, longitude: lng }) => {
-    setLatitude(lat);
-    setLongitude(lng);
-    setValidationError('');
+    setLatitude(String(lat));
+    setLongitude(String(lng));
+    setValidationError("");
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    hapticFeedback('medium');
-    setValidationError('');
+    hapticFeedback("medium");
+    setValidationError("");
 
     if (!isOpen) {
-      setValidationError('Restoran hozir yopiq.');
-      hapticFeedback('error');
+      setValidationError("Restoran hozir yopiq.");
+      hapticFeedback("error");
       return;
     }
 
@@ -69,56 +89,66 @@ export default function CheckoutPage({
     const trimmedAddress = address.trim();
 
     if (cartItems.length === 0) {
-      setValidationError('Savat bo‘sh.');
-      hapticFeedback('error');
+      setValidationError("Savat bo‘sh.");
+      hapticFeedback("error");
       return;
     }
 
     if (!trimmedPhone) {
-      setValidationError('Telefon raqam kiriting.');
-      hapticFeedback('error');
+      setValidationError("Telefon raqam kiriting.");
+      hapticFeedback("error");
       return;
     }
 
-    if (trimmedPhone.replace(/\D/g, '').length < 9) {
-      setValidationError('Telefon raqam noto‘g‘ri ko‘rinadi.');
-      hapticFeedback('error');
+    if (trimmedPhone.replace(/\D/g, "").length < 9) {
+      setValidationError("Telefon raqam noto‘g‘ri ko‘rinadi.");
+      hapticFeedback("error");
       return;
     }
 
-    if (orderType === 'delivery' && !trimmedAddress && !hasLocation) {
-      setValidationError('Manzil yozing yoki xaritadan belgilang.');
-      hapticFeedback('error');
+    if (orderType === "delivery" && !trimmedAddress && !hasLocation) {
+      setValidationError("Manzil yozing yoki xaritadan belgilang.");
+      hapticFeedback("error");
       return;
     }
 
-    if (orderType === 'delivery' && minOrderAmount > 0 && subtotal < minOrderAmount) {
-      setValidationError(`Dastavka uchun kamida ${minOrderAmount.toLocaleString('uz-UZ')} so‘mlik buyurtma kerak.`);
-      hapticFeedback('error');
+    if (
+      orderType === "delivery" &&
+      minOrderAmount > 0 &&
+      subtotal < minOrderAmount
+    ) {
+      setValidationError(
+        `Dastavka uchun kamida ${minOrderAmount.toLocaleString(
+          "uz-UZ"
+        )} so‘mlik buyurtma kerak.`
+      );
+      hapticFeedback("error");
       return;
     }
-
-    const items = cartItems.map(item => ({
-      product: item.product.id,
-      quantity: item.quantity
-    }));
 
     const telegramInitData = getTelegramInitData();
+
+    const items = cartItems.map((item) => ({
+      product: item.product.id,
+      quantity: item.quantity,
+    }));
 
     const payload = {
       telegram_init_data: telegramInitData,
       telegram_id: telegramUser.id,
-      full_name: telegramUser.fullName || 'Telegram foydalanuvchisi',
-      username: telegramUser.username || '',
+      full_name: telegramUser.fullName || "Telegram foydalanuvchisi",
+      username: telegramUser.username || "",
+
       order_type: orderType,
       payment_type: paymentType,
       phone: trimmedPhone,
-      address: orderType === 'delivery' ? trimmedAddress : '',
-      latitude: hasLocation ? latitude : null,
-      longitude: hasLocation ? longitude : null,
+      address: orderType === "delivery" ? trimmedAddress : "",
+      latitude: hasLocation ? String(latitude) : null,
+      longitude: hasLocation ? String(longitude) : null,
       comment: comment.trim(),
+
       items,
-      __total_price: subtotal + deliveryPrice
+      __total_price: subtotal + deliveryPrice,
     };
 
     onSubmitOrder(payload);
@@ -130,7 +160,9 @@ export default function CheckoutPage({
         <div className="rounded-[2rem] bg-[#1C1511] border border-[#D99A2B]/15 p-5 shadow-lg relative overflow-hidden">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_0%_0%,rgba(217,154,43,0.16),transparent_38%)]" />
           <div className="relative">
-            <h2 className="font-serif font-black text-2xl text-[#F5EFE6] leading-tight">Buyurtmani yakunlash</h2>
+            <h2 className="font-serif font-black text-2xl text-[#F5EFE6] leading-tight">
+              Buyurtmani yakunlash
+            </h2>
             <p className="text-base text-[#A8988C] leading-relaxed font-semibold mt-2">
               {totalItemCount} ta mahsulot. Telefon va manzilni kiriting.
             </p>
@@ -157,7 +189,9 @@ export default function CheckoutPage({
         />
 
         <SectionCard title="Telefon">
-          <label htmlFor="phone-input" className="sr-only">Telefon raqam</label>
+          <label htmlFor="phone-input" className="sr-only">
+            Telefon raqam
+          </label>
           <div className="relative flex items-center">
             <Phone className="absolute left-4 w-5 h-5 text-[#A8988C] opacity-80" />
             <input
@@ -173,9 +207,11 @@ export default function CheckoutPage({
           </div>
         </SectionCard>
 
-        {orderType === 'delivery' && (
+        {orderType === "delivery" && (
           <SectionCard title="Manzil">
-            <label htmlFor="address-input" className="sr-only">Manzil</label>
+            <label htmlFor="address-input" className="sr-only">
+              Manzil
+            </label>
             <input
               id="address-input"
               type="text"
@@ -188,17 +224,17 @@ export default function CheckoutPage({
             <button
               type="button"
               onClick={() => {
-                hapticFeedback('medium');
+                hapticFeedback("medium");
                 setIsMapOpen(true);
               }}
               className={`w-full py-4 px-4 rounded-2xl font-black text-base flex items-center justify-center gap-2 transition-all border active:scale-[0.98] ${
                 hasLocation
-                  ? 'bg-emerald-950/25 border-emerald-700/60 text-emerald-300'
-                  : 'bg-[#120E0B] border-[#D99A2B]/25 text-[#D99A2B]'
+                  ? "bg-emerald-950/25 border-emerald-700/60 text-emerald-300"
+                  : "bg-[#120E0B] border-[#D99A2B]/25 text-[#D99A2B]"
               }`}
             >
               <MapPinned className="w-5 h-5" />
-              {hasLocation ? 'Xaritada belgilandi ✅' : 'Xaritadan tanlash'}
+              {hasLocation ? "Xaritada belgilandi ✅" : "Xaritadan tanlash"}
             </button>
 
             {hasLocation && (
@@ -229,7 +265,11 @@ export default function CheckoutPage({
           </div>
         </SectionCard>
 
-        <PriceSummary subtotal={subtotal} deliveryPrice={deliveryPrice} title="Hisob" />
+        <PriceSummary
+          subtotal={subtotal}
+          deliveryPrice={deliveryPrice}
+          title="Hisob"
+        />
 
         <div className="rounded-2xl border border-[#D99A2B]/15 bg-[#1C1511]/80 px-4 py-3 text-sm leading-relaxed text-[#A8988C] font-semibold flex gap-2.5">
           <ShieldCheck className="w-5 h-5 text-[#D99A2B] shrink-0 mt-0.5" />
@@ -249,7 +289,7 @@ export default function CheckoutPage({
               </>
             ) : (
               <>
-                <span>{isOpen ? 'Buyurtmani tasdiqlash' : 'Restoran yopiq'}</span>
+                <span>{isOpen ? "Buyurtmani tasdiqlash" : "Restoran yopiq"}</span>
                 <ArrowRight className="w-5 h-5 text-[#120E0B]" />
               </>
             )}
