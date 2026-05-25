@@ -2,6 +2,7 @@ import os
 import requests
 
 from .models import Order
+from decimal import Decimal
 
 
 STATUS_BUTTONS = [
@@ -26,8 +27,14 @@ def build_order_message(order: Order) -> str:
         )
 
     location_text = ""
-    if order.latitude and order.longitude:
-        location_text = f"\n📍 Lokatsiya: {order.latitude}, {order.longitude}"
+    location_links = build_location_links(order)
+
+    if location_links:
+        location_text = (
+            f"\n📍 Lokatsiya: {order.latitude}, {order.longitude}"
+            f"\n🗺 <a href=\"{location_links['google']}\">Google Maps orqali ochish</a>"
+            f"\n🧭 <a href=\"{location_links['yandex']}\">Yandex Maps orqali ochish</a>"
+        )
 
     comment_text = ""
     if order.comment:
@@ -56,8 +63,23 @@ def build_order_message(order: Order) -> str:
     return message
 
 
-def build_status_keyboard(order_id: int) -> dict:
+def build_status_keyboard(order_id: int, order: Order | None = None) -> dict:
     inline_keyboard = []
+
+    if order:
+        location_links = build_location_links(order)
+
+        if location_links:
+            inline_keyboard.append([
+                {
+                    "text": "📍 Google Maps",
+                    "url": location_links["google"],
+                },
+                {
+                    "text": "🧭 Yandex Maps",
+                    "url": location_links["yandex"],
+                },
+            ])
 
     for text, status in STATUS_BUTTONS:
         inline_keyboard.append([
@@ -68,7 +90,6 @@ def build_status_keyboard(order_id: int) -> dict:
         ])
 
     return {"inline_keyboard": inline_keyboard}
-
 
 def send_order_to_operator_group(order: Order) -> None:
     bot_token = os.getenv("BOT_TOKEN")
@@ -84,10 +105,40 @@ def send_order_to_operator_group(order: Order) -> None:
         "chat_id": operator_chat_id,
         "text": build_order_message(order),
         "parse_mode": "HTML",
-        "reply_markup": build_status_keyboard(order.id),
+        "reply_markup": build_status_keyboard(order.id, order),
     }
 
     response = requests.post(url, json=payload, timeout=10)
 
     if response.status_code != 200:
         print("Telegramga xabar yuborishda xatolik:", response.text)
+
+
+
+def format_coordinate(value):
+    if value is None:
+        return None
+
+    if isinstance(value, Decimal):
+        return str(value)
+
+    return str(value)
+
+
+def build_location_links(order: Order) -> dict | None:
+    if not order.latitude or not order.longitude:
+        return None
+
+    latitude = format_coordinate(order.latitude)
+    longitude = format_coordinate(order.longitude)
+
+    google_maps_url = f"https://www.google.com/maps?q={latitude},{longitude}"
+    yandex_maps_url = (
+        f"https://yandex.uz/maps/?ll={longitude}%2C{latitude}"
+        f"&z=17&pt={longitude},{latitude},pm2rdm"
+    )
+
+    return {
+        "google": google_maps_url,
+        "yandex": yandex_maps_url,
+    }
