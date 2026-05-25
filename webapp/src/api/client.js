@@ -138,14 +138,16 @@ function normalizeListResponse(data) {
 async function request(endpoint, options = {}) {
   const { headers: customHeaders = {}, ...restOptions } = options;
 
+  const isNgrokApi = API_URL.includes("ngrok-free.app");
+
   const response = await fetch(`${API_URL}${endpoint}`, {
     ...restOptions,
     headers: {
       Accept: "application/json",
       ...(restOptions.body ? { "Content-Type": "application/json" } : {}),
-      "ngrok-skip-browser-warning": "1",
-      ...customHeaders
-    }
+      ...(isNgrokApi ? { "ngrok-skip-browser-warning": "1" } : {}),
+      ...customHeaders,
+    },
   });
 
   const contentType = response.headers.get("content-type") || "";
@@ -158,6 +160,7 @@ async function request(endpoint, options = {}) {
       data?.items ||
       data?.non_field_errors ||
       JSON.stringify(data || {});
+
     throw new Error(apiMessage || `API xatolik: ${response.status}`);
   }
 
