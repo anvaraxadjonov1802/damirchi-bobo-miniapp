@@ -128,6 +128,14 @@ export default function CheckoutPage({
 
     const telegramInitData = getTelegramInitData();
 
+    if (!telegramInitData) {
+      setValidationError(
+        "Buyurtma berish uchun ilovani Telegram bot ichidan oching."
+      );
+      hapticFeedback("error");
+      return;
+    }
+
     const items = cartItems.map((item) => ({
       product: item.product.id,
       quantity: item.quantity,
