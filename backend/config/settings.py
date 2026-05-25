@@ -28,10 +28,11 @@ SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-key")
 
 DEBUG = os.getenv("DEBUG", "False") == "True"
 
-ALLOWED_HOSTS = os.getenv(
-    "ALLOWED_HOSTS",
-    "127.0.0.1,localhost"
-).split(",")
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in os.getenv("ALLOWED_HOSTS", "127.0.0.1,localhost").split(",")
+    if host.strip()
+]
 
 # Application definition
 
@@ -148,10 +149,12 @@ STORAGES = {
     },
 }
 
-CORS_ALLOW_ALL_ORIGINS = os.getenv("CORS_ALLOW_ALL_ORIGINS", "False") == "True"
 CORS_ALLOW_HEADERS = list(default_headers) + [
     "x-telegram-init-data",
 ]
+
+CORS_ALLOW_ALL_ORIGINS = os.getenv("CORS_ALLOW_ALL_ORIGINS", "False") == "True"
+
 CORS_ALLOWED_ORIGINS = [
     origin.strip()
     for origin in os.getenv("CORS_ALLOWED_ORIGINS", "").split(",")
@@ -177,3 +180,7 @@ TELEGRAM_INIT_DATA_MAX_AGE_SECONDS = int(
 ALLOW_UNVERIFIED_TELEGRAM_IN_DEBUG = os.getenv(
     "ALLOW_UNVERIFIED_TELEGRAM_IN_DEBUG", "true"
 ).lower() == "true"
+
+ALLOW_UNVERIFIED_TELEGRAM_IN_DEBUG = (
+    os.getenv("ALLOW_UNVERIFIED_TELEGRAM_IN_DEBUG", "False") == "True"
+)

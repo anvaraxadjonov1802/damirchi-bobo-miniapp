@@ -1,14 +1,12 @@
 from rest_framework import serializers
 from django.db import transaction
+from django.conf import settings
 
 from customers.models import Customer
-from menu.models import Product
-from .models import Order, OrderItem
-
-from common.models import RestaurantSettings
-
-from django.conf import settings
 from customers.telegram_auth import validate_telegram_init_data
+from menu.models import Product
+from common.models import RestaurantSettings
+from .models import Order, OrderItem
 
 
 class OrderItemCreateSerializer(serializers.Serializer):
@@ -66,14 +64,25 @@ class OrderCreateSerializer(serializers.ModelSerializer):
     @transaction.atomic
     def create(self, validated_data):
         items_data = validated_data.pop("items")
+
         telegram_init_data = validated_data.pop("telegram_init_data", "") or ""
+        fallback_telegram_id = validated_data.pop("telegram_id", None)
+        fallback_full_name = validated_data.pop("full_name", "") or ""
+        fallback_username = validated_data.pop("username", "") or ""
+
         request = self.context.get("request")
 
         if not telegram_init_data and request:
-            telegram_init_data = request.headers.get("X-Telegram-Init-Data", "")
+            telegram_init_data = request.headers.get("X-Telegram-Init-Data", "") or ""
 
         if telegram_init_data:
-            telegram_user = validate_telegram_init_data(telegram_init_data)
+            try:
+                telegram_user = validate_telegram_init_data(telegram_init_data)
+            except Exception:
+                raise serializers.ValidationError(
+                    {"detail": "Telegram tasdiqlash ma’lumoti noto‘g‘ri."}
+                )
+
             telegram_id = telegram_user["id"]
             full_name = " ".join(
                 filter(
@@ -83,25 +92,29 @@ class OrderCreateSerializer(serializers.ModelSerializer):
                         telegram_user.get("last_name", ""),
                     ],
                 )
-            )
+            ) or "Telegram foydalanuvchisi"
             username = telegram_user.get("username", "") or ""
+
         else:
-            allow_local_fallback = (
-                settings.DEBUG
-                and getattr(settings, "ALLOW_UNVERIFIED_TELEGRAM_IN_DEBUG", False)
+            allow_unverified = getattr(
+                settings,
+                "ALLOW_UNVERIFIED_TELEGRAM_IN_DEBUG",
+                False,
             )
 
-            if not allow_local_fallback:
+            if not allow_unverified:
                 raise serializers.ValidationError(
                     {"detail": "Telegram tasdiqlash ma’lumoti talab qilinadi."}
                 )
 
-            telegram_id = validated_data.pop("telegram_id", None)
-            full_name = validated_data.pop("full_name", "")
-            username = validated_data.pop("username", "")
+            telegram_id = fallback_telegram_id
+            full_name = fallback_full_name or "Test User"
+            username = fallback_username or "test_user"
 
             if not telegram_id:
-                raise serializers.ValidationError({"telegram_id": "telegram_id talab qilinadi."})
+                raise serializers.ValidationError(
+                    {"telegram_id": "telegram_id talab qilinadi."}
+                )
 
         customer, _ = Customer.objects.update_or_create(
             telegram_id=telegram_id,
@@ -133,42 +146,15 @@ class OrderCreateSerializer(serializers.ModelSerializer):
             item_total = product.price * quantity
             subtotal += item_total
 
-            order_items.append({
-                "product": product,
-                "product_name": product.name_uz,
-                "quantity": quantity,
-                "price": product.price,
-                "total": item_total,
-            })
-
-        subtotal = 0
-        order_items = []
-
-        for item in items_data:
-            product_id = item["product"]
-            quantity = item["quantity"]
-
-            try:
-                product = Product.objects.get(
-                    id=product_id,
-                    is_active=True,
-                    is_available=True,
-                )
-            except Product.DoesNotExist:
-                raise serializers.ValidationError(
-                    {"items": f"Product with id {product_id} not found or unavailable."}
-                )
-
-            item_total = product.price * quantity
-            subtotal += item_total
-
-            order_items.append({
-                "product": product,
-                "product_name": product.name_uz,
-                "quantity": quantity,
-                "price": product.price,
-                "total": item_total,
-            })
+            order_items.append(
+                {
+                    "product": product,
+                    "product_name": product.name_uz,
+                    "quantity": quantity,
+                    "price": product.price,
+                    "total": item_total,
+                }
+            )
 
         restaurant_settings = RestaurantSettings.load()
 
@@ -178,6 +164,7 @@ class OrderCreateSerializer(serializers.ModelSerializer):
             )
 
         delivery_price = 0
+
         if validated_data.get("order_type") == Order.OrderType.DELIVERY:
             delivery_price = restaurant_settings.delivery_price
 
@@ -188,7 +175,7 @@ class OrderCreateSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(
                     {
                         "detail": (
-                            f"Dastavka uchun minimal buyurtma summasi "
+                            "Dastavka uchun minimal buyurtma summasi "
                             f"{restaurant_settings.min_order_amount:,} so‘m."
                         )
                     }
@@ -214,7 +201,10 @@ class OrderDetailSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True, read_only=True)
     customer_name = serializers.CharField(source="customer.full_name", read_only=True)
     customer_username = serializers.CharField(source="customer.username", read_only=True)
-    customer_telegram_id = serializers.IntegerField(source="customer.telegram_id", read_only=True)
+    customer_telegram_id = serializers.IntegerField(
+        source="customer.telegram_id",
+        read_only=True,
+    )
 
     class Meta:
         model = Order
