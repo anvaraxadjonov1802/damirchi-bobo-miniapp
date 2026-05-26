@@ -26,13 +26,22 @@ export function initTelegramApp() {
     tg.ready?.();
     tg.expand?.();
 
-    // setHeaderColor / setBackgroundColor old Telegram clients’da warning beradi.
     if (supportsTelegramVersion(tg, "6.1")) {
       tg.setHeaderColor?.(BRAND_DARK);
       tg.setBackgroundColor?.(BRAND_DARK);
     }
 
-    // disableVerticalSwipes faqat yangi Telegram clientlarda ishlaydi.
+    // Yangi Telegram clientlarda Mini App fullscreen bo‘lib ochiladi.
+    if (supportsTelegramVersion(tg, "8.0")) {
+      tg.requestFullscreen?.();
+
+      try {
+        tg.lockOrientation?.();
+      } catch {
+        // Orientation lock hamma clientda ishlamasligi mumkin.
+      }
+    }
+
     if (supportsTelegramVersion(tg, "7.7")) {
       tg.disableVerticalSwipes?.();
     }
