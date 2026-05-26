@@ -1,173 +1,213 @@
-import React, { useState, useEffect } from 'react';
-import { X, Minus, Plus, ShoppingBag } from 'lucide-react';
-import { formatPrice } from '../utils/format';
-import { client } from '../api/client';
-import { hapticFeedback } from '../telegram/telegram';
+import React, { useEffect, useState } from "react";
+import { Minus, Plus, ShoppingBag, Trash2, X } from "lucide-react";
 
-export default function ProductDetailsModal({ product, currentQuantity = 0, onClose, onUpdateQuantity }) {
-  if (!product) return null;
+import { formatPrice } from "../utils/format";
+import { client } from "../api/client";
+import { hapticFeedback } from "../telegram/telegram";
 
+export default function ProductDetailsModal({
+  product,
+  currentQuantity = 0,
+  onClose,
+  onUpdateQuantity,
+}) {
   const [quantity, setQuantity] = useState(currentQuantity || 1);
-  const isAvailable = product.is_available !== false;
 
-  // Initialize local quantity to existing quantity, or 1 if not in cart
   useEffect(() => {
-    setQuantity(currentQuantity || 1);
+    if (product) {
+      setQuantity(currentQuantity || 1);
+    }
   }, [currentQuantity, product]);
 
+  useEffect(() => {
+    if (!product) return;
+
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [product]);
+
+  if (!product) return null;
+
+  const isAvailable = product.is_available !== false;
+  const imageSrc = client.getImageUrl(product.image);
+  const totalPrice = product.price * quantity;
+
   const handleDecrease = () => {
-    if (quantity > 1) {
-      hapticFeedback('light');
-      setQuantity(prev => prev - 1);
-    }
+    if (quantity <= 1) return;
+
+    hapticFeedback("light");
+    setQuantity((prev) => prev - 1);
   };
 
   const handleIncrease = () => {
-    hapticFeedback('light');
-    setQuantity(prev => prev + 1);
+    hapticFeedback("light");
+    setQuantity((prev) => prev + 1);
   };
 
   const handleAddToCart = () => {
-    hapticFeedback('success');
+    if (!isAvailable) return;
+
+    hapticFeedback("success");
+
     if (onUpdateQuantity) {
       onUpdateQuantity(product, quantity);
     }
+
     onClose();
   };
 
   const handleRemoveFromCart = () => {
-    hapticFeedback('light');
+    hapticFeedback("error");
+
     if (onUpdateQuantity) {
       onUpdateQuantity(product, 0);
     }
+
     onClose();
   };
 
   return (
-    <div className="fixed inset-0 bg-black/75 z-50 flex items-end justify-center backdrop-blur-sm animate-fade-in" onClick={onClose}>
+    <div
+      className="fixed inset-0 z-[9997] bg-black/75 backdrop-blur-sm flex items-end justify-center animate-fade-in"
+      onClick={onClose}
+    >
       <div
-        className="bg-[#120E0B] w-full max-w-[480px] rounded-t-[32px] overflow-hidden shadow-2xl border-t border-[#D99A2B]/20 p-6 animate-slide-up flex flex-col max-h-[85vh]"
-        onClick={(e) => e.stopPropagation()}
+        className="w-full max-w-[480px] max-h-[92dvh] bg-[#120E0B] rounded-t-[2rem] border-t border-[#D99A2B]/20 shadow-2xl overflow-hidden flex flex-col animate-map-sheet"
+        onClick={(event) => event.stopPropagation()}
       >
-        {/* Top visual handle */}
-        <div className="mx-auto w-12 h-1 bg-neutral-800 rounded-full mb-4" />
+        <div className="shrink-0 px-4 pt-3 pb-2 bg-[#120E0B]">
+          <div className="mx-auto w-11 h-1 rounded-full bg-[#F5EFE6]/12 mb-3" />
 
-        {/* Content Header */}
-        <div className="flex items-center justify-between mb-4">
-          <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-[#D99A2B] bg-[#D99A2B]/10 px-3 py-1.5 rounded-full">
-            {product.category_name}
-          </span>
-          <button
-            onClick={onClose}
-            className="w-8 h-8 rounded-xl bg-[#1C1511] hover:bg-[#2A201A] flex items-center justify-center text-[#A8988C] transition-colors cursor-pointer"
-            aria-label="Yopish"
-          >
-            <X className="w-4 h-4 text-[#F5EFE6]" />
-          </button>
+          <div className="flex items-center justify-between gap-3">
+            <span className="text-[9px] font-black uppercase tracking-[0.16em] text-[#D99A2B] bg-[#D99A2B]/10 border border-[#D99A2B]/15 px-3 py-1.5 rounded-full truncate">
+              {product.category_name || "Damirchi menyusi"}
+            </span>
+
+            <button
+              type="button"
+              onClick={onClose}
+              className="w-9 h-9 rounded-2xl bg-[#1C1511] border border-[#D99A2B]/15 flex items-center justify-center active:scale-95 transition shrink-0"
+              aria-label="Yopish"
+            >
+              <X className="w-4 h-4 text-[#F5EFE6]" />
+            </button>
+          </div>
         </div>
 
-        {/* Scrollable details container */}
-        <div className="overflow-y-auto no-scrollbar flex-1 pb-4">
-          {/* Large display image */}
-          <div className="aspect-[16/10] w-full rounded-2xl overflow-hidden bg-[#120E0B] border border-[#D99A2B]/15 mb-4">
+        <div className="flex-1 overflow-y-auto no-scrollbar px-4 pb-3">
+          <div className="relative aspect-[16/9] w-full rounded-3xl overflow-hidden bg-[#1C1511] border border-[#D99A2B]/12 shadow-lg">
             <img
-              src={client.getImageUrl(product.image)}
+              src={imageSrc}
               alt={product.name_uz}
-              className="w-full h-full object-cover"
+              loading="lazy"
               referrerPolicy="no-referrer"
+              className="w-full h-full object-cover"
             />
+
+            <div className="absolute inset-0 bg-gradient-to-t from-[#120E0B]/80 via-transparent to-transparent" />
+
+            {!isAvailable && (
+              <div className="absolute inset-0 bg-black/70 backdrop-blur-[2px] flex items-center justify-center">
+                <span className="bg-red-950/90 text-red-200 border border-red-800 text-xs font-black px-4 py-2 rounded-full uppercase tracking-wider">
+                  Mavjud emas
+                </span>
+              </div>
+            )}
           </div>
 
-          <h3 className="font-serif font-black text-xl text-[#F5EFE6] mb-1 leading-snug">
-            {product.name_uz}
-          </h3>
+          <div className="pt-4">
+            <h3 className="font-serif font-black text-xl text-[#F5EFE6] leading-tight">
+              {product.name_uz}
+            </h3>
 
-          <p className="font-serif font-bold text-lg text-[#D99A2B] mb-4">
-            {formatPrice(product.price)}
-          </p>
+            <div className="flex items-center justify-between gap-3 mt-2">
+              <p className="font-serif font-black text-xl text-[#D99A2B] leading-none">
+                {formatPrice(product.price)}
+              </p>
 
-          <p className="text-[#A8988C] text-sm leading-relaxed font-normal bg-[#1C1511] p-4 border border-[#D99A2B]/10 rounded-2xl">
-            {product.description_uz || "Maxsus resept asosida pishirilgan betakror milliy taom."}
-          </p>
+              {currentQuantity > 0 && (
+                <span className="rounded-full bg-[#D99A2B]/10 border border-[#D99A2B]/15 text-[#D99A2B] text-[10px] font-black px-3 py-1 uppercase tracking-wider">
+                  Savatda {currentQuantity} ta
+                </span>
+              )}
+            </div>
+
+            <p className="text-[#A8988C] text-sm leading-snug font-semibold mt-3">
+              {product.description_uz ||
+                "Damirchi oshxonasi uslubida tayyorlangan mazali taom."}
+            </p>
+          </div>
         </div>
 
-        {/* Bottom Actions Frame */}
-        {isAvailable ? (
-          <div className="pt-4 border-t border-[#D99A2B]/15 flex flex-col gap-3">
-            {/* Quantity control panel */}
-            <div className="flex items-center justify-between bg-[#1C1511] p-2 rounded-2xl border border-[#D99A2B]/10">
-              <span className="text-xs font-bold text-[#A8988C] pl-2 uppercase tracking-wide">
-                Soni:
-              </span>
-              <div className="flex items-center bg-[#120E0B] rounded-xl p-1 text-[#F5EFE6] border border-[#D99A2B]/10">
-                <button
-                  type="button"
-                  onClick={handleDecrease}
-                  disabled={quantity <= 1}
-                  className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-neutral-800 disabled:opacity-30 transition-all font-bold cursor-pointer"
-                >
-                  <Minus className="w-4 h-4 text-[#D99A2B]" />
-                </button>
-                <span className="w-10 text-center text-sm font-extrabold text-[#F5EFE6]">
-                  {quantity}
+        <div className="shrink-0 border-t border-[#D99A2B]/15 bg-[#120E0B] px-4 pt-3 pb-4 safe-bottom">
+          {isAvailable ? (
+            <div className="flex flex-col gap-3">
+              <div className="flex items-center justify-between gap-3 bg-[#1C1511] rounded-2xl border border-[#D99A2B]/12 p-2">
+                <span className="text-xs font-black text-[#A8988C] pl-2 uppercase tracking-wide">
+                  Soni
                 </span>
+
+                <div className="flex items-center bg-[#120E0B] rounded-2xl p-1 border border-[#D99A2B]/12">
+                  <button
+                    type="button"
+                    onClick={handleDecrease}
+                    disabled={quantity <= 1}
+                    className="w-9 h-9 flex items-center justify-center rounded-xl text-[#D99A2B] hover:bg-[#1C1511] disabled:opacity-30 active:scale-90 transition"
+                    aria-label="Kamaytirish"
+                  >
+                    <Minus className="w-4 h-4" />
+                  </button>
+
+                  <span className="w-9 text-center text-base font-black text-[#F5EFE6]">
+                    {quantity}
+                  </span>
+
+                  <button
+                    type="button"
+                    onClick={handleIncrease}
+                    className="w-9 h-9 flex items-center justify-center rounded-xl bg-[#D99A2B] text-[#120E0B] active:scale-90 transition"
+                    aria-label="Ko‘paytirish"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex gap-2">
+                {currentQuantity > 0 && (
+                  <button
+                    type="button"
+                    onClick={handleRemoveFromCart}
+                    className="w-12 rounded-2xl border border-red-800/35 bg-red-950/25 text-red-300 flex items-center justify-center active:scale-95 transition"
+                    aria-label="Savatdan olib tashlash"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                )}
+
                 <button
                   type="button"
-                  onClick={handleIncrease}
-                  className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-neutral-800 transition-all font-bold cursor-pointer"
+                  onClick={handleAddToCart}
+                  className="flex-1 py-4 bg-[#D99A2B] hover:bg-[#C98A1F] text-[#120E0B] rounded-2xl text-sm font-black flex items-center justify-center gap-2 transition-all active:scale-[0.98] shadow-lg shadow-[#D99A2B]/10"
                 >
-                  <Plus className="w-4 h-4 text-[#D99A2B]" />
+                  <ShoppingBag className="w-4 h-4 text-[#120E0B]" />
+                  <span>
+                    {currentQuantity > 0 ? "Yangilash" : "Savatga qo‘shish"} ·{" "}
+                    {formatPrice(totalPrice)}
+                  </span>
                 </button>
               </div>
             </div>
-
-            {/* Main Action Buttons */}
-            <div className="flex gap-2">
-              {currentQuantity > 0 && (
-                <button
-                  onClick={handleRemoveFromCart}
-                  className="px-4.5 py-3.5 border border-[#DC2626]/30 bg-[#DC2626]/10 hover:bg-[#DC2626]/20 text-red-400 rounded-2xl text-xs font-bold transition-all active:scale-95 cursor-pointer"
-                >
-                  Olib tashlash
-                </button>
-              )}
-              
-              <button
-                onClick={handleAddToCart}
-                className="flex-1 py-4 bg-[#D99A2B] hover:bg-[#C98A1F] text-[#120E0B] rounded-2xl text-xs font-black flex items-center justify-center gap-2 transition-all active:scale-95 shadow-lg shadow-[#D99A2B]/20 cursor-pointer"
-              >
-                <ShoppingBag className="w-4 h-4 text-[#120E0B]" />
-                <span>
-                  {currentQuantity > 0 ? "Savatni yangilash" : "Savatga qo‘shish"} — {formatPrice(product.price * quantity)}
-                </span>
-              </button>
-            </div>
-          </div>
-        ) : (
-          <div className="pt-4 border-t border-[#D99A2B]/15">
-            <span className="w-full py-4 bg-[#1C1511] text-[#A8988C] border border-[#D99A2B]/5 rounded-2xl text-xs font-bold flex items-center justify-center gap-2">
+          ) : (
+            <div className="w-full py-4 bg-[#1C1511] text-[#A8988C] border border-[#D99A2B]/10 rounded-2xl text-sm font-black flex items-center justify-center">
               Ushbu taom vaqtincha mavjud emas
-            </span>
-          </div>
-        )}
+            </div>
+          )}
+        </div>
       </div>
-
-      <style>{`
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-        @keyframes slideUp {
-          from { transform: translateY(100%); }
-          to { transform: translateY(0); }
-        }
-        .animate-fade-in {
-          animation: fadeIn 0.15s ease-out forwards;
-        }
-        .animate-slide-up {
-          animation: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-      `}</style>
     </div>
   );
 }

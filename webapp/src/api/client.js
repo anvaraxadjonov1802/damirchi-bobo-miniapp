@@ -1,5 +1,5 @@
 /**
- * Damirchi  Django REST API Client
+ * Damirchi Django REST API Client
  * Real API first. Mock data is available only when VITE_USE_MOCK_DATA=true.
  */
 
@@ -86,7 +86,7 @@ const MOCK_PRODUCTS = [
     name_uz: "Mol go‘shti shashlik",
     name_ru: "Шашлык из говядины",
     description_uz:
-      "Sershira mol go‘shti, piyoz va Damirchi  maxsus ziravorlari bilan pishirilgan premium shashlik.",
+      "Sershira mol go‘shti, piyoz va Damirchi maxsus ziravorlari bilan pishirilgan premium shashlik.",
     price: 35000,
     image: FALLBACK_IMAGES.shashlik_beef,
     is_available: true,
@@ -166,7 +166,7 @@ const MOCK_PRODUCTS = [
 ];
 
 const DEFAULT_SETTINGS = {
-  restaurant_name: "Damirchi ",
+  restaurant_name: "Damirchi",
   tagline: "Mazali taomlar, tezkor buyurtma",
   phone: "+998 XX XXX XX XX",
   address: "Toshkent, Sergeli",
@@ -226,10 +226,12 @@ export const client = {
       return { ...DEFAULT_SETTINGS, ...(data || {}) };
     } catch (error) {
       if (USE_MOCK_DATA) return DEFAULT_SETTINGS;
+
       console.warn(
         "Restaurant settings endpoint not available, using safe defaults:",
         error
       );
+
       return DEFAULT_SETTINGS;
     }
   },
@@ -247,6 +249,7 @@ export const client = {
       return [];
     } catch (error) {
       if (USE_MOCK_DATA) return MOCK_CATEGORIES;
+
       throw new Error(
         "Kategoriyalarni yuklab bo‘lmadi. Backend ishlayotganini tekshiring."
       );
@@ -266,6 +269,7 @@ export const client = {
       return [];
     } catch (error) {
       if (USE_MOCK_DATA) return MOCK_PRODUCTS;
+
       throw new Error("Menyuni yuklab bo‘lmadi. Backend API manzilini tekshiring.");
     }
   },
