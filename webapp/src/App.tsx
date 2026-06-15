@@ -4,6 +4,7 @@ import AppHeader from "./components/AppHeader";
 import LoadingScreen from "./components/LoadingScreen";
 import ErrorState from "./components/ErrorState";
 import ProductDetailsModal from "./components/ProductDetailsModal";
+import BottomNavbar from "./components/BottomNavbar";
 
 import MenuPage from "./pages/MenuPage";
 import CartPage from "./pages/CartPage";
@@ -277,6 +278,27 @@ export default function App() {
     );
   }, [cart]);
 
+  const handleBottomNavigate = (screen: string) => {
+    if (screen === "menu") {
+      setCurrentScreen("menu");
+      return;
+    }
+
+    if (screen === "cart") {
+      setCurrentScreen("cart");
+      return;
+    }
+
+    if (screen === "orders") {
+      showToast("Buyurtmalar bo‘limi tez orada qo‘shiladi.", "info");
+      return;
+    }
+
+    if (screen === "profile") {
+      showToast("Profil bo‘limi tez orada qo‘shiladi.", "info");
+    }
+  };
+
   if (isLoading) {
     return <LoadingScreen />;
   }
@@ -300,7 +322,7 @@ export default function App() {
           settings={restaurantSettings}
         />
 
-        <main className="w-full flex-1 pb-4">
+        <main className="w-full flex-1 pb-24">
           {currentScreen === "menu" && (
             <MenuPage
               products={products}
@@ -356,6 +378,14 @@ export default function App() {
             currentQuantity={cart[selectedProduct.id]?.quantity || 0}
             onClose={() => setSelectedProduct(null)}
             onUpdateQuantity={handleUpdateProductQuantity}
+          />
+        )}
+        
+        {currentScreen !== "checkout" && (
+          <BottomNavbar
+            active={currentScreen === "cart" ? "cart" : "menu"}
+            cartCount={totalCartCount}
+            onNavigate={handleBottomNavigate}
           />
         )}
       </div>
