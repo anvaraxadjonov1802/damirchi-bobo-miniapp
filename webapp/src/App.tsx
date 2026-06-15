@@ -21,6 +21,7 @@ import {
 import { useToast } from "./components/ToastProvider";
 
 const CART_STORAGE_KEY = "damirchi_cart_v1";
+const ORDER_TYPE_STORAGE_KEY = "damirchi_order_type_v1";
 
 const DEFAULT_RESTAURANT_SETTINGS = {
   restaurant_name: "Damirchi",
@@ -35,6 +36,27 @@ const DEFAULT_RESTAURANT_SETTINGS = {
   instagram_url: null,
   telegram_url: null,
 };
+
+function loadStoredOrderType() {
+  if (typeof window === "undefined") return "delivery";
+
+  try {
+    const value = window.localStorage.getItem(ORDER_TYPE_STORAGE_KEY);
+    return value === "pickup" ? "pickup" : "delivery";
+  } catch {
+    return "delivery";
+  }
+}
+
+function saveStoredOrderType(orderType: string) {
+  if (typeof window === "undefined") return;
+
+  try {
+    window.localStorage.setItem(ORDER_TYPE_STORAGE_KEY, orderType);
+  } catch {
+    // Ignore storage errors.
+  }
+}
 
 function loadStoredCart() {
   if (typeof window === "undefined") return {};
@@ -89,6 +111,11 @@ export default function App() {
 
   const [submittingOrder, setSubmittingOrder] = useState(false);
   const [completedOrderDetails, setCompletedOrderDetails] = useState<any>(null);
+
+  const [orderType, setOrderType] = useState(() => loadStoredOrderType());
+  useEffect(() => {
+    saveStoredOrderType(orderType);
+  }, [orderType]);
 
   const [isNotificationModalOpen, setIsNotificationModalOpen] = useState(false);
   const [notifications, setNotifications] = useState<any[]>([
@@ -381,6 +408,8 @@ export default function App() {
               onOpenDetails={setSelectedProduct}
               onViewCart={() => setCurrentScreen("cart")}
               settings={restaurantSettings}
+              orderType={orderType}
+              onOrderTypeChange={setOrderType}
             />
           )}
 
@@ -404,6 +433,7 @@ export default function App() {
               isSubmitting={submittingOrder}
               onGoBack={handleGoBack}
               settings={restaurantSettings}
+              initialOrderType={orderType}
             />
           )}
 

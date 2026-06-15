@@ -30,11 +30,12 @@ export default function CheckoutPage({
   isSubmitting,
   onGoBack,
   settings,
+  initialOrderType = "delivery",
 }) {
   const { showToast } = useToast();
   const telegramUser = useMemo(() => getTelegramUser(), []);
 
-  const [orderType, setOrderType] = useState("delivery");
+  const [orderType, setOrderType] = useState(initialOrderType || "delivery");
   const [paymentType, setPaymentType] = useState("cash");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
@@ -144,12 +145,14 @@ export default function CheckoutPage({
     }));
 
     const payload = {
+      
       telegram_init_data: telegramInitData,
       telegram_id: telegramUser.id,
       full_name: telegramUser.fullName || "Telegram foydalanuvchisi",
       username: telegramUser.username || "",
 
       order_type: orderType,
+      delivery_price: orderType === "delivery" ? deliveryPrice : 0,
       payment_type: paymentType,
       phone: trimmedPhone,
       address: orderType === "delivery" ? trimmedAddress : "",
@@ -160,6 +163,7 @@ export default function CheckoutPage({
       items,
       __total_price: subtotal + deliveryPrice,
     };
+    
 
     onSubmitOrder(payload);
   };

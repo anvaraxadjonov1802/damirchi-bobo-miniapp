@@ -32,28 +32,44 @@ const banners = [
   },
 ];
 
-function DeliveryModeBlock() {
+function DeliveryModeBlock({ orderType, onOrderTypeChange }) {
+  const isDelivery = orderType === "delivery";
+
   return (
-    <div className="mx-4 mt-3 flex items-end justify-between gap-3">
-      <div>
-        <p className="text-[12px] font-bold text-[#777777]">Buyurtma turi</p>
+    <div className="mx-4 mt-3 rounded-[20px] border border-[#E7E7E7] bg-white p-2 shadow-sm">
+      <div className="grid grid-cols-2 gap-2">
+        <button
+          type="button"
+          onClick={() => onOrderTypeChange("delivery")}
+          className={`flex h-12 items-center justify-center gap-2 rounded-[16px] text-[14px] font-black transition active:scale-95 ${
+            isDelivery
+              ? "bg-[#8C6CF7] text-white shadow-[0_10px_24px_-16px_rgba(140,108,247,0.9)]"
+              : "bg-[#F6F6F7] text-[#666666]"
+          }`}
+        >
+          <Truck className="h-4 w-4" />
+          Dastavka
+        </button>
 
         <button
           type="button"
-          className="mt-1 inline-flex items-center gap-1 text-[15px] font-black text-[#1F1F1F]"
+          onClick={() => onOrderTypeChange("pickup")}
+          className={`flex h-12 items-center justify-center gap-2 rounded-[16px] text-[14px] font-black transition active:scale-95 ${
+            !isDelivery
+              ? "bg-[#8C6CF7] text-white shadow-[0_10px_24px_-16px_rgba(140,108,247,0.9)]"
+              : "bg-[#F6F6F7] text-[#666666]"
+          }`}
         >
-          Dastavka
-          <ChevronDown className="h-4 w-4" />
+          <PackageCheck className="h-4 w-4" />
+          Olib ketish
         </button>
       </div>
 
-      <button
-        type="button"
-        className="inline-flex h-11 items-center gap-2 rounded-[16px] border border-[#E7E7E7] bg-white px-5 text-[14px] font-black text-[#1F1F1F] shadow-sm active:scale-95"
-      >
-        Dastavka
-        <ChevronDown className="h-4 w-4" />
-      </button>
+      <p className="mt-2 px-2 text-[11px] font-bold leading-snug text-[#777777]">
+        {isDelivery
+          ? "Buyurtma manzilingizga yetkazib beriladi."
+          : "Buyurtmani restorandan o‘zingiz olib ketasiz."}
+      </p>
     </div>
   );
 }
@@ -130,6 +146,8 @@ export default function MenuPage({
   onDecreaseQuantity,
   onOpenDetails,
   settings,
+  orderType = "delivery",
+  onOrderTypeChange,
 }) {
   const filteredProducts = useMemo(() => {
     let list = [...products];
@@ -217,7 +235,10 @@ export default function MenuPage({
 
   return (
     <div className="flex min-h-[100dvh] flex-col bg-[#F6F6F7] pb-28">
-      <DeliveryModeBlock />
+      <DeliveryModeBlock
+        orderType={orderType}
+        onOrderTypeChange={onOrderTypeChange}
+      />
       <PromoCarousel />
 
       {settings?.is_open === false && (
