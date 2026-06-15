@@ -93,7 +93,7 @@ export default function AppHeader({
             <Bell className="h-5 w-5 text-[var(--app-accent-dark)]" />
 
             {notificationCount > 0 && (
-              <span className="absolute -right-1.5 -top-1.5 flex h-5 min-w-5 animate-scale-in items-center justify-center rounded-full border-2 border-[#FFFAF2] bg-[#8C6CF7] px-1 text-[10px] font-black text-white shadow-md">
+              <span className="absolute -right-1.5 -top-1.5 flex h-5 min-w-5 animate-scale-in items-center justify-center rounded-full border-2 border-[#FFFAF2] bg-[#C89438] px-1 text-[10px] font-black text-white shadow-md">
                 {notificationCount}
               </span>
             )}

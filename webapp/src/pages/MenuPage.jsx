@@ -36,14 +36,14 @@ function DeliveryModeBlock({ orderType, onOrderTypeChange }) {
   const isDelivery = orderType === "delivery";
 
   return (
-    <div className="mx-4 mt-3 rounded-[20px] border border-[#E7E7E7] bg-white p-2 shadow-sm">
+    <div className="relative min-h-[112px] overflow-hidden rounded-[18px] bg-gradient-to-br from-[#C89438] to-[#6F4624] px-4 py-4 text-white shadow-[0_16px_34px_-26px_rgba(0,0,0,0.6)]">
       <div className="grid grid-cols-2 gap-2">
         <button
           type="button"
           onClick={() => onOrderTypeChange("delivery")}
           className={`flex h-12 items-center justify-center gap-2 rounded-[16px] text-[14px] font-black transition active:scale-95 ${
             isDelivery
-              ? "bg-[#8C6CF7] text-white shadow-[0_10px_24px_-16px_rgba(140,108,247,0.9)]"
+              ? "bg-gradient-to-br from-[#C89438] to-[#6F4624] text-white shadow-[0_10px_24px_-16px_rgba(140,108,247,0.9)]"
               : "bg-[#F6F6F7] text-[#666666]"
           }`}
         >
@@ -56,7 +56,7 @@ function DeliveryModeBlock({ orderType, onOrderTypeChange }) {
           onClick={() => onOrderTypeChange("pickup")}
           className={`flex h-12 items-center justify-center gap-2 rounded-[16px] text-[14px] font-black transition active:scale-95 ${
             !isDelivery
-              ? "bg-[#8C6CF7] text-white shadow-[0_10px_24px_-16px_rgba(140,108,247,0.9)]"
+              ? "bg-gradient-to-br from-[#C89438] to-[#6F4624] text-white shadow-[0_10px_24px_-16px_rgba(140,108,247,0.9)]"
               : "bg-[#F6F6F7] text-[#666666]"
           }`}
         >
@@ -90,7 +90,7 @@ function PromoCarousel() {
 
   return (
     <section className="mx-4 mt-4">
-      <div className="relative min-h-[112px] overflow-hidden rounded-[18px] bg-[#8068C9] px-4 py-4 text-white shadow-[0_16px_34px_-26px_rgba(0,0,0,0.6)]">
+      <div className="relative min-h-[112px] overflow-hidden rounded-[18px] bg-gradient-to-br from-[#C89438] to-[#6F4624] px-4 py-4 text-white shadow-[0_16px_34px_-26px_rgba(0,0,0,0.6)]">
         <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-white/12" />
         <div className="absolute -bottom-14 right-7 h-36 w-36 rounded-full bg-white/10" />
 
@@ -270,7 +270,7 @@ export default function MenuPage({
                     <button
                       type="button"
                       onClick={handleClearFilters}
-                      className="shrink-0 rounded-full bg-white px-3 py-1.5 text-[10px] font-black text-[#8C6CF7] shadow-sm ring-1 ring-[#E7E7E7]"
+                      className="shrink-0 rounded-full bg-white px-3 py-1.5 text-[10px] font-black text-[#C89438] shadow-sm ring-1 ring-[#E7E7E7]"
                     >
                       Tozalash
                     </button>

@@ -61,7 +61,7 @@ export default function NotificationModal({
                     className="rounded-[22px] border border-[#E7E7E7] bg-[#FAFAFA] p-3.5"
                   >
                     <div className="flex gap-3">
-                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#F0ECFF] text-[#8C6CF7]">
+                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#FFF0D3] text-[#C89438]">
                         <Icon className="h-5 w-5" />
                       </div>
 
@@ -72,7 +72,7 @@ export default function NotificationModal({
                           </h3>
 
                           {!notification.read && (
-                            <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-[#8C6CF7]" />
+                            <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-[#C89438]" />
                           )}
                         </div>
 
@@ -93,7 +93,7 @@ export default function NotificationModal({
             </div>
           ) : (
             <div className="flex min-h-[260px] flex-col items-center justify-center rounded-[24px] border border-dashed border-[#E0E0E0] bg-[#FAFAFA] px-6 text-center">
-              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-[24px] bg-[#F0ECFF] text-[#8C6CF7]">
+              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-[24px] bg-[#FFF0D3] text-[#C89438]">
                 <Bell className="h-7 w-7" />
               </div>
 

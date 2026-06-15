@@ -37,14 +37,14 @@ export default function BottomNavbar({
               <div
                 className={`relative flex h-7 w-7 items-center justify-center rounded-xl transition ${
                   isActive
-                    ? "bg-[#F0ECFF] text-[#8C6CF7]"
+                    ? "bg-[#FFF0D3] text-[#C89438]"
                     : "text-[#666666]"
                 }`}
               >
                 <Icon className="h-5 w-5" />
 
                 {isCart && cartCount > 0 && (
-                  <span className="absolute -right-1.5 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#8C6CF7] px-1 text-[9px] font-black text-white">
+                  <span className="absolute -right-1.5 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#C89438] px-1 text-[9px] font-black text-white">
                     {cartCount}
                   </span>
                 )}
@@ -52,7 +52,7 @@ export default function BottomNavbar({
 
               <span
                 className={`text-[10px] font-bold leading-none ${
-                  isActive ? "text-[#8C6CF7]" : "text-[#666666]"
+                  isActive ? "text-[#C89438]" : "text-[#666666]"
                 }`}
               >
                 {label}
