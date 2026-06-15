@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 
 import AppHeader from "./components/AppHeader";
 import LoadingScreen from "./components/LoadingScreen";
 import ErrorState from "./components/ErrorState";
 import ProductDetailsModal from "./components/ProductDetailsModal";
 import BottomNavbar from "./components/BottomNavbar";
+import NotificationModal from "./components/NotificationModal";
 
 import MenuPage from "./pages/MenuPage";
 import CartPage from "./pages/CartPage";
@@ -88,6 +89,18 @@ export default function App() {
 
   const [submittingOrder, setSubmittingOrder] = useState(false);
   const [completedOrderDetails, setCompletedOrderDetails] = useState<any>(null);
+
+  const [isNotificationModalOpen, setIsNotificationModalOpen] = useState(false);
+  const [notifications, setNotifications] = useState<any[]>([
+    {
+      id: "welcome",
+      type: "info",
+      title: "Damirchiga xush kelibsiz",
+      message: "Buyurtma statuslari va muhim xabarlar shu yerda ko‘rinadi.",
+      time: "Hozir",
+      read: false,
+    },
+  ]);
 
   useEffect(() => {
     initTelegramApp();
@@ -253,6 +266,19 @@ export default function App() {
       hapticFeedback("success");
       showToast("Buyurtma qabul qilindi ✅", "success");
 
+      setNotifications((prev) => [
+        {
+          id: `order-${Date.now()}`,
+          type: "order",
+          title: "Buyurtma qabul qilindi",
+          message:
+            "Buyurtmangiz operatorga yuborildi. Status o‘zgarsa, sizga xabar beramiz.",
+          time: "Hozir",
+          read: false,
+        },
+        ...prev,
+      ]);
+
       setCompletedOrderDetails(response);
       clearStoredCart();
       setCart({});
@@ -277,6 +303,22 @@ export default function App() {
       0
     );
   }, [cart]);
+
+  const unreadNotificationCount = useMemo(() => {
+    return notifications.filter((notification) => !notification.read).length;
+  }, [notifications]);
+
+  const handleOpenNotifications = () => {
+    hapticFeedback("light");
+    setIsNotificationModalOpen(true);
+
+    setNotifications((prev) =>
+      prev.map((notification) => ({
+        ...notification,
+        read: true,
+      }))
+    );
+  };
 
   const handleBottomNavigate = (screen: string) => {
     if (screen === "menu") {
@@ -316,7 +358,8 @@ export default function App() {
       <div className="relative flex min-h-[100dvh] w-full max-w-[480px] flex-col bg-[#F6F6F7] shadow-sm">
         <AppHeader
           cartCount={totalCartCount}
-          onCartClick={() => setCurrentScreen("cart")}
+          notificationCount={unreadNotificationCount}
+          onNotificationClick={handleOpenNotifications}
           currentScreen={currentScreen}
           onBackClick={handleGoBack}
           settings={restaurantSettings}
@@ -380,8 +423,14 @@ export default function App() {
             onUpdateQuantity={handleUpdateProductQuantity}
           />
         )}
-        
-        {currentScreen !== "checkout" && (
+
+        <NotificationModal
+          isOpen={isNotificationModalOpen}
+          onClose={() => setIsNotificationModalOpen(false)}
+          notifications={notifications}
+        />
+
+        {currentScreen !== "checkout" && currentScreen !== "success" && (
           <BottomNavbar
             active={currentScreen === "cart" ? "cart" : "menu"}
             cartCount={totalCartCount}

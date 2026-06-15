@@ -1,8 +1,8 @@
 import React from "react";
 import {
+  Bell,
   ChevronLeft,
   MapPin,
-  ShoppingBag,
   Sparkles,
   Store,
 } from "lucide-react";
@@ -16,6 +16,8 @@ const screenTitles = {
 };
 
 export default function AppHeader({
+  notificationCount = 0,
+  onNotificationClick,
   cartCount = 0,
   onCartClick,
   currentScreen = "menu",
@@ -29,9 +31,9 @@ export default function AppHeader({
   const isMenu = currentScreen === "menu";
   const title = screenTitles[currentScreen] || restaurantName;
 
-  const handleCartClick = () => {
+  const handleNotificationClick = () => {
     hapticFeedback("light");
-    onCartClick?.();
+    onNotificationClick?.();
   };
 
   const handleBackClick = () => {
@@ -102,11 +104,17 @@ export default function AppHeader({
         <div className="flex items-center justify-between gap-3">
           <button
             type="button"
-            onClick={handleBackClick}
-            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[18px] border border-[var(--app-border)] bg-white shadow-[var(--app-shadow-card)] transition-click"
-            aria-label="Orqaga"
+            onClick={handleNotificationClick}
+            className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-[18px] border border-[var(--app-border)] bg-white shadow-[var(--app-shadow-card)] transition-click"
+            aria-label="Bildirishnomalar"
           >
-            <ChevronLeft className="h-5 w-5 text-[var(--app-text)]" />
+            <Bell className="h-5 w-5 text-[var(--app-accent-dark)]" />
+
+            {notificationCount > 0 && (
+              <span className="absolute -right-1.5 -top-1.5 flex h-5 min-w-5 animate-scale-in items-center justify-center rounded-full border-2 border-[#FFFAF2] bg-[#8C6CF7] px-1 text-[10px] font-black text-white shadow-md">
+                {notificationCount}
+              </span>
+            )}
           </button>
 
           <div className="min-w-0 flex-1 text-center">
