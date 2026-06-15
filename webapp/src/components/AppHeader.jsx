@@ -16,10 +16,9 @@ const screenTitles = {
 };
 
 export default function AppHeader({
+  cartCount = 0,
   notificationCount = 0,
   onNotificationClick,
-  cartCount = 0,
-  onCartClick,
   currentScreen = "menu",
   onBackClick,
   settings,
@@ -87,23 +86,6 @@ export default function AppHeader({
 
           <button
             type="button"
-            onClick={handleCartClick}
-            className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-[18px] border border-[var(--app-border)] bg-white shadow-[var(--app-shadow-card)] transition-click"
-            aria-label="Savatni ochish"
-          >
-            <ShoppingBag className="h-5 w-5 text-[var(--app-accent-dark)]" />
-
-            {cartCount > 0 && (
-              <span className="absolute -right-1.5 -top-1.5 flex h-5 min-w-5 animate-scale-in items-center justify-center rounded-full border-2 border-[#FFFAF2] bg-[var(--app-accent)] px-1 text-[10px] font-black text-white shadow-md">
-                {cartCount}
-              </span>
-            )}
-          </button>
-        </div>
-      ) : (
-        <div className="flex items-center justify-between gap-3">
-          <button
-            type="button"
             onClick={handleNotificationClick}
             className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-[18px] border border-[var(--app-border)] bg-white shadow-[var(--app-shadow-card)] transition-click"
             aria-label="Bildirishnomalar"
@@ -115,6 +97,17 @@ export default function AppHeader({
                 {notificationCount}
               </span>
             )}
+          </button>
+        </div>
+      ) : (
+        <div className="flex items-center justify-between gap-3">
+          <button
+            type="button"
+            onClick={handleBackClick}
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[18px] border border-[var(--app-border)] bg-white shadow-[var(--app-shadow-card)] transition-click"
+            aria-label="Orqaga"
+          >
+            <ChevronLeft className="h-5 w-5 text-[var(--app-text)]" />
           </button>
 
           <div className="min-w-0 flex-1 text-center">
