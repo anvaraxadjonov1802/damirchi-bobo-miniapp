@@ -1,61 +1,49 @@
-from aiogram.types import (
-    InlineKeyboardButton,
-    InlineKeyboardMarkup,
-    KeyboardButton,
-    ReplyKeyboardMarkup,
-    WebAppInfo,
-)
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
 
 
-def main_menu_keyboard(webapp_url: str) -> ReplyKeyboardMarkup:
-    return ReplyKeyboardMarkup(
-        keyboard=[
-            [
-                KeyboardButton(
-                    text="🍽 Menyuni ochish",
-                    web_app=WebAppInfo(url=webapp_url),
-                )
-            ],
-            [
-                KeyboardButton(text="📞 Telefon yuborish", request_contact=True),
-            ],
-        ],
-        resize_keyboard=True,
-    )
-
-
-def order_status_keyboard(order_id: int) -> InlineKeyboardMarkup:
+def main_menu_keyboard(webapp_url: str) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(
         inline_keyboard=[
             [
                 InlineKeyboardButton(
-                    text="✅ Qabul qilindi",
-                    callback_data=f"order_status:{order_id}:accepted",
+                    text='Menyuni ochish',
+                    web_app=WebAppInfo(url=webapp_url),
                 )
             ],
             [
+                InlineKeyboardButton(text='Aloqa', callback_data='bot_info:contact'),
+                InlineKeyboardButton(text='Yordam', callback_data='bot_info:help'),
+            ],
+            [
+                InlineKeyboardButton(text='Damirchi haqida', callback_data='bot_info:about'),
+            ],
+        ]
+    )
+
+
+def back_to_menu_keyboard(webapp_url: str) -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
                 InlineKeyboardButton(
-                    text="👨‍🍳 Tayyorlanmoqda",
-                    callback_data=f"order_status:{order_id}:preparing",
+                    text='Menyuni ochish',
+                    web_app=WebAppInfo(url=webapp_url),
                 )
             ],
             [
-                InlineKeyboardButton(
-                    text="🚚 Yo‘lda",
-                    callback_data=f"order_status:{order_id}:on_way",
-                )
+                InlineKeyboardButton(text='Asosiy sahifa', callback_data='bot_info:home'),
             ],
-            [
-                InlineKeyboardButton(
-                    text="✅ Yetkazildi",
-                    callback_data=f"order_status:{order_id}:completed",
-                )
-            ],
-            [
-                InlineKeyboardButton(
-                    text="❌ Bekor qilindi",
-                    callback_data=f"order_status:{order_id}:cancelled",
-                )
-            ],
+        ]
+    )
+
+
+def order_status_keyboard(order_id: int | str) -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(text='Qabul qilish', callback_data=f'order_status:{order_id}:accepted')],
+            [InlineKeyboardButton(text='Tayyorlanmoqda', callback_data=f'order_status:{order_id}:preparing')],
+            [InlineKeyboardButton(text='Yo‘lda', callback_data=f'order_status:{order_id}:on_way')],
+            [InlineKeyboardButton(text='Yetkazildi', callback_data=f'order_status:{order_id}:completed')],
+            [InlineKeyboardButton(text='Bekor qilish', callback_data=f'order_status:{order_id}:cancelled')],
         ]
     )
