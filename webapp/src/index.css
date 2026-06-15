@@ -5,34 +5,56 @@
   --font-serif: "Playfair Display", Georgia, serif;
   --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
 
-  --color-brand-bg: #f6f6f7;
-  --color-brand-dark: #221816;
+  --color-brand-bg: #f7f3eb;
+  --color-brand-dark: #241812;
   --color-brand-card: #ffffff;
   --color-brand-gold: #c89438;
-  --color-brand-gold-muted: #b88a45;
+  --color-brand-gold-muted: #b98a45;
   --color-brand-gold-dark: #a97824;
-  --color-brand-brown: #8a5a2b;
-  --color-brand-muted: #78716c;
+  --color-brand-brown: #6f4624;
+  --color-brand-muted: #776b60;
 }
+
+/* =========================
+   Damirchi / MaxWay-like base
+========================= */
 
 :root {
   color-scheme: light;
-  --damirchi-bg: #f6f6f7;
-  --damirchi-card: #ffffff;
-  --damirchi-soft: #f1eee9;
-  --damirchi-text: #221816;
-  --damirchi-muted: #78716c;
-  --damirchi-border: #e8e2da;
-  --damirchi-primary: #c89438;
-  --damirchi-primary-dark: #a97824;
-  --damirchi-radius: 18px;
+
+  --app-bg: #f7f3eb;
+  --app-bg-soft: #fffaf2;
+  --app-card: #ffffff;
+  --app-card-soft: #fff7eb;
+
+  --app-text: #241812;
+  --app-text-soft: #4b3628;
+  --app-muted: #776b60;
+
+  --app-border: #eadcc7;
+  --app-border-soft: rgba(234, 220, 199, 0.72);
+
+  --app-accent: #c89438;
+  --app-accent-dark: #a97824;
+  --app-accent-soft: #fff0d3;
+
+  --app-danger: #dc2626;
+  --app-success: #16a34a;
+
+  --app-radius-sm: 14px;
+  --app-radius-md: 18px;
+  --app-radius-lg: 24px;
+  --app-radius-xl: 30px;
+
+  --app-shadow-card: 0 12px 30px -24px rgba(36, 24, 18, 0.38);
+  --app-shadow-button: 0 10px 24px -18px rgba(169, 120, 36, 0.8);
 }
 
 html,
 body,
 #root {
   min-height: 100%;
-  background: var(--damirchi-bg);
+  background: var(--app-bg);
 }
 
 html {
@@ -45,8 +67,10 @@ body {
   min-width: 320px;
   min-height: 100dvh;
   font-family: var(--font-sans);
-  background: var(--damirchi-bg);
-  color: var(--damirchi-text);
+  color: var(--app-text);
+  background:
+    radial-gradient(circle at top left, rgba(200, 148, 56, 0.12), transparent 320px),
+    linear-gradient(180deg, #fffaf2 0%, #f7f3eb 42%, #f4eadb 100%);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-tap-highlight-color: transparent;
@@ -56,6 +80,7 @@ body {
 
 #root {
   min-height: 100dvh;
+  background: transparent;
 }
 
 * {
@@ -72,18 +97,19 @@ select {
 
 button {
   touch-action: manipulation;
+  cursor: pointer;
 }
 
 input,
 textarea,
 select {
   font-size: 16px;
-  color: var(--damirchi-text);
+  color: var(--app-text);
 }
 
 input::placeholder,
 textarea::placeholder {
-  color: rgba(120, 113, 108, 0.62);
+  color: rgba(119, 107, 96, 0.7);
 }
 
 .app-no-select,
@@ -97,12 +123,18 @@ textarea {
   user-select: text;
 }
 
+/* =========================
+   Mobile shell
+========================= */
+
 .mobile-shell {
   width: 100%;
   max-width: 480px;
   min-height: 100dvh;
   margin: 0 auto;
-  background: var(--damirchi-bg);
+  background:
+    radial-gradient(circle at top right, rgba(200, 148, 56, 0.1), transparent 220px),
+    linear-gradient(180deg, #fffaf2 0%, #f7f3eb 46%, #f4eadb 100%);
 }
 
 .safe-top {
@@ -110,29 +142,98 @@ textarea {
 }
 
 .safe-bottom {
-  padding-bottom: max(1.1rem, env(safe-area-inset-bottom));
+  padding-bottom: max(1.25rem, env(safe-area-inset-bottom));
 }
 
 .bottom-safe-space {
-  padding-bottom: calc(6rem + env(safe-area-inset-bottom));
+  padding-bottom: calc(6.5rem + env(safe-area-inset-bottom));
 }
 
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
+/* =========================
+   MaxWay-like reusable UI
+========================= */
+
+.maxway-page {
+  min-height: 100dvh;
+  background: var(--app-bg);
 }
 
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+.maxway-card {
+  background: var(--app-card);
+  border: 1px solid var(--app-border-soft);
+  border-radius: var(--app-radius-lg);
+  box-shadow: var(--app-shadow-card);
 }
+
+.maxway-soft-card {
+  background: var(--app-card-soft);
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius-lg);
+}
+
+.maxway-section-title {
+  color: var(--app-text);
+  font-size: 20px;
+  line-height: 1.1;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+}
+
+.maxway-section-subtitle {
+  color: var(--app-muted);
+  font-size: 12px;
+  line-height: 1.25;
+  font-weight: 700;
+}
+
+.maxway-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  border-radius: 999px;
+  border: 1px solid var(--app-border);
+  background: #ffffff;
+  color: var(--app-text);
+  font-size: 12px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.maxway-primary-button {
+  border-radius: 18px;
+  background: var(--app-accent);
+  color: #ffffff;
+  font-weight: 900;
+  box-shadow: var(--app-shadow-button);
+  transition: transform 0.12s ease, opacity 0.12s ease, box-shadow 0.16s ease;
+}
+
+.maxway-primary-button:active {
+  transform: scale(0.97);
+  opacity: 0.92;
+}
+
+.maxway-secondary-button {
+  border-radius: 18px;
+  border: 1px solid var(--app-border);
+  background: #ffffff;
+  color: var(--app-text);
+  font-weight: 900;
+  transition: transform 0.12s ease, opacity 0.12s ease;
+}
+
+.maxway-secondary-button:active {
+  transform: scale(0.97);
+  opacity: 0.92;
+}
+
+/* =========================
+   Legacy compatibility
+========================= */
 
 .font-title {
   font-family: var(--font-serif);
-}
-
-::selection {
-  background: rgba(200, 148, 56, 0.22);
-  color: var(--damirchi-text);
 }
 
 .transition-click {
@@ -145,55 +246,93 @@ textarea {
 }
 
 .premium-card {
-  background: #ffffff;
-  border: 1px solid var(--damirchi-border);
-  box-shadow: 0 8px 26px -20px rgba(34, 24, 22, 0.5);
+  background-color: var(--app-card);
+  border: 1px solid var(--app-border-soft);
+  box-shadow: var(--app-shadow-card);
 }
 
 .premium-shadow {
-  box-shadow: 0 14px 34px -26px rgba(34, 24, 22, 0.45);
+  box-shadow: 0 18px 40px -26px rgba(36, 24, 18, 0.42);
 }
 
 .bg-brand-bg {
-  background-color: var(--damirchi-bg) !important;
+  background-color: var(--app-bg) !important;
 }
 
 .bg-brand-card {
-  background-color: #ffffff !important;
+  background-color: var(--app-card) !important;
 }
 
 .text-brand-dark {
-  color: var(--damirchi-text) !important;
+  color: var(--app-text) !important;
 }
 
 .text-brand-muted {
-  color: var(--damirchi-muted) !important;
+  color: var(--app-muted) !important;
 }
 
 .border-brand-brown {
-  border-color: rgba(200, 148, 56, 0.22) !important;
+  border-color: rgba(111, 70, 36, 0.2) !important;
 }
+
+::selection {
+  background: rgba(200, 148, 56, 0.24);
+  color: var(--app-text);
+}
+
+/* =========================
+   Forms
+========================= */
 
 input,
 textarea,
 select {
   background-color: #ffffff;
-  border-color: var(--damirchi-border);
+  border-color: var(--app-border);
 }
 
 input:focus,
 textarea:focus,
 select:focus {
   outline: none;
-  border-color: rgba(200, 148, 56, 0.72);
+  border-color: rgba(200, 148, 56, 0.78);
   box-shadow: 0 0 0 4px rgba(200, 148, 56, 0.14);
 }
+
+.checkout-readable input,
+.checkout-readable textarea,
+.checkout-readable button {
+  font-size: 1rem;
+}
+
+.checkout-readable input,
+.checkout-readable textarea {
+  line-height: 1.45;
+}
+
+/* =========================
+   Scrollbar
+========================= */
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* =========================
+   Animations
+========================= */
 
 @keyframes fadeIn {
   from {
     opacity: 0;
     transform: translateY(6px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -201,33 +340,105 @@ select:focus {
 }
 
 @keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  20% { transform: translateX(-4px); }
-  40% { transform: translateX(4px); }
-  60% { transform: translateX(-3px); }
-  80% { transform: translateX(3px); }
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  20% {
+    transform: translateX(-4px);
+  }
+
+  40% {
+    transform: translateX(4px);
+  }
+
+  60% {
+    transform: translateX(-3px);
+  }
+
+  80% {
+    transform: translateX(3px);
+  }
 }
 
 @keyframes scaleIn {
-  from { opacity: 0; transform: scale(0.75); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.75);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 @keyframes toastDown {
-  from { opacity: 0; transform: translateY(-18px) scale(0.98); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+  from {
+    opacity: 0;
+    transform: translateY(-18px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 @keyframes mapSheet {
-  from { transform: translateY(24px); opacity: 0.4; }
-  to { transform: translateY(0); opacity: 1; }
+  from {
+    transform: translateY(24px);
+    opacity: 0.4;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
-.animate-fade-in { animation: fadeIn 0.22s ease-out both; }
-.animate-shake { animation: shake 0.28s ease-in-out both; }
-.animate-scale-in { animation: scaleIn 0.18s ease-out both; }
-.animate-toast-down { animation: toastDown 0.22s ease-out both; }
-.animate-map-sheet { animation: mapSheet 0.2s ease-out both; }
+@keyframes loadingBar {
+  0% {
+    transform: translateX(-120%);
+  }
+
+  50% {
+    transform: translateX(45%);
+  }
+
+  100% {
+    transform: translateX(130%);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.22s ease-out both;
+}
+
+.animate-shake {
+  animation: shake 0.28s ease-in-out both;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.18s ease-out both;
+}
+
+.animate-toast-down {
+  animation: toastDown 0.22s ease-out both;
+}
+
+.animate-map-sheet {
+  animation: mapSheet 0.2s ease-out both;
+}
+
+.animate-loading-bar {
+  animation: loadingBar 1.35s infinite ease-in-out;
+}
+
+/* =========================
+   Text utilities
+========================= */
 
 .line-clamp-2 {
   display: -webkit-box;
@@ -243,27 +454,27 @@ select:focus {
   overflow: hidden;
 }
 
-.checkout-readable input,
-.checkout-readable textarea,
-.checkout-readable button { font-size: 1rem; }
-.checkout-readable input,
-.checkout-readable textarea { line-height: 1.45; }
+/* =========================
+   Leaflet / Map Picker
+========================= */
 
 .leaflet-container {
   width: 100%;
   height: 100%;
   font-family: var(--font-sans);
-  background: #f1eee9;
+  background: #f4eadb;
   z-index: 1;
 }
 
-.leaflet-control-container { font-family: var(--font-sans); }
+.leaflet-control-container {
+  font-family: var(--font-sans);
+}
 
 .leaflet-control-zoom {
-  border: 1px solid rgba(200, 148, 56, 0.22) !important;
+  border: 1px solid rgba(200, 148, 56, 0.24) !important;
   border-radius: 1rem !important;
   overflow: hidden;
-  box-shadow: 0 12px 30px rgba(34, 24, 22, 0.14) !important;
+  box-shadow: 0 12px 30px rgba(36, 24, 18, 0.14) !important;
 }
 
 .leaflet-control-zoom a {
@@ -271,29 +482,34 @@ select:focus {
   height: 38px !important;
   line-height: 38px !important;
   background: #ffffff !important;
-  color: var(--damirchi-text) !important;
-  border-color: rgba(200, 148, 56, 0.18) !important;
+  color: var(--app-text) !important;
+  border-color: rgba(200, 148, 56, 0.22) !important;
   font-weight: 900 !important;
 }
 
 .leaflet-control-attribution {
-  background: rgba(255, 255, 255, 0.86) !important;
-  color: rgba(34, 24, 22, 0.58) !important;
+  background: rgba(255, 250, 242, 0.84) !important;
+  color: rgba(36, 24, 18, 0.58) !important;
   font-size: 10px !important;
 }
 
-.leaflet-control-attribution a { color: rgba(169, 120, 36, 0.92) !important; }
+.leaflet-control-attribution a {
+  color: rgba(169, 120, 36, 0.92) !important;
+}
 
-.damirchi-map-marker { background: transparent; border: 0; }
+.damirchi-map-marker {
+  background: transparent;
+  border: 0;
+}
 
 .damirchi-map-pin {
   width: 42px;
   height: 42px;
   border-radius: 50% 50% 50% 0;
   transform: rotate(-45deg);
-  background: var(--damirchi-primary);
+  background: var(--app-accent);
   border: 3px solid #ffffff;
-  box-shadow: 0 10px 30px rgba(34, 24, 22, 0.28);
+  box-shadow: 0 10px 30px rgba(36, 24, 18, 0.28);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -309,18 +525,22 @@ select:focus {
   position: absolute;
 }
 
-.map-modal-open { overflow: hidden; }
+.map-modal-open {
+  overflow: hidden;
+}
+
+/* =========================
+   Small screens
+========================= */
 
 @media (max-width: 380px) {
   .checkout-readable input,
   .checkout-readable textarea,
-  .checkout-readable button { font-size: 0.95rem; }
-}
+  .checkout-readable button {
+    font-size: 0.95rem;
+  }
 
-@keyframes loadingBar {
-  0% { transform: translateX(-120%); }
-  50% { transform: translateX(45%); }
-  100% { transform: translateX(130%); }
+  .maxway-section-title {
+    font-size: 18px;
+  }
 }
-
-.animate-loading-bar { animation: loadingBar 1.35s infinite ease-in-out; }

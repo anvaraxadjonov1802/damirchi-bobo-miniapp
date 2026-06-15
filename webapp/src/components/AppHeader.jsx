@@ -1,107 +1,127 @@
 import React from "react";
-import { Bell, ChevronLeft, Search, ShoppingBag } from "lucide-react";
+import {
+  ChevronLeft,
+  MapPin,
+  ShoppingBag,
+  Sparkles,
+  Store,
+} from "lucide-react";
+
 import { hapticFeedback } from "../telegram/telegram";
 
-const titles = {
-  cart: "Корзина",
+const screenTitles = {
+  cart: "Savat",
   checkout: "Buyurtma",
   success: "Qabul qilindi",
 };
 
 export default function AppHeader({
-  cartCount,
+  cartCount = 0,
   onCartClick,
-  currentScreen,
+  currentScreen = "menu",
   onBackClick,
   settings,
 }) {
-  const triggerCart = () => {
+  const restaurantName = settings?.restaurant_name || "Damirchi";
+  const address = settings?.address || "Toshkent";
+  const isOpen = settings?.is_open !== false;
+
+  const isMenu = currentScreen === "menu";
+  const title = screenTitles[currentScreen] || restaurantName;
+
+  const handleCartClick = () => {
     hapticFeedback("light");
     onCartClick?.();
   };
 
-  const triggerBack = () => {
+  const handleBackClick = () => {
     hapticFeedback("light");
     onBackClick?.();
   };
 
-  const restaurantName = settings?.restaurant_name || "Damirchi";
-  const address = settings?.address || "Manzil tanlanmagan";
-  const showBackButton = currentScreen !== "menu";
-
   return (
-    <header className="sticky top-0 z-40 border-b border-[#E8E2DA] bg-white/95 px-4 py-2.5 safe-top backdrop-blur-xl">
-      <div className="flex items-center justify-between gap-3">
-        <div className="flex min-w-0 items-center gap-2.5">
-          {showBackButton ? (
-            <button
-              type="button"
-              onClick={triggerBack}
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#F2F0ED] text-[#221816] active:scale-90"
-              aria-label="Orqaga"
-            >
-              <ChevronLeft className="h-5 w-5" />
-            </button>
-          ) : (
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#C89438] text-sm font-black text-white shadow-sm">
-              D
-            </div>
-          )}
-
-          <div className="min-w-0">
-            <div className="flex items-center gap-1.5">
-              <h1 className="truncate text-[15px] font-extrabold leading-tight text-[#221816]">
-                {showBackButton ? titles[currentScreen] || restaurantName : restaurantName}
-              </h1>
-              {!showBackButton && <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />}
+    <header className="sticky top-0 z-40 safe-top border-b border-[var(--app-border-soft)] bg-[rgba(255,250,242,0.92)] px-4 pb-3 pt-3 backdrop-blur-xl">
+      {isMenu ? (
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex min-w-0 items-center gap-3">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[18px] bg-[var(--app-accent)] text-white shadow-[var(--app-shadow-button)]">
+              <Store className="h-5 w-5" />
             </div>
 
-            {!showBackButton ? (
-              <p className="mt-0.5 max-w-[205px] truncate text-[11px] font-semibold text-[#78716C]">
-                {address}
-              </p>
-            ) : (
-              <p className="mt-0.5 text-[11px] font-semibold text-[#78716C]">
-                Damirchi
-              </p>
-            )}
-          </div>
-        </div>
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5">
+                <h1 className="truncate text-[20px] font-black leading-none tracking-[-0.04em] text-[var(--app-text)]">
+                  {restaurantName}
+                </h1>
 
-        {currentScreen === "menu" ? (
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              className="flex h-9 w-9 items-center justify-center rounded-full bg-[#F2F0ED] text-[#221816] active:scale-90"
-              aria-label="Qidirish"
-            >
-              <Search className="h-4.5 w-4.5" />
-            </button>
+                <Sparkles className="h-3.5 w-3.5 shrink-0 text-[var(--app-accent)]" />
+              </div>
 
-            <button
-              type="button"
-              className="flex h-9 w-9 items-center justify-center rounded-full bg-[#F2F0ED] text-[#221816] active:scale-90"
-              aria-label="Bildirishnomalar"
-            >
-              <Bell className="h-4.5 w-4.5" />
-            </button>
+              <div className="mt-1.5 flex min-w-0 items-center gap-1.5">
+                <span
+                  className={`h-2 w-2 shrink-0 rounded-full ${
+                    isOpen ? "bg-emerald-500" : "bg-red-500"
+                  }`}
+                />
 
-            <button
-              type="button"
-              onClick={triggerCart}
-              className="relative flex h-9 w-9 items-center justify-center rounded-full bg-[#F2F0ED] text-[#221816] active:scale-90"
-              aria-label="Savat"
-            >
-              <ShoppingBag className="h-4.5 w-4.5" />
-              {cartCount > 0 && (
-                <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#C89438] px-1 text-[10px] font-black text-white ring-2 ring-white">
-                  {cartCount}
+                <span
+                  className={`shrink-0 text-[10px] font-black uppercase tracking-[0.14em] ${
+                    isOpen ? "text-emerald-700" : "text-red-600"
+                  }`}
+                >
+                  {isOpen ? "Ochiq" : "Yopiq"}
                 </span>
-              )}
-            </button>
+
+                <span className="h-1 w-1 shrink-0 rounded-full bg-[var(--app-border)]" />
+
+                <MapPin className="h-3.5 w-3.5 shrink-0 text-[var(--app-accent-dark)]" />
+
+                <span className="truncate text-[11px] font-bold text-[var(--app-muted)]">
+                  {address}
+                </span>
+              </div>
+            </div>
           </div>
-        ) : null}
-      </div>
+
+          <button
+            type="button"
+            onClick={handleCartClick}
+            className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-[18px] border border-[var(--app-border)] bg-white shadow-[var(--app-shadow-card)] transition-click"
+            aria-label="Savatni ochish"
+          >
+            <ShoppingBag className="h-5 w-5 text-[var(--app-accent-dark)]" />
+
+            {cartCount > 0 && (
+              <span className="absolute -right-1.5 -top-1.5 flex h-5 min-w-5 animate-scale-in items-center justify-center rounded-full border-2 border-[#FFFAF2] bg-[var(--app-accent)] px-1 text-[10px] font-black text-white shadow-md">
+                {cartCount}
+              </span>
+            )}
+          </button>
+        </div>
+      ) : (
+        <div className="flex items-center justify-between gap-3">
+          <button
+            type="button"
+            onClick={handleBackClick}
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[18px] border border-[var(--app-border)] bg-white shadow-[var(--app-shadow-card)] transition-click"
+            aria-label="Orqaga"
+          >
+            <ChevronLeft className="h-5 w-5 text-[var(--app-text)]" />
+          </button>
+
+          <div className="min-w-0 flex-1 text-center">
+            <h1 className="truncate text-[19px] font-black leading-tight tracking-[-0.035em] text-[var(--app-text)]">
+              {title}
+            </h1>
+
+            <p className="mt-0.5 text-[10px] font-black uppercase tracking-[0.16em] text-[var(--app-muted)]">
+              Damirchi
+            </p>
+          </div>
+
+          <div className="h-11 w-11 shrink-0" />
+        </div>
+      )}
     </header>
   );
 }
