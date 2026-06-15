@@ -90,7 +90,7 @@ export default function MenuPage({
       </div>
 
       {settings?.is_open === false && (
-        <div className="mx-4 mt-3 rounded-2xl border border-red-700/35 bg-red-950/30 px-4 py-3 text-sm font-bold leading-snug text-red-200">
+        <div className="mx-4 mt-3 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-bold leading-snug text-red-600">
           Restoran hozir yopiq. Menyuni ko‘rish mumkin, buyurtma vaqtincha
           qabul qilinmaydi.
         </div>
@@ -116,16 +116,16 @@ export default function MenuPage({
       <div className="px-4 mt-4">
         <div className="flex items-end justify-between gap-3 mb-3">
           <div className="min-w-0">
-            <p className="text-[10px] font-black text-[#D99A2B] uppercase tracking-[0.18em] mb-1">
+            <p className="text-[10px] font-black text-[#A97824] uppercase tracking-[0.18em] mb-1">
               Damirchi katalogi
             </p>
 
-            <h3 className="font-serif font-black text-[#F5EFE6] text-lg leading-tight truncate">
+            <h3 className="font-serif font-black text-[#2C211A] text-lg leading-tight truncate">
               {activeCategoryName}
             </h3>
           </div>
 
-          <span className="shrink-0 rounded-full bg-[#1C1511] border border-[#D99A2B]/12 px-3 py-1.5 text-[10px] text-[#D99A2B] font-black uppercase tracking-wider">
+          <span className="shrink-0 rounded-full bg-white border border-[#E9DCC7] px-3 py-1.5 text-[10px] text-[#A97824] font-black uppercase tracking-wider">
             {filteredProducts.length} ta
           </span>
         </div>

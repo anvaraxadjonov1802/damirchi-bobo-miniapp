@@ -165,26 +165,26 @@ export default function CheckoutPage({
   };
 
   return (
-    <div className="px-4 py-3 pb-28 animate-fade-in text-[#F5EFE6] checkout-readable">
+    <div className="px-4 py-3 pb-28 animate-fade-in text-[#2C211A] checkout-readable">
       <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-        <div className="rounded-3xl bg-[#1C1511] border border-[#D99A2B]/15 p-4 shadow-lg relative overflow-hidden">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_0%_0%,rgba(217,154,43,0.14),transparent_38%)]" />
+        <div className="rounded-3xl bg-white border border-[#E9DCC7] p-4 shadow-lg relative overflow-hidden">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_0%_0%,rgba(200,148,56,0.14),transparent_38%)]" />
 
           <div className="relative flex items-center justify-between gap-3">
             <div>
-              <h2 className="font-serif font-black text-xl text-[#F5EFE6] leading-tight">
+              <h2 className="font-serif font-black text-xl text-[#2C211A] leading-tight">
                 Buyurtma
               </h2>
-              <p className="text-sm text-[#A8988C] font-semibold mt-1">
+              <p className="text-sm text-[#776B60] font-semibold mt-1">
                 {totalItemCount} ta mahsulot
               </p>
             </div>
 
-            <div className="rounded-2xl bg-[#120E0B] border border-[#D99A2B]/15 px-3 py-2 text-right">
-              <p className="text-xs text-[#A8988C] font-bold">Holat</p>
+            <div className="rounded-2xl bg-[#FFFAF2] border border-[#E9DCC7] px-3 py-2 text-right">
+              <p className="text-xs text-[#776B60] font-bold">Holat</p>
               <p
                 className={`text-sm font-black ${
-                  isOpen ? "text-emerald-300" : "text-red-300"
+                  isOpen ? "text-emerald-700" : "text-red-600"
                 }`}
               >
                 {isOpen ? "Ochiq" : "Yopiq"}
@@ -194,7 +194,7 @@ export default function CheckoutPage({
         </div>
 
         {!isOpen && (
-          <div className="bg-red-950/45 text-red-200 border border-red-800/45 rounded-2xl p-3 text-sm font-bold">
+          <div className="bg-red-100 text-red-600 border border-red-500/45 rounded-2xl p-3 text-sm font-bold">
             Restoran hozir yopiq.
           </div>
         )}
@@ -219,7 +219,7 @@ export default function CheckoutPage({
           </label>
 
           <div className="relative flex items-center">
-            <Phone className="absolute left-4 w-5 h-5 text-[#A8988C] opacity-80" />
+            <Phone className="absolute left-4 w-5 h-5 text-[#776B60] opacity-80" />
             <input
               id="phone-input"
               type="tel"
@@ -228,7 +228,7 @@ export default function CheckoutPage({
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               placeholder="+998 90 123 45 67"
-              className="w-full pl-12 pr-4 py-3.5 bg-[#120E0B] border border-[#D99A2B]/20 rounded-2xl text-base text-[#F5EFE6] focus:outline-none focus:ring-2 focus:ring-[#D99A2B]/45 focus:border-[#D99A2B] placeholder-[#A8988C]/50 font-semibold"
+              className="w-full pl-12 pr-4 py-3.5 bg-[#FFFAF2] border border-[#E9DCC7] rounded-2xl text-base text-[#2C211A] focus:outline-none focus:ring-2 focus:ring-[#C89438]/45 focus:border-[#C89438] placeholder-[#776B60]/50 font-semibold"
             />
           </div>
 
@@ -244,7 +244,7 @@ export default function CheckoutPage({
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
                 placeholder="Uy, ko‘cha, mo‘ljal..."
-                className="w-full px-4 py-3.5 bg-[#120E0B] border border-[#D99A2B]/20 rounded-2xl text-base text-[#F5EFE6] focus:outline-none focus:ring-2 focus:ring-[#D99A2B]/45 focus:border-[#D99A2B] placeholder-[#A8988C]/50 font-semibold"
+                className="w-full px-4 py-3.5 bg-[#FFFAF2] border border-[#E9DCC7] rounded-2xl text-base text-[#2C211A] focus:outline-none focus:ring-2 focus:ring-[#C89438]/45 focus:border-[#C89438] placeholder-[#776B60]/50 font-semibold"
               />
 
               <button
@@ -255,8 +255,8 @@ export default function CheckoutPage({
                 }}
                 className={`w-full py-3.5 px-4 rounded-2xl font-black text-base flex items-center justify-center gap-2 transition-all border active:scale-[0.98] ${
                   hasLocation
-                    ? "bg-emerald-950/25 border-emerald-700/60 text-emerald-300"
-                    : "bg-[#120E0B] border-[#D99A2B]/25 text-[#D99A2B]"
+                    ? "bg-emerald-950/25 border-emerald-700/60 text-emerald-700"
+                    : "bg-[#FFFAF2] border-[#E9DCC7] text-[#A97824]"
                 }`}
               >
                 <MapPinned className="w-5 h-5" />
@@ -281,13 +281,13 @@ export default function CheckoutPage({
           />
 
           <div className="relative">
-            <MessageSquare className="absolute top-3.5 left-4 w-5 h-5 text-[#A8988C] opacity-80" />
+            <MessageSquare className="absolute top-3.5 left-4 w-5 h-5 text-[#776B60] opacity-80" />
             <textarea
               value={comment}
               onChange={(e) => setComment(e.target.value)}
               placeholder="Izoh: achchiq bo‘lmasin..."
               rows={2}
-              className="w-full pl-12 pr-4 py-3.5 bg-[#120E0B] border border-[#D99A2B]/20 rounded-2xl text-base text-[#F5EFE6] focus:outline-none focus:ring-2 focus:ring-[#D99A2B]/45 focus:border-[#D99A2B] placeholder-[#A8988C]/50 font-semibold resize-none"
+              className="w-full pl-12 pr-4 py-3.5 bg-[#FFFAF2] border border-[#E9DCC7] rounded-2xl text-base text-[#2C211A] focus:outline-none focus:ring-2 focus:ring-[#C89438]/45 focus:border-[#C89438] placeholder-[#776B60]/50 font-semibold resize-none"
             />
           </div>
         </SectionCard>
@@ -298,8 +298,8 @@ export default function CheckoutPage({
           title="Hisob"
         />
 
-        <div className="rounded-2xl border border-[#D99A2B]/15 bg-[#1C1511]/80 px-4 py-2.5 text-xs leading-snug text-[#A8988C] font-bold flex gap-2.5">
-          <ShieldCheck className="w-4 h-4 text-[#D99A2B] shrink-0 mt-0.5" />
+        <div className="rounded-2xl border border-[#E9DCC7] bg-white/80 px-4 py-2.5 text-xs leading-snug text-[#776B60] font-bold flex gap-2.5">
+          <ShieldCheck className="w-4 h-4 text-[#A97824] shrink-0 mt-0.5" />
           <span>To‘lov buyurtma tasdiqlangandan keyin qilinadi.</span>
         </div>
 
@@ -307,17 +307,17 @@ export default function CheckoutPage({
           <button
             type="submit"
             disabled={isSubmitting || !isOpen}
-            className="w-full py-4 bg-[#D99A2B] hover:bg-[#C98A1F] text-[#120E0B] disabled:bg-neutral-800 disabled:text-neutral-500 rounded-2xl text-base font-black flex items-center justify-center gap-2 transition-all active:scale-[0.98] shadow-2xl shadow-black/35 border border-[#FFE2A3]/25 cursor-pointer disabled:cursor-not-allowed"
+            className="w-full py-4 bg-[#C89438] hover:bg-[#A97824] text-white disabled:bg-stone-200 disabled:text-stone-400 rounded-2xl text-base font-black flex items-center justify-center gap-2 transition-all active:scale-[0.98] shadow-2xl shadow-[#2C211A]/14 border border-[#EFD9AE] cursor-pointer disabled:cursor-not-allowed"
           >
             {isSubmitting ? (
               <>
-                <Loader2 className="w-5 h-5 animate-spin text-[#120E0B]" />
+                <Loader2 className="w-5 h-5 animate-spin text-white" />
                 <span>Yuborilmoqda...</span>
               </>
             ) : (
               <>
                 <span>{isOpen ? "Tasdiqlash" : "Restoran yopiq"}</span>
-                <ArrowRight className="w-5 h-5 text-[#120E0B]" />
+                <ArrowRight className="w-5 h-5 text-white" />
               </>
             )}
           </button>

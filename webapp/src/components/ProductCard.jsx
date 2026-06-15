@@ -8,7 +8,7 @@ import { hapticFeedback } from "../telegram/telegram";
 function ProductBadge({ product }) {
   if (product.sort_order === 1) {
     return (
-      <span className="inline-flex items-center gap-1 rounded-full bg-[#D99A2B] text-[#120E0B] px-2 py-1 text-[8px] font-black uppercase tracking-wider">
+      <span className="inline-flex items-center gap-1 rounded-full bg-[#C89438] text-white px-2 py-1 text-[8px] font-black uppercase tracking-wider">
         <ChefHat className="w-3 h-3" />
         Chef
       </span>
@@ -17,7 +17,7 @@ function ProductBadge({ product }) {
 
   if (Number(product.price) >= 45000) {
     return (
-      <span className="inline-flex items-center gap-1 rounded-full bg-[#120E0B]/85 text-[#D99A2B] border border-[#D99A2B]/25 px-2 py-1 text-[8px] font-black uppercase tracking-wider backdrop-blur">
+      <span className="inline-flex items-center gap-1 rounded-full bg-[#FFFAF2]/85 text-[#A97824] border border-[#E9DCC7] px-2 py-1 text-[8px] font-black uppercase tracking-wider backdrop-blur">
         <Star className="w-3 h-3" />
         Premium
       </span>
@@ -74,14 +74,14 @@ export default function ProductCard({
   return (
     <article
       onClick={handleCardClick}
-      className={`group relative overflow-hidden rounded-3xl bg-[#1C1511] border border-[#D99A2B]/13 shadow-lg shadow-black/20 transition-all duration-300 active:scale-[0.992] cursor-pointer ${
-        isAvailable ? "hover:border-[#D99A2B]/45" : "opacity-65"
+      className={`group relative overflow-hidden rounded-3xl bg-white border border-[#C89438]/13 shadow-lg shadow-[#2C211A]/10 transition-all duration-300 active:scale-[0.992] cursor-pointer ${
+        isAvailable ? "hover:border-[#C89438]/45" : "opacity-65"
       }`}
     >
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_12%_0%,rgba(217,154,43,0.08),transparent_34%)] pointer-events-none" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_12%_0%,rgba(200,148,56,0.08),transparent_34%)] pointer-events-none" />
 
       <div className="relative z-10 p-2.5 flex gap-3">
-        <div className="relative w-[104px] h-[104px] shrink-0 rounded-[1.25rem] overflow-hidden bg-[#120E0B] border border-[#D99A2B]/10">
+        <div className="relative w-[104px] h-[104px] shrink-0 rounded-[1.25rem] overflow-hidden bg-[#FFFAF2] border border-[#E9DCC7]">
           <img
             src={imageSrc}
             alt={product.name_uz}
@@ -98,7 +98,7 @@ export default function ProductCard({
 
           {!isAvailable && (
             <div className="absolute inset-0 bg-black/70 backdrop-blur-[2px] flex items-center justify-center">
-              <span className="bg-red-950/90 text-red-200 border border-red-800 text-[9px] font-black px-2.5 py-1.5 rounded-full uppercase tracking-wider">
+              <span className="bg-red-600 text-red-600 border border-red-500 text-[9px] font-black px-2.5 py-1.5 rounded-full uppercase tracking-wider">
                 Mavjud emas
               </span>
             </div>
@@ -107,15 +107,15 @@ export default function ProductCard({
 
         <div className="min-w-0 flex-1 flex flex-col justify-between py-0.5">
           <div className="min-w-0">
-            <span className="block text-[8px] font-black text-[#D99A2B] uppercase tracking-[0.15em] truncate">
+            <span className="block text-[8px] font-black text-[#A97824] uppercase tracking-[0.15em] truncate">
               {product.category_name || "Damirchi menyusi"}
             </span>
 
-            <h3 className="font-serif font-black text-[#F5EFE6] text-[15.5px] leading-tight tracking-tight line-clamp-2 mt-1">
+            <h3 className="font-serif font-black text-[#2C211A] text-[15.5px] leading-tight tracking-tight line-clamp-2 mt-1">
               {product.name_uz}
             </h3>
 
-            <p className="text-[#A8988C] text-[10.5px] leading-snug mt-1 line-clamp-2 font-semibold">
+            <p className="text-[#776B60] text-[10.5px] leading-snug mt-1 line-clamp-2 font-semibold">
               {product.description_uz ||
                 "Damirchi oshxonasi uslubida tayyorlangan mazali taom."}
             </p>
@@ -123,35 +123,35 @@ export default function ProductCard({
 
           <div className="flex items-end justify-between gap-2.5 mt-2.5">
             <div className="min-w-0">
-              <p className="text-[8px] uppercase tracking-[0.14em] font-black text-[#A8988C]">
+              <p className="text-[8px] uppercase tracking-[0.14em] font-black text-[#776B60]">
                 Narxi
               </p>
 
-              <p className="font-serif font-black text-[#D99A2B] text-[15.5px] leading-none mt-0.5 truncate">
+              <p className="font-serif font-black text-[#A97824] text-[15.5px] leading-none mt-0.5 truncate">
                 {formatPrice(product.price)}
               </p>
             </div>
 
             {isAvailable &&
               (quantity > 0 ? (
-                <div className="qty-control flex items-center bg-[#120E0B] rounded-2xl p-1 text-[#F5EFE6] shadow-inner border border-[#D99A2B]/12 shrink-0">
+                <div className="qty-control flex items-center bg-[#FFFAF2] rounded-2xl p-1 text-[#2C211A] shadow-inner border border-[#E9DCC7] shrink-0">
                   <button
                     type="button"
                     onClick={handleDecrease}
-                    className="w-8 h-8 flex items-center justify-center rounded-xl hover:bg-[#1C1511] text-[#D99A2B] active:scale-90 transition-all"
+                    className="w-8 h-8 flex items-center justify-center rounded-xl hover:bg-white text-[#A97824] active:scale-90 transition-all"
                     aria-label="Kamaytirish"
                   >
                     <Minus className="w-4 h-4" />
                   </button>
 
-                  <span className="w-7 text-center text-sm font-black text-[#F5EFE6]">
+                  <span className="w-7 text-center text-sm font-black text-[#2C211A]">
                     {quantity}
                   </span>
 
                   <button
                     type="button"
                     onClick={handleIncrease}
-                    className="w-8 h-8 flex items-center justify-center rounded-xl bg-[#D99A2B] text-[#120E0B] active:scale-90 transition-all"
+                    className="w-8 h-8 flex items-center justify-center rounded-xl bg-[#C89438] text-white active:scale-90 transition-all"
                     aria-label="Ko‘paytirish"
                   >
                     <Plus className="w-4 h-4" />
@@ -161,7 +161,7 @@ export default function ProductCard({
                 <button
                   type="button"
                   onClick={handleAddClick}
-                  className="add-btn h-9 px-3.5 bg-[#D99A2B] text-[#120E0B] rounded-2xl flex items-center justify-center gap-1.5 transition-all duration-200 active:scale-95 shadow-lg shadow-[#D99A2B]/10 font-black text-[10.5px] shrink-0"
+                  className="add-btn h-9 px-3.5 bg-[#C89438] text-white rounded-2xl flex items-center justify-center gap-1.5 transition-all duration-200 active:scale-95 shadow-lg shadow-[#C89438]/10 font-black text-[10.5px] shrink-0"
                 >
                   <Plus className="w-4 h-4" />
                   Qo‘shish

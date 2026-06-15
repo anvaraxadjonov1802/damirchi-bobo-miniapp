@@ -208,15 +208,15 @@ export default function MapPickerModal({
   };
 
   return (
-    <div className="fixed inset-0 z-[9998] bg-[#120E0B] text-[#F5EFE6]">
-      <div className="h-[100dvh] w-full max-w-[480px] mx-auto bg-[#120E0B] flex flex-col overflow-hidden">
-        <div className="shrink-0 px-4 pt-4 pb-3 bg-[#1C1511] border-b border-[#D99A2B]/15 safe-top">
+    <div className="fixed inset-0 z-[9998] bg-[#FFFAF2] text-[#2C211A]">
+      <div className="h-[100dvh] w-full max-w-[480px] mx-auto bg-[#FFFAF2] flex flex-col overflow-hidden">
+        <div className="shrink-0 px-4 pt-4 pb-3 bg-white border-b border-[#E9DCC7] safe-top">
           <div className="flex items-center justify-between gap-3">
             <div className="min-w-0">
-              <h3 className="text-lg font-black text-[#F5EFE6] leading-tight">
+              <h3 className="text-lg font-black text-[#2C211A] leading-tight">
                 Manzilni tanlang
               </h3>
-              <p className="text-sm text-[#A8988C] mt-1 font-semibold leading-snug">
+              <p className="text-sm text-[#776B60] mt-1 font-semibold leading-snug">
                 Xaritadan bosing yoki hozirgi joyingizni oling
               </p>
             </div>
@@ -224,10 +224,10 @@ export default function MapPickerModal({
             <button
               type="button"
               onClick={onClose}
-              className="w-11 h-11 rounded-2xl bg-[#120E0B] border border-[#D99A2B]/20 flex items-center justify-center active:scale-95 shrink-0"
+              className="w-11 h-11 rounded-2xl bg-[#FFFAF2] border border-[#E9DCC7] flex items-center justify-center active:scale-95 shrink-0"
               aria-label="Yopish"
             >
-              <X className="w-5 h-5 text-[#F5EFE6]" />
+              <X className="w-5 h-5 text-[#2C211A]" />
             </button>
           </div>
         </div>
@@ -239,28 +239,28 @@ export default function MapPickerModal({
             type="button"
             onClick={useMyLocation}
             disabled={locating}
-            className="absolute top-4 left-4 z-[1000] rounded-2xl bg-[#1C1511]/95 border border-[#D99A2B]/25 text-[#F5EFE6] px-4 py-3 text-sm font-black flex items-center gap-2 shadow-xl active:scale-95 disabled:opacity-60 backdrop-blur"
+            className="absolute top-4 left-4 z-[1000] rounded-2xl bg-white/95 border border-[#E9DCC7] text-[#2C211A] px-4 py-3 text-sm font-black flex items-center gap-2 shadow-xl active:scale-95 disabled:opacity-60 backdrop-blur"
           >
             {locating ? (
-              <Loader2 className="w-4 h-4 animate-spin text-[#D99A2B]" />
+              <Loader2 className="w-4 h-4 animate-spin text-[#A97824]" />
             ) : (
-              <Crosshair className="w-4 h-4 text-[#D99A2B]" />
+              <Crosshair className="w-4 h-4 text-[#A97824]" />
             )}
             {locating ? "Aniqlanmoqda..." : "Hozirgi joyim"}
           </button>
 
-          <div className="absolute left-4 right-4 bottom-4 z-[1000] rounded-[1.5rem] bg-[#1C1511]/95 border border-[#D99A2B]/20 p-4 shadow-2xl backdrop-blur animate-map-sheet safe-bottom">
+          <div className="absolute left-4 right-4 bottom-4 z-[1000] rounded-[1.5rem] bg-white/95 border border-[#E9DCC7] p-4 shadow-2xl backdrop-blur animate-map-sheet safe-bottom">
             <div className="flex items-start gap-3 mb-3">
-              <div className="w-11 h-11 rounded-2xl bg-[#D99A2B]/15 flex items-center justify-center shrink-0">
-                <MapPin className="w-5 h-5 text-[#D99A2B]" />
+              <div className="w-11 h-11 rounded-2xl bg-[#C89438]/15 flex items-center justify-center shrink-0">
+                <MapPin className="w-5 h-5 text-[#A97824]" />
               </div>
 
               <div className="min-w-0">
-                <p className="text-base font-black text-[#F5EFE6] leading-tight">
+                <p className="text-base font-black text-[#2C211A] leading-tight">
                   {selectedPoint ? "Manzil belgilandi" : "Joyni belgilang"}
                 </p>
 
-                <p className="text-sm text-[#A8988C] mt-1 leading-snug font-semibold break-words">
+                <p className="text-sm text-[#776B60] mt-1 leading-snug font-semibold break-words">
                   {selectedPoint
                     ? `${selectedPoint.latitude}, ${selectedPoint.longitude}`
                     : "Xaritaga bosing yoki “Hozirgi joyim” tugmasidan foydalaning."}
@@ -272,7 +272,7 @@ export default function MapPickerModal({
               type="button"
               onClick={confirmPoint}
               disabled={!selectedPoint}
-              className="w-full rounded-2xl bg-[#D99A2B] disabled:bg-neutral-800 disabled:text-neutral-500 text-[#120E0B] py-4 text-base font-black flex items-center justify-center gap-2 active:scale-[0.98] transition"
+              className="w-full rounded-2xl bg-[#C89438] disabled:bg-stone-200 disabled:text-stone-400 text-white py-4 text-base font-black flex items-center justify-center gap-2 active:scale-[0.98] transition"
             >
               <Check className="w-5 h-5" />
               Shu manzilni tanlash

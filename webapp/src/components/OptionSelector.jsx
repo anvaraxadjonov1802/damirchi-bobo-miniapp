@@ -16,7 +16,7 @@ export default function OptionSelector({
   return (
     <div className={compact ? "flex flex-col gap-2" : "flex flex-col gap-2.5"}>
       {label && (
-        <label className="text-base font-black text-[#F5EFE6] pl-1">
+        <label className="text-base font-black text-[#2C211A] pl-1">
           {label}
         </label>
       )}
@@ -35,14 +35,14 @@ export default function OptionSelector({
                 compact ? "px-3 py-3" : "px-3.5 py-3.5"
               } ${
                 isActive
-                  ? "bg-[#D99A2B] border-[#FFE2A3]/40 text-[#120E0B] shadow-lg shadow-[#D99A2B]/10"
-                  : "bg-[#120E0B] border-[#D99A2B]/16 text-[#F5EFE6] hover:border-[#D99A2B]/35"
+                  ? "bg-[#C89438] border-[#FFE2A3]/40 text-white shadow-lg shadow-[#C89438]/10"
+                  : "bg-[#FFFAF2] border-[#C89438]/16 text-[#2C211A] hover:border-[#C89438]/35"
               }`}
             >
               {Icon && (
                 <Icon
                   className={`w-5 h-5 shrink-0 ${
-                    isActive ? "text-[#120E0B]" : "text-[#D99A2B]"
+                    isActive ? "text-white" : "text-[#A97824]"
                   }`}
                 />
               )}

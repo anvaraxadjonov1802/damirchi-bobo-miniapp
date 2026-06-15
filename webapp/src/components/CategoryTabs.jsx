@@ -18,11 +18,11 @@ export default function CategoryTabs({
   return (
     <div className="w-full mt-3 flex flex-col gap-2">
       <div className="px-4 flex items-center justify-between">
-        <span className="text-[9px] font-black text-[#D99A2B] uppercase tracking-[0.18em] opacity-90">
+        <span className="text-[9px] font-black text-[#A97824] uppercase tracking-[0.18em] opacity-90">
           Kategoriyalar
         </span>
 
-        <span className="text-[9px] text-[#A8988C] font-black uppercase tracking-widest">
+        <span className="text-[9px] text-[#776B60] font-black uppercase tracking-widest">
           {categories.length} bo‘lim
         </span>
       </div>
@@ -33,13 +33,13 @@ export default function CategoryTabs({
           onClick={() => handleSelect(null)}
           className={`shrink-0 h-10 px-3.5 rounded-2xl text-xs font-black whitespace-nowrap transition-all duration-200 border cursor-pointer active:scale-[0.98] flex items-center gap-2 ${
             activeCategoryId === null
-              ? "bg-[#D99A2B] text-[#120E0B] border-[#D99A2B] shadow-lg shadow-[#D99A2B]/10"
-              : "bg-[#1C1511]/70 text-[#F5EFE6] border-[#D99A2B]/12 hover:bg-[#1C1511]"
+              ? "bg-[#C89438] text-white border-[#C89438] shadow-lg shadow-[#C89438]/10"
+              : "bg-white/70 text-[#2C211A] border-[#E9DCC7] hover:bg-white"
           }`}
         >
           <Grid2X2
             className={`w-4 h-4 ${
-              activeCategoryId === null ? "text-[#120E0B]" : "text-[#D99A2B]"
+              activeCategoryId === null ? "text-white" : "text-[#A97824]"
             }`}
           />
 
@@ -56,8 +56,8 @@ export default function CategoryTabs({
               onClick={() => handleSelect(category.id)}
               className={`shrink-0 h-10 max-w-[150px] px-3.5 rounded-2xl text-xs font-black whitespace-nowrap transition-all duration-200 border cursor-pointer active:scale-[0.98] relative ${
                 isActive
-                  ? "bg-[#D99A2B] text-[#120E0B] border-[#D99A2B] shadow-lg shadow-[#D99A2B]/10"
-                  : "bg-[#1C1511]/70 text-[#F5EFE6] border-[#D99A2B]/12 hover:bg-[#1C1511]"
+                  ? "bg-[#C89438] text-white border-[#C89438] shadow-lg shadow-[#C89438]/10"
+                  : "bg-white/70 text-[#2C211A] border-[#E9DCC7] hover:bg-white"
               }`}
             >
               <span className="block truncate">{category.name_uz}</span>

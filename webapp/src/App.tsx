@@ -282,15 +282,15 @@ export default function App() {
 
   if (error && categories.length === 0) {
     return (
-      <div className="flex items-center justify-center min-h-[100dvh] px-4 bg-[#120E0B]">
+      <div className="flex items-center justify-center min-h-[100dvh] px-4 bg-[#FFFAF2]">
         <ErrorState message={error} onRetry={fetchInitialMenu} />
       </div>
     );
   }
 
   return (
-    <div className="min-h-[100dvh] w-full select-none bg-[#120E0B] text-[#F5EFE6] overflow-x-hidden flex justify-center">
-      <div className="w-full max-w-[480px] bg-[#120E0B] flex flex-col min-h-[100dvh] border-x border-[#D99A2B]/10 relative shadow-sm">
+    <div className="min-h-[100dvh] w-full select-none bg-[#FFFAF2] text-[#2C211A] overflow-x-hidden flex justify-center">
+      <div className="w-full max-w-[480px] bg-[#FFFAF2] flex flex-col min-h-[100dvh] border-x border-[#E9DCC7] relative shadow-sm">
         <AppHeader
           cartCount={totalCartCount}
           onCartClick={() => setCurrentScreen("cart")}

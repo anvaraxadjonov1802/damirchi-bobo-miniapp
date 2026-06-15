@@ -10,10 +10,10 @@ import React, {
 const ToastContext = createContext(null);
 
 const toastStyles = {
-  success: "border-emerald-700/50 bg-emerald-950/95 text-emerald-100",
-  error: "border-red-700/50 bg-red-950/95 text-red-100",
-  warning: "border-amber-700/50 bg-amber-950/95 text-amber-100",
-  info: "border-[#D99A2B]/40 bg-[#1C1511]/95 text-[#F5EFE6]",
+  success: "border-emerald-200 bg-emerald-50 text-emerald-700",
+  error: "border-red-200 bg-red-50 text-red-700",
+  warning: "border-amber-200 bg-amber-50 text-amber-700",
+  info: "border-[#C89438]/40 bg-white/95 text-[#2C211A]",
 };
 
 const toastIcons = {

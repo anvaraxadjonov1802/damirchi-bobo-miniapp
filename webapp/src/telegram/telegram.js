@@ -1,6 +1,6 @@
 /** Telegram Web App helpers with safe browser fallback. */
 
-const BRAND_DARK = "#120E0B";
+const BRAND_DARK = "#FAF7F0";
 
 function getWindowTelegramApp() {
   if (typeof window === "undefined") return null;

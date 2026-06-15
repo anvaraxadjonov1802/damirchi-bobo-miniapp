@@ -71,21 +71,21 @@ export default function CartPage({
 
   return (
     <div className="px-4 py-3 pb-28 animate-fade-in flex flex-col gap-3">
-      <div className="rounded-3xl bg-[#1C1511] border border-[#D99A2B]/15 p-4 shadow-lg relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_0%_0%,rgba(217,154,43,0.12),transparent_38%)]" />
+      <div className="rounded-3xl bg-white border border-[#E9DCC7] p-4 shadow-lg relative overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_0%_0%,rgba(200,148,56,0.12),transparent_38%)]" />
 
         <div className="relative flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="w-11 h-11 rounded-2xl bg-[#D99A2B] text-[#120E0B] flex items-center justify-center shrink-0 shadow-md shadow-[#D99A2B]/10">
+            <div className="w-11 h-11 rounded-2xl bg-[#C89438] text-white flex items-center justify-center shrink-0 shadow-md shadow-[#C89438]/10">
               <ShoppingBag className="w-5 h-5" />
             </div>
 
             <div className="min-w-0">
-              <h2 className="font-serif font-black text-xl text-[#F5EFE6] leading-tight">
+              <h2 className="font-serif font-black text-xl text-[#2C211A] leading-tight">
                 Savat
               </h2>
 
-              <p className="text-sm text-[#A8988C] font-semibold mt-1">
+              <p className="text-sm text-[#776B60] font-semibold mt-1">
                 {cartItems.length} xil, {totalCount} ta mahsulot
               </p>
             </div>
@@ -94,7 +94,7 @@ export default function CartPage({
           <button
             type="button"
             onClick={handleClearCart}
-            className="shrink-0 w-10 h-10 rounded-2xl bg-red-950/25 border border-red-800/35 text-red-300 flex items-center justify-center active:scale-95 transition"
+            className="shrink-0 w-10 h-10 rounded-2xl bg-red-50 border border-red-500/35 text-red-600 flex items-center justify-center active:scale-95 transition"
             aria-label="Savatni tozalash"
           >
             <Trash2 className="w-4.5 h-4.5" />
@@ -121,19 +121,19 @@ export default function CartPage({
         compact
       />
 
-      <div className="rounded-2xl border border-[#D99A2B]/12 bg-[#1C1511]/70 px-4 py-2.5 text-[11px] leading-snug text-[#A8988C] font-bold">
-        Dastavka: <span className="text-[#F5EFE6]">{formatPrice(deliveryPrice)}</span>
+      <div className="rounded-2xl border border-[#E9DCC7] bg-white/70 px-4 py-2.5 text-[11px] leading-snug text-[#776B60] font-bold">
+        Dastavka: <span className="text-[#2C211A]">{formatPrice(deliveryPrice)}</span>
         {minOrderAmount > 0 && (
           <>
             {" "}
             · Minimal:{" "}
-            <span className="text-[#F5EFE6]">{formatPrice(minOrderAmount)}</span>
+            <span className="text-[#2C211A]">{formatPrice(minOrderAmount)}</span>
           </>
         )}
       </div>
 
       {!isOpen && (
-        <div className="rounded-2xl border border-red-700/35 bg-red-950/30 px-4 py-3 text-sm leading-snug text-red-200 font-bold">
+        <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm leading-snug text-red-600 font-bold">
           Restoran hozir yopiq. Buyurtma vaqtincha qabul qilinmaydi.
         </div>
       )}
@@ -143,10 +143,10 @@ export default function CartPage({
           type="button"
           onClick={handleProceed}
           disabled={!isOpen}
-          className="w-full py-4 bg-[#D99A2B] hover:bg-[#C98A1F] disabled:bg-neutral-800 disabled:text-neutral-500 text-[#120E0B] rounded-2xl text-base font-black flex items-center justify-center gap-2 transition-all active:scale-[0.98] shadow-2xl shadow-black/35 border border-[#FFE2A3]/25 cursor-pointer disabled:cursor-not-allowed group"
+          className="w-full py-4 bg-[#C89438] hover:bg-[#A97824] disabled:bg-stone-200 disabled:text-stone-400 text-white rounded-2xl text-base font-black flex items-center justify-center gap-2 transition-all active:scale-[0.98] shadow-2xl shadow-[#2C211A]/14 border border-[#EFD9AE] cursor-pointer disabled:cursor-not-allowed group"
         >
           <span>{isOpen ? "Davom etish" : "Restoran yopiq"}</span>
-          <ArrowRight className="w-5 h-5 text-[#120E0B] group-hover:translate-x-0.5 transition-transform" />
+          <ArrowRight className="w-5 h-5 text-white group-hover:translate-x-0.5 transition-transform" />
         </button>
       </div>
     </div>

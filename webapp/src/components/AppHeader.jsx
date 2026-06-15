@@ -31,84 +31,86 @@ export default function AppHeader({
   const statusLabel = isOpen ? "Ochiq" : "Yopiq";
 
   return (
-    <header className="sticky top-0 bg-[#120E0B]/88 backdrop-blur-xl border-b border-[#D99A2B]/15 px-4 py-3 flex items-center justify-between z-30 transition-all safe-top">
-      <div className="flex items-center gap-3 min-w-0">
-        {showBackButton ? (
-          <button
-            type="button"
-            onClick={triggerBack}
-            className="w-10 h-10 rounded-2xl flex items-center justify-center bg-[#1C1511] border border-[#D99A2B]/20 active:scale-90 transition-all cursor-pointer shrink-0"
-            aria-label="Orqaga"
-          >
-            <ChevronLeft className="w-5 h-5 text-[#F5EFE6]" />
-          </button>
-        ) : (
-          <div className="w-10 h-10 rounded-2xl bg-[#D99A2B] flex items-center justify-center font-serif font-black text-[#120E0B] text-lg shadow-lg shadow-[#D99A2B]/10 shrink-0 rotate-[-3deg]">
-            D
-          </div>
-        )}
+    <header className="sticky top-0 z-30 safe-top border-b border-[#E9DCC7]/80 bg-[#FFFAF2]/90 px-4 py-3 backdrop-blur-xl transition-all">
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex min-w-0 items-center gap-3">
+          {showBackButton ? (
+            <button
+              type="button"
+              onClick={triggerBack}
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-[#E9DCC7] bg-white shadow-sm transition-all active:scale-90"
+              aria-label="Orqaga"
+            >
+              <ChevronLeft className="h-5 w-5 text-[#2C211A]" />
+            </button>
+          ) : (
+            <div className="flex h-10 w-10 shrink-0 rotate-[-3deg] items-center justify-center rounded-2xl bg-[#C89438] font-serif text-lg font-black text-white shadow-md shadow-[#C89438]/20">
+              D
+            </div>
+          )}
 
-        {!showBackButton ? (
-          <div className="flex flex-col min-w-0">
-            <span className="font-serif font-extrabold text-lg tracking-tight text-[#F5EFE6] truncate leading-tight">
-              {restaurantName}
-            </span>
+          {!showBackButton ? (
+            <div className="flex min-w-0 flex-col">
+              <span className="truncate font-serif text-lg font-extrabold leading-tight tracking-tight text-[#2C211A]">
+                {restaurantName}
+              </span>
 
-            <div className="flex items-center gap-1.5 mt-0.5">
-              <span
-                className={`w-1.5 h-1.5 rounded-full ${
-                  isOpen
-                    ? "bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]"
-                    : "bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.35)]"
-                }`}
-              />
+              <div className="mt-0.5 flex items-center gap-1.5">
+                <span
+                  className={`h-1.5 w-1.5 rounded-full ${
+                    isOpen
+                      ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.45)]"
+                      : "bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.35)]"
+                  }`}
+                />
 
-              <span
-                className={`text-[10px] font-black uppercase tracking-[0.14em] leading-none ${
-                  isOpen ? "text-emerald-400" : "text-red-300"
-                }`}
-              >
-                {statusLabel}
+                <span
+                  className={`text-[10px] font-black uppercase leading-none tracking-[0.14em] ${
+                    isOpen ? "text-emerald-700" : "text-red-600"
+                  }`}
+                >
+                  {statusLabel}
+                </span>
+              </div>
+            </div>
+          ) : (
+            <div className="flex min-w-0 flex-col">
+              <span className="truncate font-serif text-lg font-extrabold leading-tight tracking-tight text-[#2C211A]">
+                {titles[currentScreen] || restaurantName}
+              </span>
+
+              <span className="mt-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-[#776B60]">
+                Damirchi
               </span>
             </div>
-          </div>
-        ) : (
-          <div className="flex flex-col min-w-0">
-            <span className="font-serif font-extrabold text-lg tracking-tight text-[#F5EFE6] truncate leading-tight">
-              {titles[currentScreen] || restaurantName}
-            </span>
+          )}
+        </div>
 
-            <span className="text-[10px] font-bold text-[#A8988C] uppercase tracking-[0.14em] mt-0.5">
-              Damirchi
-            </span>
-          </div>
+        {currentScreen === "menu" && (
+          <button
+            type="button"
+            onClick={triggerCart}
+            className="relative flex h-10 min-w-10 items-center justify-center gap-2 rounded-2xl border border-[#E9DCC7] bg-white px-3 shadow-sm transition-all active:scale-90"
+            aria-label="Savatni ochish"
+          >
+            {cartCount > 0 && (
+              <span className="text-[10px] font-black uppercase tracking-wider text-[#A97824]">
+                Savat
+              </span>
+            )}
+
+            <ShoppingBag className="h-5 w-5 text-[#A97824]" />
+
+            {cartCount > 0 ? (
+              <span className="absolute -right-1.5 -top-1.5 flex h-5 min-w-5 animate-scale-in items-center justify-center rounded-full border-2 border-[#FFFAF2] bg-[#C89438] px-1 text-[10px] font-black text-white shadow-md">
+                {cartCount}
+              </span>
+            ) : (
+              <Sparkles className="absolute -right-1 -top-1 h-3 w-3 text-[#C89438]" />
+            )}
+          </button>
         )}
       </div>
-
-      {currentScreen === "menu" && (
-        <button
-          type="button"
-          onClick={triggerCart}
-          className="relative min-w-10 h-10 bg-[#1C1511] border border-[#D99A2B]/20 rounded-2xl flex items-center justify-center transition-all active:scale-90 cursor-pointer px-3 gap-2"
-          aria-label="Savatni ochish"
-        >
-          {cartCount > 0 && (
-            <span className="text-[10px] font-black text-[#D99A2B] uppercase tracking-wider">
-              Savat
-            </span>
-          )}
-
-          <ShoppingBag className="w-5 h-5 text-[#D99A2B]" />
-
-          {cartCount > 0 ? (
-            <span className="absolute -top-1.5 -right-1.5 bg-[#D99A2B] text-[#120E0B] text-[10px] font-black min-w-5 h-5 px-1 rounded-full flex items-center justify-center animate-scale-in border-2 border-[#120E0B] shadow-md">
-              {cartCount}
-            </span>
-          ) : (
-            <Sparkles className="absolute -top-1 -right-1 w-3 h-3 text-[#D99A2B]" />
-          )}
-        </button>
-      )}
     </header>
   );
 }

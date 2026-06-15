@@ -5,25 +5,42 @@
   --font-serif: "Playfair Display", Georgia, serif;
   --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
 
-  --color-brand-bg: #120e0b;
-  --color-brand-dark: #f5efe6;
-  --color-brand-card: #1c1511;
-  --color-brand-gold: #d99a2b;
-  --color-brand-gold-muted: #8b6d43;
-  --color-brand-gold-dark: #c98a1f;
-  --color-brand-brown: #cfa37b;
-  --color-brand-muted: #a8988c;
+  --color-brand-bg: #faf7f0;
+  --color-brand-dark: #2c211a;
+  --color-brand-card: #ffffff;
+  --color-brand-gold: #c89438;
+  --color-brand-gold-muted: #b88a45;
+  --color-brand-gold-dark: #a97824;
+  --color-brand-brown: #8a5a2b;
+  --color-brand-muted: #776b60;
 }
 
 /* =========================
    Base / Telegram Mini App
 ========================= */
 
+:root {
+  color-scheme: light;
+
+  --damirchi-bg: #faf7f0;
+  --damirchi-bg-soft: #f4eadb;
+  --damirchi-card: #ffffff;
+  --damirchi-card-soft: #fffaf2;
+  --damirchi-text: #2c211a;
+  --damirchi-muted: #776b60;
+  --damirchi-border: #eadcc7;
+  --damirchi-gold: #c89438;
+  --damirchi-gold-dark: #a97824;
+  --damirchi-brown: #6f4624;
+  --damirchi-danger: #c2410c;
+  --damirchi-success: #15803d;
+}
+
 html,
 body,
 #root {
   min-height: 100%;
-  background-color: #120e0b;
+  background-color: var(--damirchi-bg);
 }
 
 html {
@@ -36,8 +53,10 @@ body {
   min-width: 320px;
   min-height: 100dvh;
   font-family: var(--font-sans);
-  background-color: #120e0b;
-  color: #f5efe6;
+  background:
+    radial-gradient(circle at top left, rgba(200, 148, 56, 0.14), transparent 32rem),
+    linear-gradient(180deg, #fffaf2 0%, #faf7f0 42%, #f7efe2 100%);
+  color: var(--damirchi-text);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-tap-highlight-color: transparent;
@@ -47,7 +66,7 @@ body {
 
 #root {
   min-height: 100dvh;
-  background-color: #120e0b;
+  background: transparent;
 }
 
 * {
@@ -72,6 +91,17 @@ select {
   font-size: 16px;
 }
 
+input,
+textarea,
+select {
+  color: var(--damirchi-text);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: rgba(119, 107, 96, 0.72);
+}
+
 /* Telegram/WebView ichida accidental selection kamroq bo‘lsin */
 .app-no-select,
 button,
@@ -93,7 +123,9 @@ textarea {
   max-width: 480px;
   min-height: 100dvh;
   margin: 0 auto;
-  background-color: #120e0b;
+  background:
+    radial-gradient(circle at top right, rgba(200, 148, 56, 0.12), transparent 18rem),
+    linear-gradient(180deg, #fffaf2 0%, #faf7f0 46%, #f7efe2 100%);
 }
 
 .safe-top {
@@ -130,8 +162,8 @@ textarea {
 }
 
 ::selection {
-  background: rgba(217, 154, 43, 0.35);
-  color: #f5efe6;
+  background: rgba(200, 148, 56, 0.26);
+  color: var(--damirchi-text);
 }
 
 /* =========================
@@ -139,43 +171,62 @@ textarea {
 ========================= */
 
 .transition-click {
-  transition: transform 0.1s ease, opacity 0.1s ease;
+  transition: transform 0.1s ease, opacity 0.1s ease, box-shadow 0.16s ease;
 }
 
 .transition-click:active {
-  transform: scale(0.96);
-  opacity: 0.9;
+  transform: scale(0.97);
+  opacity: 0.92;
 }
 
 .premium-card {
-  background-color: #1c1511;
-  border: 1px solid rgba(217, 154, 43, 0.12);
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5);
+  background-color: var(--damirchi-card);
+  border: 1px solid var(--damirchi-border);
+  box-shadow: 0 10px 28px -18px rgba(44, 33, 26, 0.32);
 }
 
 .premium-shadow {
-  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.7);
+  box-shadow: 0 16px 36px -24px rgba(44, 33, 26, 0.38);
 }
 
 /* Legacy class compatibility */
 .bg-brand-bg {
-  background-color: #120e0b !important;
+  background-color: var(--damirchi-bg) !important;
 }
 
 .bg-brand-card {
-  background-color: #1c1511 !important;
+  background-color: var(--damirchi-card) !important;
 }
 
 .text-brand-dark {
-  color: #f5efe6 !important;
+  color: var(--damirchi-text) !important;
 }
 
 .text-brand-muted {
-  color: #a8988c !important;
+  color: var(--damirchi-muted) !important;
 }
 
 .border-brand-brown {
-  border-color: rgba(139, 94, 52, 0.3) !important;
+  border-color: rgba(138, 90, 43, 0.22) !important;
+}
+
+/* =========================
+   Form polish
+========================= */
+
+input,
+textarea,
+select {
+  background-color: #ffffff;
+  border-color: var(--damirchi-border);
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: rgba(200, 148, 56, 0.75);
+  box-shadow: 0 0 0 4px rgba(200, 148, 56, 0.14);
 }
 
 /* =========================
@@ -311,7 +362,7 @@ textarea {
   width: 100%;
   height: 100%;
   font-family: var(--font-sans);
-  background: #120e0b;
+  background: #f7efe2;
   z-index: 1;
 }
 
@@ -320,30 +371,30 @@ textarea {
 }
 
 .leaflet-control-zoom {
-  border: 1px solid rgba(217, 154, 43, 0.22) !important;
+  border: 1px solid rgba(200, 148, 56, 0.24) !important;
   border-radius: 1rem !important;
   overflow: hidden;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35) !important;
+  box-shadow: 0 12px 30px rgba(44, 33, 26, 0.14) !important;
 }
 
 .leaflet-control-zoom a {
   width: 38px !important;
   height: 38px !important;
   line-height: 38px !important;
-  background: #1c1511 !important;
-  color: #f5efe6 !important;
-  border-color: rgba(217, 154, 43, 0.2) !important;
+  background: #ffffff !important;
+  color: var(--damirchi-text) !important;
+  border-color: rgba(200, 148, 56, 0.22) !important;
   font-weight: 900 !important;
 }
 
 .leaflet-control-attribution {
-  background: rgba(18, 14, 11, 0.75) !important;
-  color: rgba(245, 239, 230, 0.65) !important;
+  background: rgba(255, 250, 242, 0.82) !important;
+  color: rgba(44, 33, 26, 0.58) !important;
   font-size: 10px !important;
 }
 
 .leaflet-control-attribution a {
-  color: rgba(217, 154, 43, 0.85) !important;
+  color: rgba(169, 120, 36, 0.92) !important;
 }
 
 /* Custom marker */
@@ -357,9 +408,9 @@ textarea {
   height: 42px;
   border-radius: 50% 50% 50% 0;
   transform: rotate(-45deg);
-  background: #d99a2b;
-  border: 3px solid #120e0b;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+  background: var(--damirchi-gold);
+  border: 3px solid #ffffff;
+  box-shadow: 0 10px 30px rgba(44, 33, 26, 0.28);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -370,7 +421,7 @@ textarea {
   content: "";
   width: 11px;
   height: 11px;
-  background: #120e0b;
+  background: #ffffff;
   border-radius: 50%;
   position: absolute;
 }
