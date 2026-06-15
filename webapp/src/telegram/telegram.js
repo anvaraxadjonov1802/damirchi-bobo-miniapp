@@ -25,6 +25,24 @@ export function initTelegramApp() {
   try {
     tg.ready?.();
     tg.expand?.();
+    
+    const applyTelegramSafeArea = () => {
+      const topInset =
+        tg?.safeAreaInset?.top ||
+        tg?.contentSafeAreaInset?.top ||
+        0;
+
+      document.documentElement.style.setProperty(
+        "--tg-safe-top",
+        `${topInset}px`
+      );
+    };
+
+    applyTelegramSafeArea();
+
+    tg.onEvent?.("safeAreaChanged", applyTelegramSafeArea);
+    tg.onEvent?.("contentSafeAreaChanged", applyTelegramSafeArea);
+    tg.onEvent?.("viewportChanged", applyTelegramSafeArea);
 
     if (supportsTelegramVersion(tg, "6.1")) {
       tg.setHeaderColor?.(BRAND_DARK);
