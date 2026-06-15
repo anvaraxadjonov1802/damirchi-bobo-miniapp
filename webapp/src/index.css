@@ -5,42 +5,34 @@
   --font-serif: "Playfair Display", Georgia, serif;
   --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
 
-  --color-brand-bg: #faf7f0;
-  --color-brand-dark: #2c211a;
+  --color-brand-bg: #f6f6f7;
+  --color-brand-dark: #221816;
   --color-brand-card: #ffffff;
   --color-brand-gold: #c89438;
   --color-brand-gold-muted: #b88a45;
   --color-brand-gold-dark: #a97824;
   --color-brand-brown: #8a5a2b;
-  --color-brand-muted: #776b60;
+  --color-brand-muted: #78716c;
 }
-
-/* =========================
-   Base / Telegram Mini App
-========================= */
 
 :root {
   color-scheme: light;
-
-  --damirchi-bg: #faf7f0;
-  --damirchi-bg-soft: #f4eadb;
+  --damirchi-bg: #f6f6f7;
   --damirchi-card: #ffffff;
-  --damirchi-card-soft: #fffaf2;
-  --damirchi-text: #2c211a;
-  --damirchi-muted: #776b60;
-  --damirchi-border: #eadcc7;
-  --damirchi-gold: #c89438;
-  --damirchi-gold-dark: #a97824;
-  --damirchi-brown: #6f4624;
-  --damirchi-danger: #c2410c;
-  --damirchi-success: #15803d;
+  --damirchi-soft: #f1eee9;
+  --damirchi-text: #221816;
+  --damirchi-muted: #78716c;
+  --damirchi-border: #e8e2da;
+  --damirchi-primary: #c89438;
+  --damirchi-primary-dark: #a97824;
+  --damirchi-radius: 18px;
 }
 
 html,
 body,
 #root {
   min-height: 100%;
-  background-color: var(--damirchi-bg);
+  background: var(--damirchi-bg);
 }
 
 html {
@@ -53,9 +45,7 @@ body {
   min-width: 320px;
   min-height: 100dvh;
   font-family: var(--font-sans);
-  background:
-    radial-gradient(circle at top left, rgba(200, 148, 56, 0.14), transparent 32rem),
-    linear-gradient(180deg, #fffaf2 0%, #faf7f0 42%, #f7efe2 100%);
+  background: var(--damirchi-bg);
   color: var(--damirchi-text);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -66,7 +56,6 @@ body {
 
 #root {
   min-height: 100dvh;
-  background: transparent;
 }
 
 * {
@@ -89,20 +78,14 @@ input,
 textarea,
 select {
   font-size: 16px;
-}
-
-input,
-textarea,
-select {
   color: var(--damirchi-text);
 }
 
 input::placeholder,
 textarea::placeholder {
-  color: rgba(119, 107, 96, 0.72);
+  color: rgba(120, 113, 108, 0.62);
 }
 
-/* Telegram/WebView ichida accidental selection kamroq bo‘lsin */
 .app-no-select,
 button,
 img {
@@ -114,18 +97,12 @@ textarea {
   user-select: text;
 }
 
-/* =========================
-   Mobile shell helpers
-========================= */
-
 .mobile-shell {
   width: 100%;
   max-width: 480px;
   min-height: 100dvh;
   margin: 0 auto;
-  background:
-    radial-gradient(circle at top right, rgba(200, 148, 56, 0.12), transparent 18rem),
-    linear-gradient(180deg, #fffaf2 0%, #faf7f0 46%, #f7efe2 100%);
+  background: var(--damirchi-bg);
 }
 
 .safe-top {
@@ -133,16 +110,12 @@ textarea {
 }
 
 .safe-bottom {
-  padding-bottom: max(1.25rem, env(safe-area-inset-bottom));
+  padding-bottom: max(1.1rem, env(safe-area-inset-bottom));
 }
 
 .bottom-safe-space {
   padding-bottom: calc(6rem + env(safe-area-inset-bottom));
 }
-
-/* =========================
-   Scrollbar
-========================= */
 
 .no-scrollbar::-webkit-scrollbar {
   display: none;
@@ -153,22 +126,14 @@ textarea {
   scrollbar-width: none;
 }
 
-/* =========================
-   Typography / Brand
-========================= */
-
 .font-title {
   font-family: var(--font-serif);
 }
 
 ::selection {
-  background: rgba(200, 148, 56, 0.26);
+  background: rgba(200, 148, 56, 0.22);
   color: var(--damirchi-text);
 }
-
-/* =========================
-   Premium reusable styles
-========================= */
 
 .transition-click {
   transition: transform 0.1s ease, opacity 0.1s ease, box-shadow 0.16s ease;
@@ -180,22 +145,21 @@ textarea {
 }
 
 .premium-card {
-  background-color: var(--damirchi-card);
+  background: #ffffff;
   border: 1px solid var(--damirchi-border);
-  box-shadow: 0 10px 28px -18px rgba(44, 33, 26, 0.32);
+  box-shadow: 0 8px 26px -20px rgba(34, 24, 22, 0.5);
 }
 
 .premium-shadow {
-  box-shadow: 0 16px 36px -24px rgba(44, 33, 26, 0.38);
+  box-shadow: 0 14px 34px -26px rgba(34, 24, 22, 0.45);
 }
 
-/* Legacy class compatibility */
 .bg-brand-bg {
   background-color: var(--damirchi-bg) !important;
 }
 
 .bg-brand-card {
-  background-color: var(--damirchi-card) !important;
+  background-color: #ffffff !important;
 }
 
 .text-brand-dark {
@@ -207,12 +171,8 @@ textarea {
 }
 
 .border-brand-brown {
-  border-color: rgba(138, 90, 43, 0.22) !important;
+  border-color: rgba(200, 148, 56, 0.22) !important;
 }
-
-/* =========================
-   Form polish
-========================= */
 
 input,
 textarea,
@@ -225,20 +185,15 @@ input:focus,
 textarea:focus,
 select:focus {
   outline: none;
-  border-color: rgba(200, 148, 56, 0.75);
+  border-color: rgba(200, 148, 56, 0.72);
   box-shadow: 0 0 0 4px rgba(200, 148, 56, 0.14);
 }
-
-/* =========================
-   Animations
-========================= */
 
 @keyframes fadeIn {
   from {
     opacity: 0;
     transform: translateY(6px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);
@@ -246,87 +201,33 @@ select:focus {
 }
 
 @keyframes shake {
-  0%,
-  100% {
-    transform: translateX(0);
-  }
-
-  20% {
-    transform: translateX(-4px);
-  }
-
-  40% {
-    transform: translateX(4px);
-  }
-
-  60% {
-    transform: translateX(-3px);
-  }
-
-  80% {
-    transform: translateX(3px);
-  }
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-4px); }
+  40% { transform: translateX(4px); }
+  60% { transform: translateX(-3px); }
+  80% { transform: translateX(3px); }
 }
 
 @keyframes scaleIn {
-  from {
-    opacity: 0;
-    transform: scale(0.75);
-  }
-
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+  from { opacity: 0; transform: scale(0.75); }
+  to { opacity: 1; transform: scale(1); }
 }
 
 @keyframes toastDown {
-  from {
-    opacity: 0;
-    transform: translateY(-18px) scale(0.98);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
+  from { opacity: 0; transform: translateY(-18px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 @keyframes mapSheet {
-  from {
-    transform: translateY(24px);
-    opacity: 0.4;
-  }
-
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
+  from { transform: translateY(24px); opacity: 0.4; }
+  to { transform: translateY(0); opacity: 1; }
 }
 
-.animate-fade-in {
-  animation: fadeIn 0.22s ease-out both;
-}
-
-.animate-shake {
-  animation: shake 0.28s ease-in-out both;
-}
-
-.animate-scale-in {
-  animation: scaleIn 0.18s ease-out both;
-}
-
-.animate-toast-down {
-  animation: toastDown 0.22s ease-out both;
-}
-
-.animate-map-sheet {
-  animation: mapSheet 0.2s ease-out both;
-}
-
-/* =========================
-   Text utilities
-========================= */
+.animate-fade-in { animation: fadeIn 0.22s ease-out both; }
+.animate-shake { animation: shake 0.28s ease-in-out both; }
+.animate-scale-in { animation: scaleIn 0.18s ease-out both; }
+.animate-toast-down { animation: toastDown 0.22s ease-out both; }
+.animate-map-sheet { animation: mapSheet 0.2s ease-out both; }
 
 .line-clamp-2 {
   display: -webkit-box;
@@ -342,39 +243,27 @@ select:focus {
   overflow: hidden;
 }
 
-/* Checkout readability */
 .checkout-readable input,
 .checkout-readable textarea,
-.checkout-readable button {
-  font-size: 1rem;
-}
-
+.checkout-readable button { font-size: 1rem; }
 .checkout-readable input,
-.checkout-readable textarea {
-  line-height: 1.45;
-}
-
-/* =========================
-   Leaflet / Map Picker
-========================= */
+.checkout-readable textarea { line-height: 1.45; }
 
 .leaflet-container {
   width: 100%;
   height: 100%;
   font-family: var(--font-sans);
-  background: #f7efe2;
+  background: #f1eee9;
   z-index: 1;
 }
 
-.leaflet-control-container {
-  font-family: var(--font-sans);
-}
+.leaflet-control-container { font-family: var(--font-sans); }
 
 .leaflet-control-zoom {
-  border: 1px solid rgba(200, 148, 56, 0.24) !important;
+  border: 1px solid rgba(200, 148, 56, 0.22) !important;
   border-radius: 1rem !important;
   overflow: hidden;
-  box-shadow: 0 12px 30px rgba(44, 33, 26, 0.14) !important;
+  box-shadow: 0 12px 30px rgba(34, 24, 22, 0.14) !important;
 }
 
 .leaflet-control-zoom a {
@@ -383,34 +272,28 @@ select:focus {
   line-height: 38px !important;
   background: #ffffff !important;
   color: var(--damirchi-text) !important;
-  border-color: rgba(200, 148, 56, 0.22) !important;
+  border-color: rgba(200, 148, 56, 0.18) !important;
   font-weight: 900 !important;
 }
 
 .leaflet-control-attribution {
-  background: rgba(255, 250, 242, 0.82) !important;
-  color: rgba(44, 33, 26, 0.58) !important;
+  background: rgba(255, 255, 255, 0.86) !important;
+  color: rgba(34, 24, 22, 0.58) !important;
   font-size: 10px !important;
 }
 
-.leaflet-control-attribution a {
-  color: rgba(169, 120, 36, 0.92) !important;
-}
+.leaflet-control-attribution a { color: rgba(169, 120, 36, 0.92) !important; }
 
-/* Custom marker */
-.damirchi-map-marker {
-  background: transparent;
-  border: 0;
-}
+.damirchi-map-marker { background: transparent; border: 0; }
 
 .damirchi-map-pin {
   width: 42px;
   height: 42px;
   border-radius: 50% 50% 50% 0;
   transform: rotate(-45deg);
-  background: var(--damirchi-gold);
+  background: var(--damirchi-primary);
   border: 3px solid #ffffff;
-  box-shadow: 0 10px 30px rgba(44, 33, 26, 0.28);
+  box-shadow: 0 10px 30px rgba(34, 24, 22, 0.28);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -426,37 +309,18 @@ select:focus {
   position: absolute;
 }
 
-/* Fullscreen modal ichida scroll chiqib ketmasin */
-.map-modal-open {
-  overflow: hidden;
-}
-
-/* =========================
-   Small screen polish
-========================= */
+.map-modal-open { overflow: hidden; }
 
 @media (max-width: 380px) {
   .checkout-readable input,
   .checkout-readable textarea,
-  .checkout-readable button {
-    font-size: 0.95rem;
-  }
+  .checkout-readable button { font-size: 0.95rem; }
 }
 
 @keyframes loadingBar {
-  0% {
-    transform: translateX(-120%);
-  }
-
-  50% {
-    transform: translateX(45%);
-  }
-
-  100% {
-    transform: translateX(130%);
-  }
+  0% { transform: translateX(-120%); }
+  50% { transform: translateX(45%); }
+  100% { transform: translateX(130%); }
 }
 
-.animate-loading-bar {
-  animation: loadingBar 1.35s infinite ease-in-out;
-}
+.animate-loading-bar { animation: loadingBar 1.35s infinite ease-in-out; }

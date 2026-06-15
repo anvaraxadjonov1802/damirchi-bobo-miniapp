@@ -1,32 +1,20 @@
 import React, { useEffect, useState } from "react";
-import { Minus, Plus, ShoppingBag, Trash2, X } from "lucide-react";
-
+import { ChevronLeft, Minus, Plus, ShoppingBag, Star, Trash2 } from "lucide-react";
 import { formatPrice } from "../utils/format";
 import { client } from "../api/client";
 import { hapticFeedback } from "../telegram/telegram";
 
-export default function ProductDetailsModal({
-  product,
-  currentQuantity = 0,
-  onClose,
-  onUpdateQuantity,
-}) {
+export default function ProductDetailsModal({ product, currentQuantity = 0, onClose, onUpdateQuantity }) {
   const [quantity, setQuantity] = useState(currentQuantity || 1);
 
   useEffect(() => {
-    if (product) {
-      setQuantity(currentQuantity || 1);
-    }
+    if (product) setQuantity(currentQuantity || 1);
   }, [currentQuantity, product]);
 
   useEffect(() => {
     if (!product) return;
-
     document.body.style.overflow = "hidden";
-
-    return () => {
-      document.body.style.overflow = "";
-    };
+    return () => { document.body.style.overflow = ""; };
   }, [product]);
 
   if (!product) return null;
@@ -37,7 +25,6 @@ export default function ProductDetailsModal({
 
   const handleDecrease = () => {
     if (quantity <= 1) return;
-
     hapticFeedback("light");
     setQuantity((prev) => prev - 1);
   };
@@ -49,160 +36,92 @@ export default function ProductDetailsModal({
 
   const handleAddToCart = () => {
     if (!isAvailable) return;
-
     hapticFeedback("success");
-
-    if (onUpdateQuantity) {
-      onUpdateQuantity(product, quantity);
-    }
-
+    onUpdateQuantity?.(product, quantity);
     onClose();
   };
 
   const handleRemoveFromCart = () => {
     hapticFeedback("error");
-
-    if (onUpdateQuantity) {
-      onUpdateQuantity(product, 0);
-    }
-
+    onUpdateQuantity?.(product, 0);
     onClose();
   };
 
   return (
-    <div
-      className="fixed inset-0 z-[9997] bg-black/75 backdrop-blur-sm flex items-end justify-center animate-fade-in"
-      onClick={onClose}
-    >
-      <div
-        className="w-full max-w-[480px] max-h-[92dvh] bg-[#FFFAF2] rounded-t-[2rem] border-t border-[#E9DCC7] shadow-2xl overflow-hidden flex flex-col animate-map-sheet"
-        onClick={(event) => event.stopPropagation()}
-      >
-        <div className="shrink-0 px-4 pt-3 pb-2 bg-[#FFFAF2]">
-          <div className="mx-auto w-11 h-1 rounded-full bg-[#2C211A]/12 mb-3" />
-
-          <div className="flex items-center justify-between gap-3">
-            <span className="text-[9px] font-black uppercase tracking-[0.16em] text-[#A97824] bg-[#C89438]/10 border border-[#E9DCC7] px-3 py-1.5 rounded-full truncate">
-              {product.category_name || "Damirchi menyusi"}
-            </span>
-
-            <button
-              type="button"
-              onClick={onClose}
-              className="w-9 h-9 rounded-2xl bg-white border border-[#E9DCC7] flex items-center justify-center active:scale-95 transition shrink-0"
-              aria-label="Yopish"
-            >
-              <X className="w-4 h-4 text-[#2C211A]" />
-            </button>
+    <div className="fixed inset-0 z-[9997] flex justify-center bg-[#F6F6F7] animate-fade-in">
+      <div className="flex h-[100dvh] w-full max-w-[480px] flex-col bg-[#F6F6F7]">
+        <div className="safe-top flex shrink-0 items-center gap-3 bg-white px-4 pb-3 pt-2 shadow-sm">
+          <button type="button" onClick={onClose} className="flex h-9 w-9 items-center justify-center rounded-full bg-[#F2F0ED] text-[#221816] active:scale-90" aria-label="Orqaga">
+            <ChevronLeft className="h-5 w-5" />
+          </button>
+          <div className="min-w-0">
+            <h2 className="truncate text-[15px] font-black text-[#221816]">Mahsulot</h2>
+            <p className="text-[11px] font-semibold text-[#78716C]">Damirchi menyusi</p>
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto no-scrollbar px-4 pb-3">
-          <div className="relative aspect-[16/9] w-full rounded-3xl overflow-hidden bg-white border border-[#E9DCC7] shadow-lg">
-            <img
-              src={imageSrc}
-              alt={product.name_uz}
-              loading="lazy"
-              referrerPolicy="no-referrer"
-              className="w-full h-full object-cover"
-            />
-
-            <div className="absolute inset-0 bg-gradient-to-t from-[#FAF7F0]/80 via-transparent to-transparent" />
-
-            {!isAvailable && (
-              <div className="absolute inset-0 bg-black/70 backdrop-blur-[2px] flex items-center justify-center">
-                <span className="bg-red-600 text-red-600 border border-red-500 text-xs font-black px-4 py-2 rounded-full uppercase tracking-wider">
-                  Mavjud emas
-                </span>
-              </div>
-            )}
-          </div>
-
-          <div className="pt-4">
-            <h3 className="font-serif font-black text-xl text-[#2C211A] leading-tight">
-              {product.name_uz}
-            </h3>
-
-            <div className="flex items-center justify-between gap-3 mt-2">
-              <p className="font-serif font-black text-xl text-[#A97824] leading-none">
-                {formatPrice(product.price)}
-              </p>
-
-              {currentQuantity > 0 && (
-                <span className="rounded-full bg-[#C89438]/10 border border-[#E9DCC7] text-[#A97824] text-[10px] font-black px-3 py-1 uppercase tracking-wider">
-                  Savatda {currentQuantity} ta
-                </span>
+        <div className="flex-1 overflow-y-auto no-scrollbar pb-4">
+          <div className="bg-white">
+            <div className="relative aspect-[4/3] bg-[#F2F0ED]">
+              <img src={imageSrc} alt={product.name_uz} loading="lazy" referrerPolicy="no-referrer" className="h-full w-full object-cover" />
+              {!isAvailable && (
+                <div className="absolute inset-0 flex items-center justify-center bg-white/80 backdrop-blur-sm">
+                  <span className="rounded-full bg-red-50 px-4 py-2 text-xs font-black text-red-600 ring-1 ring-red-200">Mavjud emas</span>
+                </div>
               )}
             </div>
 
-            <p className="text-[#776B60] text-sm leading-snug font-semibold mt-3">
-              {product.description_uz ||
-                "Damirchi oshxonasi uslubida tayyorlangan mazali taom."}
-            </p>
-          </div>
-        </div>
-
-        <div className="shrink-0 border-t border-[#E9DCC7] bg-[#FFFAF2] px-4 pt-3 pb-4 safe-bottom">
-          {isAvailable ? (
-            <div className="flex flex-col gap-3">
-              <div className="flex items-center justify-between gap-3 bg-white rounded-2xl border border-[#E9DCC7] p-2">
-                <span className="text-xs font-black text-[#776B60] pl-2 uppercase tracking-wide">
-                  Soni
+            <div className="p-4">
+              <div className="mb-2 flex items-center gap-1.5 text-[12px] font-black text-[#A97824]">
+                <Star className="h-4 w-4 fill-[#C89438] text-[#C89438]" />
+                <span>5.0</span>
+                <span className="ml-2 rounded-full bg-[#F4EEE6] px-2 py-1 text-[9px] uppercase tracking-wider">
+                  {product.category_name || "Damirchi"}
                 </span>
-
-                <div className="flex items-center bg-[#FFFAF2] rounded-2xl p-1 border border-[#E9DCC7]">
-                  <button
-                    type="button"
-                    onClick={handleDecrease}
-                    disabled={quantity <= 1}
-                    className="w-9 h-9 flex items-center justify-center rounded-xl text-[#A97824] hover:bg-white disabled:opacity-30 active:scale-90 transition"
-                    aria-label="Kamaytirish"
-                  >
-                    <Minus className="w-4 h-4" />
-                  </button>
-
-                  <span className="w-9 text-center text-base font-black text-[#2C211A]">
-                    {quantity}
-                  </span>
-
-                  <button
-                    type="button"
-                    onClick={handleIncrease}
-                    className="w-9 h-9 flex items-center justify-center rounded-xl bg-[#C89438] text-white active:scale-90 transition"
-                    aria-label="Ko‘paytirish"
-                  >
-                    <Plus className="w-4 h-4" />
-                  </button>
-                </div>
               </div>
 
-              <div className="flex gap-2">
-                {currentQuantity > 0 && (
-                  <button
-                    type="button"
-                    onClick={handleRemoveFromCart}
-                    className="w-12 rounded-2xl border border-red-500/35 bg-red-50 text-red-600 flex items-center justify-center active:scale-95 transition"
-                    aria-label="Savatdan olib tashlash"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                )}
+              <h1 className="text-[22px] font-black leading-tight text-[#221816]">{product.name_uz}</h1>
+              <p className="mt-2 text-[13px] font-semibold leading-relaxed text-[#78716C]">
+                {product.description_uz || "Damirchi oshxonasi uslubida tayyorlangan mazali taom."}
+              </p>
+            </div>
+          </div>
 
-                <button
-                  type="button"
-                  onClick={handleAddToCart}
-                  className="flex-1 py-4 bg-[#C89438] hover:bg-[#A97824] text-white rounded-2xl text-sm font-black flex items-center justify-center gap-2 transition-all active:scale-[0.98] shadow-lg shadow-[#C89438]/10"
-                >
-                  <ShoppingBag className="w-4 h-4 text-white" />
-                  <span>
-                    {currentQuantity > 0 ? "Yangilash" : "Savatga qo‘shish"} ·{" "}
-                    {formatPrice(totalPrice)}
-                  </span>
+          <div className="mx-4 mt-3 rounded-[22px] bg-white p-4 shadow-sm ring-1 ring-[#E8E2DA]">
+            <div className="mb-3 flex items-center justify-between">
+              <span className="text-[15px] font-black text-[#221816]">Soni</span>
+              {currentQuantity > 0 && <span className="rounded-full bg-[#F4EEE6] px-3 py-1 text-[10px] font-black text-[#A97824]">Savatda {currentQuantity} ta</span>}
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-[22px] font-black text-[#A97824]">{formatPrice(product.price)}</span>
+              <div className="flex items-center rounded-xl bg-[#F2F0ED] p-1">
+                <button type="button" onClick={handleDecrease} disabled={quantity <= 1} className="flex h-9 w-9 items-center justify-center rounded-lg text-[#A97824] disabled:opacity-30 active:scale-90" aria-label="Kamaytirish">
+                  <Minus className="h-4 w-4" />
+                </button>
+                <span className="w-9 text-center text-base font-black text-[#221816]">{quantity}</span>
+                <button type="button" onClick={handleIncrease} className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#C89438] text-white active:scale-90" aria-label="Ko‘paytirish">
+                  <Plus className="h-4 w-4" />
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+
+        <div className="shrink-0 border-t border-[#E8E2DA] bg-white px-4 pb-4 pt-3 safe-bottom">
+          {isAvailable ? (
+            <div className="flex gap-2">
+              {currentQuantity > 0 && (
+                <button type="button" onClick={handleRemoveFromCart} className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-red-50 text-red-600 ring-1 ring-red-200 active:scale-95" aria-label="Savatdan olib tashlash">
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              )}
+              <button type="button" onClick={handleAddToCart} className="flex h-14 flex-1 items-center justify-center gap-2 rounded-2xl bg-[#C89438] text-sm font-black text-white shadow-lg shadow-[#C89438]/20 active:scale-[0.98]">
+                <ShoppingBag className="h-4 w-4" />
+                <span>{currentQuantity > 0 ? "Yangilash" : "Добавить"} · {formatPrice(totalPrice)}</span>
+              </button>
+            </div>
           ) : (
-            <div className="w-full py-4 bg-white text-[#776B60] border border-[#E9DCC7] rounded-2xl text-sm font-black flex items-center justify-center">
+            <div className="flex h-14 items-center justify-center rounded-2xl bg-[#F2F0ED] text-sm font-black text-[#78716C]">
               Ushbu taom vaqtincha mavjud emas
             </div>
           )}

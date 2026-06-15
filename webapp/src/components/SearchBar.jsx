@@ -9,26 +9,24 @@ export default function SearchBar({ value, onChange }) {
   };
 
   return (
-    <div className="px-4 mt-3">
-      <div className="relative flex items-center bg-white border border-[#E9DCC7] rounded-2xl shadow-md focus-within:ring-2 focus-within:ring-[#C89438]/35 focus-within:border-[#C89438]/70 transition-all">
-        <Search className="absolute left-4 w-4.5 h-4.5 text-[#776B60] opacity-75 pointer-events-none" />
-
+    <div className="px-4 pt-3">
+      <div className="relative flex items-center rounded-2xl bg-white shadow-sm ring-1 ring-[#E8E2DA] focus-within:ring-[#C89438]/45">
+        <Search className="absolute left-4 h-4.5 w-4.5 text-[#78716C]" />
         <input
           type="text"
           value={value}
           onChange={(event) => onChange(event.target.value)}
-          placeholder="Taom qidirish..."
-          className="w-full pl-11 pr-11 py-3.5 text-[15px] text-[#2C211A] placeholder-[#776B60]/55 bg-transparent focus:outline-none font-semibold"
+          placeholder="Taom qidirish"
+          className="w-full bg-transparent py-3.5 pl-11 pr-11 text-[14px] font-semibold text-[#221816] placeholder:text-[#78716C]/60 focus:outline-none"
         />
-
         {value && (
           <button
             type="button"
             onClick={handleClear}
-            className="absolute right-3 w-8 h-8 flex items-center justify-center rounded-xl bg-[#2C211A]/5 hover:bg-[#2C211A]/10 text-[#776B60] transition-colors active:scale-95"
+            className="absolute right-2 flex h-9 w-9 items-center justify-center rounded-xl bg-[#F2F0ED] text-[#78716C] active:scale-95"
             aria-label="Qidiruvni tozalash"
           >
-            <X className="w-4 h-4 text-[#2C211A]" />
+            <X className="h-4 w-4" />
           </button>
         )}
       </div>

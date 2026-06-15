@@ -1,31 +1,8 @@
 import React from "react";
-import { ChefHat, Minus, Plus, Star } from "lucide-react";
-
+import { Minus, Plus, Star } from "lucide-react";
 import { formatPrice } from "../utils/format";
 import { client } from "../api/client";
 import { hapticFeedback } from "../telegram/telegram";
-
-function ProductBadge({ product }) {
-  if (product.sort_order === 1) {
-    return (
-      <span className="inline-flex items-center gap-1 rounded-full bg-[#C89438] text-white px-2 py-1 text-[8px] font-black uppercase tracking-wider">
-        <ChefHat className="w-3 h-3" />
-        Chef
-      </span>
-    );
-  }
-
-  if (Number(product.price) >= 45000) {
-    return (
-      <span className="inline-flex items-center gap-1 rounded-full bg-[#FFFAF2]/85 text-[#A97824] border border-[#E9DCC7] px-2 py-1 text-[8px] font-black uppercase tracking-wider backdrop-blur">
-        <Star className="w-3 h-3" />
-        Premium
-      </span>
-    );
-  }
-
-  return null;
-}
 
 export default function ProductCard({
   product,
@@ -39,22 +16,14 @@ export default function ProductCard({
   const imageSrc = client.getImageUrl(product.image);
 
   const handleCardClick = (event) => {
-    if (
-      event.target.closest(".qty-control") ||
-      event.target.closest(".add-btn")
-    ) {
-      return;
-    }
-
+    if (event.target.closest(".qty-control") || event.target.closest(".add-btn")) return;
     hapticFeedback("light");
     onDetails?.(product);
   };
 
   const handleAddClick = (event) => {
     event.stopPropagation();
-
     if (!isAvailable) return;
-
     hapticFeedback("success");
     onAdd?.(product);
   };
@@ -74,100 +43,86 @@ export default function ProductCard({
   return (
     <article
       onClick={handleCardClick}
-      className={`group relative overflow-hidden rounded-3xl bg-white border border-[#C89438]/13 shadow-lg shadow-[#2C211A]/10 transition-all duration-300 active:scale-[0.992] cursor-pointer ${
-        isAvailable ? "hover:border-[#C89438]/45" : "opacity-65"
+      className={`overflow-hidden rounded-[22px] bg-white shadow-sm ring-1 ring-[#E8E2DA] transition active:scale-[0.99] ${
+        isAvailable ? "cursor-pointer" : "opacity-60"
       }`}
     >
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_12%_0%,rgba(200,148,56,0.08),transparent_34%)] pointer-events-none" />
+      <div className="relative aspect-square bg-[#F2F0ED]">
+        <img
+          src={imageSrc}
+          alt={product.name_uz}
+          loading="lazy"
+          referrerPolicy="no-referrer"
+          className="h-full w-full object-cover"
+        />
 
-      <div className="relative z-10 p-2.5 flex gap-3">
-        <div className="relative w-[104px] h-[104px] shrink-0 rounded-[1.25rem] overflow-hidden bg-[#FFFAF2] border border-[#E9DCC7]">
-          <img
-            src={imageSrc}
-            alt={product.name_uz}
-            loading="lazy"
-            referrerPolicy="no-referrer"
-            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.08]"
-          />
-
-          <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
-
-          <div className="absolute left-2 bottom-2">
-            <ProductBadge product={product} />
-          </div>
-
-          {!isAvailable && (
-            <div className="absolute inset-0 bg-black/70 backdrop-blur-[2px] flex items-center justify-center">
-              <span className="bg-red-600 text-red-600 border border-red-500 text-[9px] font-black px-2.5 py-1.5 rounded-full uppercase tracking-wider">
-                Mavjud emas
-              </span>
-            </div>
-          )}
+        <div className="absolute left-2 top-2 flex items-center gap-1 rounded-full bg-white/95 px-2 py-1 text-[9px] font-black text-[#A97824] shadow-sm">
+          <Star className="h-3 w-3 fill-[#C89438] text-[#C89438]" />
+          5.0
         </div>
 
-        <div className="min-w-0 flex-1 flex flex-col justify-between py-0.5">
-          <div className="min-w-0">
-            <span className="block text-[8px] font-black text-[#A97824] uppercase tracking-[0.15em] truncate">
-              {product.category_name || "Damirchi menyusi"}
+        {!isAvailable && (
+          <div className="absolute inset-0 flex items-center justify-center bg-white/75 backdrop-blur-sm">
+            <span className="rounded-full bg-red-50 px-3 py-1.5 text-[10px] font-black text-red-600 ring-1 ring-red-200">
+              Mavjud emas
             </span>
-
-            <h3 className="font-serif font-black text-[#2C211A] text-[15.5px] leading-tight tracking-tight line-clamp-2 mt-1">
-              {product.name_uz}
-            </h3>
-
-            <p className="text-[#776B60] text-[10.5px] leading-snug mt-1 line-clamp-2 font-semibold">
-              {product.description_uz ||
-                "Damirchi oshxonasi uslubida tayyorlangan mazali taom."}
-            </p>
           </div>
+        )}
+      </div>
 
-          <div className="flex items-end justify-between gap-2.5 mt-2.5">
-            <div className="min-w-0">
-              <p className="text-[8px] uppercase tracking-[0.14em] font-black text-[#776B60]">
-                Narxi
-              </p>
+      <div className="p-3">
+        <p className="truncate text-[9px] font-black uppercase tracking-[0.14em] text-[#A97824]">
+          {product.category_name || "Damirchi"}
+        </p>
 
-              <p className="font-serif font-black text-[#A97824] text-[15.5px] leading-none mt-0.5 truncate">
-                {formatPrice(product.price)}
-              </p>
+        <h3 className="mt-1 min-h-[36px] text-[13.5px] font-black leading-tight text-[#221816] line-clamp-2">
+          {product.name_uz}
+        </h3>
+
+        <p className="mt-1.5 min-h-[28px] text-[10.5px] font-semibold leading-snug text-[#78716C] line-clamp-2">
+          {product.description_uz || "Mazali va yangi tayyorlangan taom."}
+        </p>
+
+        <div className="mt-3 flex items-center justify-between gap-2">
+          <span className="truncate text-[14px] font-black text-[#A97824]">
+            {formatPrice(product.price)}
+          </span>
+
+          {isAvailable && quantity > 0 ? (
+            <div className="qty-control flex items-center rounded-xl bg-[#F2F0ED] p-1">
+              <button
+                type="button"
+                onClick={handleDecrease}
+                className="flex h-7 w-7 items-center justify-center rounded-lg text-[#A97824] active:scale-90"
+                aria-label="Kamaytirish"
+              >
+                <Minus className="h-3.5 w-3.5" />
+              </button>
+
+              <span className="w-6 text-center text-[12px] font-black text-[#221816]">
+                {quantity}
+              </span>
+
+              <button
+                type="button"
+                onClick={handleIncrease}
+                className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#C89438] text-white active:scale-90"
+                aria-label="Ko‘paytirish"
+              >
+                <Plus className="h-3.5 w-3.5" />
+              </button>
             </div>
-
-            {isAvailable &&
-              (quantity > 0 ? (
-                <div className="qty-control flex items-center bg-[#FFFAF2] rounded-2xl p-1 text-[#2C211A] shadow-inner border border-[#E9DCC7] shrink-0">
-                  <button
-                    type="button"
-                    onClick={handleDecrease}
-                    className="w-8 h-8 flex items-center justify-center rounded-xl hover:bg-white text-[#A97824] active:scale-90 transition-all"
-                    aria-label="Kamaytirish"
-                  >
-                    <Minus className="w-4 h-4" />
-                  </button>
-
-                  <span className="w-7 text-center text-sm font-black text-[#2C211A]">
-                    {quantity}
-                  </span>
-
-                  <button
-                    type="button"
-                    onClick={handleIncrease}
-                    className="w-8 h-8 flex items-center justify-center rounded-xl bg-[#C89438] text-white active:scale-90 transition-all"
-                    aria-label="Ko‘paytirish"
-                  >
-                    <Plus className="w-4 h-4" />
-                  </button>
-                </div>
-              ) : (
-                <button
-                  type="button"
-                  onClick={handleAddClick}
-                  className="add-btn h-9 px-3.5 bg-[#C89438] text-white rounded-2xl flex items-center justify-center gap-1.5 transition-all duration-200 active:scale-95 shadow-lg shadow-[#C89438]/10 font-black text-[10.5px] shrink-0"
-                >
-                  <Plus className="w-4 h-4" />
-                  Qo‘shish
-                </button>
-              ))}
-          </div>
+          ) : (
+            <button
+              type="button"
+              onClick={handleAddClick}
+              disabled={!isAvailable}
+              className="add-btn flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#C89438] text-white shadow-sm active:scale-95 disabled:bg-stone-200 disabled:text-stone-400"
+              aria-label="Savatga qo‘shish"
+            >
+              <Plus className="h-4 w-4" />
+            </button>
+          )}
         </div>
       </div>
     </article>

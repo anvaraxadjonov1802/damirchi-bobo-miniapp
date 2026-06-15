@@ -1,6 +1,5 @@
 import React from "react";
-import { ArrowRight, ShoppingBag } from "lucide-react";
-
+import { ChevronRight, ShoppingBag } from "lucide-react";
 import { formatPrice } from "../utils/format";
 import { hapticFeedback } from "../telegram/telegram";
 
@@ -9,52 +8,26 @@ export default function BottomCartBar({ count, totalPrice, onClick }) {
 
   const handleBarClick = () => {
     hapticFeedback("medium");
-
-    if (onClick) {
-      onClick();
-    }
+    onClick?.();
   };
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 flex justify-center px-4 pb-4 pt-8 safe-bottom bg-gradient-to-t from-[#FAF7F0] via-[#FAF7F0]/95 to-transparent pointer-events-none">
+    <div className="pointer-events-none fixed bottom-0 left-0 right-0 z-50 flex justify-center bg-gradient-to-t from-[#F6F6F7] via-[#F6F6F7]/95 to-transparent px-4 pb-4 pt-8 safe-bottom">
       <button
         type="button"
         onClick={handleBarClick}
-        className="pointer-events-auto w-full max-w-[448px] h-14 rounded-3xl bg-white hover:bg-[#FFF6E8] border border-[#E9DCC7] shadow-2xl shadow-[#2C211A]/14 px-4 flex items-center justify-between gap-3 transition-all active:scale-[0.98] relative overflow-hidden group"
+        className="pointer-events-auto flex h-14 w-full max-w-[448px] items-center justify-between gap-3 rounded-2xl bg-[#C89438] px-4 text-white shadow-xl shadow-[#C89438]/25 active:scale-[0.98]"
       >
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_0%_0%,rgba(200,148,56,0.16),transparent_36%)]" />
-
-        <div className="absolute inset-0 bg-white/5 skew-x-12 translate-x-[-110%] group-hover:translate-x-[110%] transition-transform duration-1000 ease-out" />
-
-        <div className="relative flex items-center gap-3 min-w-0">
-          <div className="w-9 h-9 rounded-2xl bg-[#C89438] text-white flex items-center justify-center shadow-md shadow-[#C89438]/10 shrink-0">
-            <ShoppingBag className="w-4 h-4" />
+        <div className="flex min-w-0 items-center gap-3">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white/18">
+            <ShoppingBag className="h-4 w-4" />
           </div>
-
           <div className="min-w-0 text-left">
-            <div className="flex items-center gap-1.5">
-              <span className="text-[9px] font-black uppercase tracking-[0.16em] text-[#A97824]/80 leading-none">
-                Savat
-              </span>
-
-              <span className="min-w-5 h-5 px-1.5 rounded-full bg-[#C89438]/10 border border-[#E9DCC7] text-[#A97824] text-[10px] font-black flex items-center justify-center leading-none">
-                {count}
-              </span>
-            </div>
-
-            <span className="block font-black text-sm text-[#2C211A] mt-0.5 truncate">
-              {formatPrice(totalPrice)}
-            </span>
+            <p className="text-[10px] font-black uppercase tracking-[0.14em] text-white/75">Savat</p>
+            <p className="truncate text-[14px] font-black">{count} ta · {formatPrice(totalPrice)}</p>
           </div>
         </div>
-
-        <div className="relative flex items-center gap-1.5 text-[#A97824] shrink-0">
-          <span className="uppercase tracking-[0.08em] text-[10px] font-black">
-            Ko‘rish
-          </span>
-
-          <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-        </div>
+        <ChevronRight className="h-5 w-5 shrink-0" />
       </button>
     </div>
   );

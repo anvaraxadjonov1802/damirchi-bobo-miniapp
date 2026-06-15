@@ -258,6 +258,7 @@ export default function App() {
       setCurrentScreen("success");
     } catch (err: any) {
       console.error("Order submission failure:", err);
+
       hapticFeedback("error");
       showToast(
         err?.message ||
@@ -282,15 +283,15 @@ export default function App() {
 
   if (error && categories.length === 0) {
     return (
-      <div className="flex items-center justify-center min-h-[100dvh] px-4 bg-[#FFFAF2]">
+      <div className="flex min-h-[100dvh] items-center justify-center bg-[#F6F6F7] px-4">
         <ErrorState message={error} onRetry={fetchInitialMenu} />
       </div>
     );
   }
 
   return (
-    <div className="min-h-[100dvh] w-full select-none bg-[#FFFAF2] text-[#2C211A] overflow-x-hidden flex justify-center">
-      <div className="w-full max-w-[480px] bg-[#FFFAF2] flex flex-col min-h-[100dvh] border-x border-[#E9DCC7] relative shadow-sm">
+    <div className="flex min-h-[100dvh] w-full justify-center overflow-x-hidden bg-[#F6F6F7] text-[#221816] select-none">
+      <div className="relative flex min-h-[100dvh] w-full max-w-[480px] flex-col bg-[#F6F6F7] shadow-sm">
         <AppHeader
           cartCount={totalCartCount}
           onCartClick={() => setCurrentScreen("cart")}
@@ -299,7 +300,7 @@ export default function App() {
           settings={restaurantSettings}
         />
 
-        <main className="flex-1 w-full pb-4">
+        <main className="w-full flex-1 pb-4">
           {currentScreen === "menu" && (
             <MenuPage
               products={products}
