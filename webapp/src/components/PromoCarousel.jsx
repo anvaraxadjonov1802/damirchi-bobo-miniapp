@@ -8,10 +8,7 @@ export default function PromoCarousel({ banners = [] }) {
   const touchStartX = useRef(null);
   const touchEndX = useRef(null);
 
-  const ChevronRight, ImageOff } from "lucide-react";
-
-export default function PromoCarousel({ banners = [] }) {
-  const [activeIndex, setActiveIndex] = total = banners.length;
+  const total = banners.length;
 
   useEffect(() => {
     if (total <= 1) return undefined;
@@ -21,7 +18,7 @@ export default function PromoCarousel({ banners = [] }) {
     }, 4000);
 
     return () => window.clearInterval(timer);
-  }, [total, activeIndex]);
+  }, [total]);
 
   useEffect(() => {
     if (activeIndex >= total && total > 0) {
@@ -60,9 +57,7 @@ export default function PromoCarousel({ banners = [] }) {
 
     if (distance > minimumSwipeDistance) {
       goNext();
-    }
-
-    if (distance < -minimumSwipeDistance) {
+    } else if (distance < -minimumSwipeDistance) {
       goPrevious();
     }
 
@@ -104,7 +99,7 @@ export default function PromoCarousel({ banners = [] }) {
                 {hasImage ? (
                   <img
                     src={banner.image}
-                    alt={banner.title}
+                    alt={banner.title || "Damirchi banner"}
                     loading={index === 0 ? "eager" : "lazy"}
                     onError={() => handleImageError(index)}
                     className="absolute inset-0 h-full w-full object-cover"
