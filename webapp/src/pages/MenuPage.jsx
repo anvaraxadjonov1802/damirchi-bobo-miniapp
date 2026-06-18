@@ -263,23 +263,29 @@ export default function MenuPage({
           <div className="flex flex-col gap-5">
             {groupedSections.map((section) => (
               <section key={section.id}>
-                <div className="mb-3 flex items-center justify-between gap-3">
-                  <h3 className="truncate text-[21px] font-black leading-tight tracking-[-0.04em] text-[#1F1F1F]">
-                    {section.title}
-                  </h3>
+                <div className="mb-3 flex items-end justify-between gap-3">
+                  <div className="min-w-0">
+                    <h3 className="truncate text-[20px] font-black leading-tight tracking-[-0.04em] text-[#241812]">
+                      {section.title}
+                    </h3>
+
+                    <p className="mt-1 text-[11px] font-bold text-[#8B8178]">
+                      {section.products.length} ta mahsulot
+                    </p>
+                  </div>
 
                   {(activeCategoryId !== null || searchQuery.trim()) && (
                     <button
                       type="button"
                       onClick={handleClearFilters}
-                      className="shrink-0 rounded-full bg-white px-3 py-1.5 text-[10px] font-black text-[#C89438] shadow-sm ring-1 ring-[#E7E7E7]"
+                      className="shrink-0 rounded-[14px] border border-[#E9DCC7] bg-white px-3 py-2 text-[10px] font-black text-[#A97824] shadow-sm transition active:scale-95"
                     >
-                      Tozalash
+                      Filtrni tozalash
                     </button>
                   )}
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 items-stretch gap-3">
                   {section.products.map((product) => {
                     const inCartQty = cart[product.id]?.quantity || 0;
 
