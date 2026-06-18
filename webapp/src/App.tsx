@@ -423,6 +423,7 @@ export default function App() {
               onGoToMenu={() => setCurrentScreen("menu")}
               onProceedToCheckout={() => setCurrentScreen("checkout")}
               settings={restaurantSettings}
+              orderType={orderType}
             />
           )}
 
