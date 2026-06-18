@@ -392,7 +392,7 @@ export default function App() {
           settings={restaurantSettings}
         />
 
-        <main className="w-full flex-1 pb-24">
+        <main className="w-full flex-1 pb-[92px]">
           {currentScreen === "menu" && (
             <MenuPage
               products={products}
