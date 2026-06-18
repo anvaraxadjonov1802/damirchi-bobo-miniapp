@@ -1,20 +1,46 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   ChevronRight,
   Clock3,
   Info,
   Instagram,
   MapPin,
+  MapPinned,
+  Navigation,
+  Car,
+  X,
   PackageCheck,
   Phone,
   Send,
   ShieldCheck,
   ShoppingBag,
   Truck,
-  UserRound,
 } from "lucide-react";
 
 import { getTelegramUser, hapticFeedback } from "../telegram/telegram";
+
+const RESTAURANT_LOCATION = {
+  name: "DAMIRCHI BOBO (restaurant)",
+  googleMapsUrl:
+    "https://maps.app.goo.gl/noZ2RfAeR5cLJwkN7?g_st=atm",
+  yandexMapsUrl:
+    "https://yandex.uz/maps/?ll=69.2269375%2C41.1681875&z=17&text=DAMIRCHI%20BOBO%20restaurant",
+  latitude: 41.1681875,
+  longitude: 69.2269375,
+};
+
+function getYandexGoUrl() {
+  const params = new URLSearchParams({
+    "end-lat": String(RESTAURANT_LOCATION.latitude),
+    "end-lon": String(RESTAURANT_LOCATION.longitude),
+    ref: "damirchi",
+    appmetrica_tracking_id: "25395763362139037",
+    lang: "uz",
+  });
+
+  return `https://3.redirect.appmetrica.yandex.com/route?${params.toString()}`;
+}
+
 
 function getInitials(name = "") {
   const parts = name
@@ -67,6 +93,143 @@ function openExternalLink(url) {
   window.open(normalizedUrl, "_blank", "noopener,noreferrer");
 }
 
+
+function LocationAppModal({ isOpen, onClose }) {
+  useEffect(() => {
+    if (!isOpen) return undefined;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        onClose?.();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isOpen, onClose]);
+
+  if (!isOpen) return null;
+
+  const openLocation = (url) => {
+    hapticFeedback("light");
+    onClose?.();
+
+    window.setTimeout(() => {
+      openExternalLink(url);
+    }, 80);
+  };
+
+  const options = [
+    {
+      key: "google",
+      title: "Google Maps",
+      subtitle: "Restoran lokatsiyasini Google Maps’da ochish",
+      icon: MapPinned,
+      onClick: () => openLocation(RESTAURANT_LOCATION.googleMapsUrl),
+    },
+    {
+      key: "yandex-maps",
+      title: "Yandex Maps",
+      subtitle: "Manzil va yo‘nalishni Yandex Maps’da ko‘rish",
+      icon: Navigation,
+      onClick: () => openLocation(RESTAURANT_LOCATION.yandexMapsUrl),
+    },
+    {
+      key: "yandex-go",
+      title: "Yandex Go",
+      subtitle: "Restoranga taksi chaqirish",
+      icon: Car,
+      onClick: () => openLocation(getYandexGoUrl()),
+    },
+  ];
+
+  return (
+    <div
+      className="fixed inset-0 z-[9999] flex items-end justify-center bg-black/45 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-[2px]"
+      onClick={onClose}
+      role="presentation"
+    >
+      <section
+        className="w-full max-w-[480px] rounded-[28px] border border-white/20 bg-[#F7F3EB] p-3 shadow-[0_-24px_70px_-30px_rgba(0,0,0,0.75)]"
+        onClick={(event) => event.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="location-modal-title"
+      >
+        <div className="mb-3 flex items-start justify-between gap-3 px-1 pt-1">
+          <div>
+            <p className="text-[10px] font-black uppercase tracking-[0.13em] text-[#A97824]">
+              Restoran lokatsiyasi
+            </p>
+
+            <h2
+              id="location-modal-title"
+              className="mt-1 text-[18px] font-black tracking-[-0.03em] text-[#241812]"
+            >
+              Qaysi ilovada ochilsin?
+            </h2>
+
+            <p className="mt-1 text-[10px] font-bold leading-[1.45] text-[#776B60]">
+              {RESTAURANT_LOCATION.name}
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] border border-[#E9E3DA] bg-white text-[#776B60] transition active:scale-90"
+            aria-label="Yopish"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+
+        <div className="flex flex-col gap-2.5">
+          {options.map(({ key, title, subtitle, icon: Icon, onClick }) => (
+            <button
+              key={key}
+              type="button"
+              onClick={onClick}
+              className="flex w-full items-center gap-3 rounded-[18px] border border-[#E9E3DA] bg-white p-3.5 text-left shadow-[0_12px_28px_-26px_rgba(36,24,18,0.55)] transition active:scale-[0.985]"
+            >
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[15px] bg-[#FFF0D3] text-[#A97824]">
+                <Icon className="h-5 w-5" />
+              </div>
+
+              <div className="min-w-0 flex-1">
+                <p className="text-[13px] font-black text-[#241812]">
+                  {title}
+                </p>
+
+                <p className="mt-1 line-clamp-1 text-[10px] font-bold text-[#8B8178]">
+                  {subtitle}
+                </p>
+              </div>
+
+              <ChevronRight className="h-4 w-4 shrink-0 text-[#B5AA9F]" />
+            </button>
+          ))}
+        </div>
+
+        <button
+          type="button"
+          onClick={onClose}
+          className="mt-3 h-12 w-full rounded-[16px] bg-[#EEE7DD] text-[12px] font-black text-[#776B60] transition active:scale-[0.985]"
+        >
+          Bekor qilish
+        </button>
+      </section>
+    </div>
+  );
+}
+
 function formatWorkingHours(openTime, closeTime) {
   if (!openTime || !closeTime) {
     return "Ish vaqti operator orqali aniqlanadi";
@@ -115,6 +278,7 @@ export default function ProfilePage({
   onGoToOrders,
 }) {
   const telegramUser = useMemo(() => getTelegramUser(), []);
+  const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
 
   const fullName =
     telegramUser?.fullName ||
@@ -129,9 +293,6 @@ export default function ProfilePage({
 
   const restaurantName = settings?.restaurant_name || "Damirchi";
   const restaurantPhone = settings?.phone || "";
-  const restaurantAddress =
-    settings?.address || "Toshkent, Sergeli Yangihayot Betonka";
-
   const callRestaurant = () => {
     if (!restaurantPhone) return;
 
@@ -155,10 +316,8 @@ export default function ProfilePage({
   };
 
   const openAddress = () => {
-    hapticFeedback("light");
-
-    const query = encodeURIComponent(restaurantAddress);
-    openExternalLink(`https://www.google.com/maps/search/?api=1&query=${query}`);
+    hapticFeedback("medium");
+    setIsLocationModalOpen(true);
   };
 
   return (
@@ -269,8 +428,8 @@ export default function ProfilePage({
 
           <ActionRow
             icon={MapPin}
-            title={restaurantAddress}
-            subtitle="Xaritada restoran manzilini ochish"
+            title={RESTAURANT_LOCATION.name}
+            subtitle="Google Maps, Yandex Maps yoki Yandex Go orqali ochish"
             onClick={openAddress}
           />
 
@@ -332,6 +491,11 @@ export default function ProfilePage({
         <Info className="h-3.5 w-3.5" />
         <span>{restaurantName} Mini App · 1.0.0</span>
       </section>
+
+      <LocationAppModal
+        isOpen={isLocationModalOpen}
+        onClose={() => setIsLocationModalOpen(false)}
+      />
     </div>
   );
 }
