@@ -374,15 +374,15 @@ export default function App() {
 
   if (error && categories.length === 0) {
     return (
-      <div className="flex min-h-[100dvh] items-center justify-center bg-[#F6F6F7] px-4">
+      <div className="flex min-h-[100dvh] items-center justify-center bg-[#F7F3EB] px-4">
         <ErrorState message={error} onRetry={fetchInitialMenu} />
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-[100dvh] w-full justify-center overflow-x-hidden bg-[#F6F6F7] text-[#221816] select-none">
-      <div className="relative flex min-h-[100dvh] w-full max-w-[480px] flex-col bg-[#F6F6F7] shadow-sm">
+    <div className="flex min-h-[100dvh] w-full justify-center overflow-x-hidden bg-[#F7F3EB] text-[#221816] select-none">
+      <div className="relative flex min-h-[100dvh] w-full max-w-[480px] flex-col bg-[#F7F3EB] shadow-sm">
         <AppHeader
           cartCount={totalCartCount}
           notificationCount={unreadNotificationCount}
@@ -432,8 +432,9 @@ export default function App() {
               cart={cart}
               onSubmitOrder={handleSubmitOrder}
               isSubmitting={submittingOrder}
-              onGoBack={handleGoBack}
               settings={restaurantSettings}
+              orderType={orderType}
+              onOrderTypeChange={setOrderType}
               initialOrderType={orderType}
             />
           )}

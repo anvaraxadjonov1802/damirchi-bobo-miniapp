@@ -1,41 +1,65 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
-  Truck,
-  MapPin,
-  Phone,
+  ArrowRight,
   CreditCard,
   DollarSign,
-  MessageSquare,
-  ArrowRight,
   Loader2,
-  ShieldCheck,
+  MapPin,
   MapPinned,
+  MessageSquare,
+  PackageCheck,
+  Phone,
+  ShieldCheck,
+  ShoppingBag,
+  Truck,
 } from "lucide-react";
 
+import MapPickerModal from "../components/MapPickerModal";
 import OptionSelector from "../components/OptionSelector";
 import PriceSummary from "../components/PriceSummary";
 import SectionCard from "../components/SectionCard";
-import MapPickerModal from "../components/MapPickerModal";
 import { useToast } from "../components/ToastProvider";
 
 import {
-  getTelegramUser,
   getTelegramInitData,
+  getTelegramUser,
   hapticFeedback,
 } from "../telegram/telegram";
 
+function normalizePhone(value = "") {
+  const digits = value.replace(/\D/g, "");
+
+  if (!digits) return "";
+
+  if (digits.startsWith("998")) {
+    return `+${digits}`;
+  }
+
+  if (digits.length === 9) {
+    return `+998${digits}`;
+  }
+
+  return value.trim();
+}
+
 export default function CheckoutPage({
-  cart,
+  cart = {},
   onSubmitOrder,
-  isSubmitting,
-  onGoBack,
+  isSubmitting = false,
   settings,
+  orderType: controlledOrderType,
+  onOrderTypeChange,
   initialOrderType = "delivery",
 }) {
   const { showToast } = useToast();
   const telegramUser = useMemo(() => getTelegramUser(), []);
 
-  const [orderType, setOrderType] = useState(initialOrderType || "delivery");
+  const [internalOrderType, setInternalOrderType] = useState(
+    initialOrderType === "pickup" ? "pickup" : "delivery"
+  );
+
+  const orderType = controlledOrderType || internalOrderType;
+
   const [paymentType, setPaymentType] = useState("cash");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
@@ -44,90 +68,151 @@ export default function CheckoutPage({
   const [comment, setComment] = useState("");
   const [isMapOpen, setIsMapOpen] = useState(false);
 
+  useEffect(() => {
+    if (!controlledOrderType) {
+      setInternalOrderType(
+        initialOrderType === "pickup" ? "pickup" : "delivery"
+      );
+    }
+  }, [controlledOrderType, initialOrderType]);
+
   const cartItems = useMemo(() => Object.values(cart), [cart]);
 
-  const subtotal = useMemo(() => {
-    return cartItems.reduce(
-      (acc, item) => acc + item.product.price * item.quantity,
-      0
-    );
-  }, [cartItems]);
+  const subtotal = useMemo(
+    () =>
+      cartItems.reduce(
+        (total, item) =>
+          total +
+          Number(item?.product?.price || 0) *
+            Number(item?.quantity || 0),
+        0
+      ),
+    [cartItems]
+  );
+
+  const totalItemCount = useMemo(
+    () =>
+      cartItems.reduce(
+        (total, item) => total + Number(item?.quantity || 0),
+        0
+      ),
+    [cartItems]
+  );
 
   const isOpen = settings?.is_open !== false;
-  const backendDeliveryPrice = Number(settings?.delivery_price ?? 15000);
-  const minOrderAmount = Number(settings?.min_order_amount || 0);
-  const deliveryPrice = orderType === "delivery" ? backendDeliveryPrice : 0;
-  const totalItemCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
+  const isDelivery = orderType === "delivery";
   const hasLocation = Boolean(latitude && longitude);
 
+  const backendDeliveryPrice = Number(
+    settings?.delivery_price ?? 15000
+  );
+
+  const deliveryPrice = isDelivery ? backendDeliveryPrice : 0;
+
+  const minOrderAmount = isDelivery
+    ? Number(settings?.min_order_amount || 0)
+    : 0;
+
+  const totalPrice = subtotal + deliveryPrice;
+
+  const isBelowMinimum =
+    minOrderAmount > 0 && subtotal < minOrderAmount;
+
   const orderTypeOptions = [
-    { value: "delivery", label: "Dastavka", icon: Truck },
-    { value: "pickup", label: "Olib ketish", icon: MapPin },
+    {
+      value: "delivery",
+      label: "Dastavka",
+      icon: Truck,
+    },
+    {
+      value: "pickup",
+      label: "Olib ketish",
+      icon: PackageCheck,
+    },
   ];
 
   const paymentTypeOptions = [
-    { value: "cash", label: "Naqd", icon: DollarSign },
-    { value: "card", label: "Karta", icon: CreditCard },
+    {
+      value: "cash",
+      label: "Naqd",
+      icon: DollarSign,
+    },
+    {
+      value: "card",
+      label: "Karta",
+      icon: CreditCard,
+    },
   ];
 
-  const notifyError = (message) => {
-    showToast(message, "error");
-    hapticFeedback("error");
+  const notify = (message, type = "error") => {
+    showToast(message, type);
+    hapticFeedback(type === "success" ? "success" : "error");
   };
 
-  const notifyWarning = (message) => {
-    showToast(message, "warning");
-    hapticFeedback("error");
+  const changeOrderType = (value) => {
+    hapticFeedback("light");
+
+    if (controlledOrderType) {
+      onOrderTypeChange?.(value);
+      return;
+    }
+
+    setInternalOrderType(value);
+    onOrderTypeChange?.(value);
   };
 
   const handleMapSelect = ({ latitude: lat, longitude: lng }) => {
     setLatitude(String(lat));
     setLongitude(String(lng));
-    showToast("Lokatsiya belgilandi ✅", "success");
-    hapticFeedback("success");
+    setIsMapOpen(false);
+
+    notify("Lokatsiya belgilandi ✅", "success");
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSubmit = (event) => {
+    event.preventDefault();
     hapticFeedback("medium");
 
+    if (isSubmitting) return;
+
     if (!isOpen) {
-      notifyError("Restoran hozir yopiq.");
+      notify("Restoran hozir yopiq.");
       return;
     }
-
-    const trimmedPhone = phone.trim();
-    const trimmedAddress = address.trim();
 
     if (cartItems.length === 0) {
-      notifyError("Savat bo‘sh.");
+      notify("Savat bo‘sh.");
       return;
     }
+
+    const trimmedPhone = normalizePhone(phone);
+    const phoneDigits = trimmedPhone.replace(/\D/g, "");
+    const trimmedAddress = address.trim();
 
     if (!trimmedPhone) {
-      notifyError("Telefon raqam kiriting.");
+      notify("Telefon raqam kiriting.");
       return;
     }
 
-    if (trimmedPhone.replace(/\D/g, "").length < 9) {
-      notifyError("Telefon raqam noto‘g‘ri ko‘rinadi.");
+    if (phoneDigits.length < 9) {
+      notify("Telefon raqam noto‘g‘ri ko‘rinadi.");
       return;
     }
 
-    if (orderType === "delivery" && !trimmedAddress && !hasLocation) {
-      notifyWarning("Manzil yozing yoki xaritadan belgilang.");
+    if (isDelivery && !trimmedAddress && !hasLocation) {
+      notify(
+        "Manzil yozing yoki xaritadan lokatsiyani belgilang.",
+        "warning"
+      );
       return;
     }
 
-    if (
-      orderType === "delivery" &&
-      minOrderAmount > 0 &&
-      subtotal < minOrderAmount
-    ) {
-      notifyWarning(
+    if (isBelowMinimum) {
+      notify(
         `Dastavka uchun kamida ${minOrderAmount.toLocaleString(
           "uz-UZ"
-        )} so‘mlik buyurtma kerak.`
+        )} so‘mlik buyurtma kerak.`,
+        "warning"
       );
       return;
     }
@@ -135,59 +220,74 @@ export default function CheckoutPage({
     const telegramInitData = getTelegramInitData();
 
     if (!telegramInitData) {
-      notifyError("Buyurtma faqat Telegram bot ichida qabul qilinadi.");
+      notify(
+        "Buyurtma faqat Telegram bot ichida qabul qilinadi."
+      );
       return;
     }
 
     const items = cartItems.map((item) => ({
       product: item.product.id,
-      quantity: item.quantity,
+      quantity: Number(item.quantity),
     }));
 
     const payload = {
-      
       telegram_init_data: telegramInitData,
-      telegram_id: telegramUser.id,
-      full_name: telegramUser.fullName || "Telegram foydalanuvchisi",
-      username: telegramUser.username || "",
+      telegram_id: telegramUser?.id || null,
+      full_name:
+        telegramUser?.fullName ||
+        telegramUser?.first_name ||
+        "Telegram foydalanuvchisi",
+      username: telegramUser?.username || "",
 
       order_type: orderType,
-      delivery_price: orderType === "delivery" ? deliveryPrice : 0,
       payment_type: paymentType,
       phone: trimmedPhone,
-      address: orderType === "delivery" ? trimmedAddress : "",
-      latitude: hasLocation ? String(latitude) : null,
-      longitude: hasLocation ? String(longitude) : null,
       comment: comment.trim(),
 
-      items,
-      __total_price: subtotal + deliveryPrice,
-    };
-    
+      address: isDelivery ? trimmedAddress : "",
+      latitude:
+        isDelivery && hasLocation ? String(latitude) : null,
+      longitude:
+        isDelivery && hasLocation ? String(longitude) : null,
+      delivery_price: isDelivery ? deliveryPrice : 0,
 
-    onSubmitOrder(payload);
+      items,
+    };
+
+    onSubmitOrder?.(payload);
   };
 
   return (
-    <div className="px-4 py-3 pb-28 animate-fade-in text-[#2C211A] checkout-readable">
+    <div className="min-h-[100dvh] bg-[#F7F3EB] px-4 pb-[120px] pt-3 text-[#241812]">
       <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-        <div className="rounded-3xl bg-white border border-[#E9DCC7] p-4 shadow-lg relative overflow-hidden">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_0%_0%,rgba(200,148,56,0.14),transparent_38%)]" />
+        <section className="relative overflow-hidden rounded-[24px] border border-[#E9E3DA] bg-white p-4 shadow-[0_14px_34px_-28px_rgba(36,24,18,0.6)]">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_0%_0%,rgba(200,148,56,0.16),transparent_42%)]" />
 
           <div className="relative flex items-center justify-between gap-3">
-            <div>
-              <h2 className="font-serif font-black text-xl text-[#2C211A] leading-tight">
-                Buyurtma
-              </h2>
-              <p className="text-sm text-[#776B60] font-semibold mt-1">
-                {totalItemCount} ta mahsulot
-              </p>
+            <div className="flex min-w-0 items-center gap-3">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[15px] bg-[#FFF0D3] text-[#A97824]">
+                <ShoppingBag className="h-5 w-5" />
+              </div>
+
+              <div className="min-w-0">
+                <h1 className="truncate text-[20px] font-black tracking-[-0.035em]">
+                  Buyurtmani rasmiylashtirish
+                </h1>
+
+                <p className="mt-1 text-[11px] font-bold text-[#776B60]">
+                  {totalItemCount} ta mahsulot
+                </p>
+              </div>
             </div>
 
-            <div className="rounded-2xl bg-[#FFFAF2] border border-[#E9DCC7] px-3 py-2 text-right">
-              <p className="text-xs text-[#776B60] font-bold">Holat</p>
+            <div className="shrink-0 rounded-[14px] border border-[#E9DCC7] bg-[#FFFAF2] px-3 py-2 text-right">
+              <p className="text-[9px] font-black uppercase tracking-[0.1em] text-[#8B8178]">
+                Holat
+              </p>
+
               <p
-                className={`text-sm font-black ${
+                className={`mt-0.5 text-[12px] font-black ${
                   isOpen ? "text-emerald-700" : "text-red-600"
                 }`}
               >
@@ -195,11 +295,12 @@ export default function CheckoutPage({
               </p>
             </div>
           </div>
-        </div>
+        </section>
 
         {!isOpen && (
-          <div className="bg-red-100 text-red-600 border border-red-500/45 rounded-2xl p-3 text-sm font-bold">
-            Restoran hozir yopiq.
+          <div className="rounded-[18px] border border-red-200 bg-red-50 px-4 py-3 text-[12px] font-bold leading-[1.45] text-red-600">
+            Restoran hozir yopiq. Buyurtmalar vaqtincha qabul
+            qilinmaydi.
           </div>
         )}
 
@@ -207,15 +308,15 @@ export default function CheckoutPage({
           label="Buyurtma turi"
           options={orderTypeOptions}
           selectedValue={orderType}
-          onChange={setOrderType}
+          onChange={changeOrderType}
         />
 
         <SectionCard
-          title="Ma’lumotlar"
+          title="Aloqa ma’lumotlari"
           subtitle={
-            orderType === "delivery"
-              ? "Telefon, manzil yoki xaritadan lokatsiya"
-              : "Telefon raqamni kiriting"
+            isDelivery
+              ? "Telefon va yetkazib berish manzilini kiriting"
+              : "Buyurtmani olish uchun telefon raqamingizni kiriting"
           }
         >
           <label htmlFor="phone-input" className="sr-only">
@@ -223,33 +324,41 @@ export default function CheckoutPage({
           </label>
 
           <div className="relative flex items-center">
-            <Phone className="absolute left-4 w-5 h-5 text-[#776B60] opacity-80" />
+            <Phone className="pointer-events-none absolute left-4 h-5 w-5 text-[#A97824]" />
+
             <input
               id="phone-input"
               type="tel"
               inputMode="tel"
-              required
+              autoComplete="tel"
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              onChange={(event) => setPhone(event.target.value)}
               placeholder="+998 90 123 45 67"
-              className="w-full pl-12 pr-4 py-3.5 bg-[#FFFAF2] border border-[#E9DCC7] rounded-2xl text-base text-[#2C211A] focus:outline-none focus:ring-2 focus:ring-[#C89438]/45 focus:border-[#C89438] placeholder-[#776B60]/50 font-semibold"
+              className="w-full rounded-[16px] border border-[#E9DCC7] bg-[#FFFAF2] py-3.5 pl-12 pr-4 text-[14px] font-bold text-[#241812] outline-none transition placeholder:font-semibold placeholder:text-[#A59B92] focus:border-[#C89438] focus:ring-2 focus:ring-[#C89438]/20"
             />
           </div>
 
-          {orderType === "delivery" && (
+          {isDelivery && (
             <>
               <label htmlFor="address-input" className="sr-only">
-                Manzil
+                Yetkazib berish manzili
               </label>
 
-              <input
-                id="address-input"
-                type="text"
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-                placeholder="Uy, ko‘cha, mo‘ljal..."
-                className="w-full px-4 py-3.5 bg-[#FFFAF2] border border-[#E9DCC7] rounded-2xl text-base text-[#2C211A] focus:outline-none focus:ring-2 focus:ring-[#C89438]/45 focus:border-[#C89438] placeholder-[#776B60]/50 font-semibold"
-              />
+              <div className="relative">
+                <MapPin className="pointer-events-none absolute left-4 top-3.5 h-5 w-5 text-[#A97824]" />
+
+                <input
+                  id="address-input"
+                  type="text"
+                  autoComplete="street-address"
+                  value={address}
+                  onChange={(event) =>
+                    setAddress(event.target.value)
+                  }
+                  placeholder="Uy, ko‘cha va mo‘ljal..."
+                  className="w-full rounded-[16px] border border-[#E9DCC7] bg-[#FFFAF2] py-3.5 pl-12 pr-4 text-[14px] font-bold text-[#241812] outline-none transition placeholder:font-semibold placeholder:text-[#A59B92] focus:border-[#C89438] focus:ring-2 focus:ring-[#C89438]/20"
+                />
+              </div>
 
               <button
                 type="button"
@@ -257,76 +366,129 @@ export default function CheckoutPage({
                   hapticFeedback("medium");
                   setIsMapOpen(true);
                 }}
-                className={`w-full py-3.5 px-4 rounded-2xl font-black text-base flex items-center justify-center gap-2 transition-all border active:scale-[0.98] ${
+                className={`flex w-full items-center justify-center gap-2 rounded-[16px] border px-4 py-3.5 text-[14px] font-black transition active:scale-[0.98] ${
                   hasLocation
-                    ? "bg-emerald-950/25 border-emerald-700/60 text-emerald-700"
-                    : "bg-[#FFFAF2] border-[#E9DCC7] text-[#A97824]"
+                    ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+                    : "border-[#E9DCC7] bg-[#FFFAF2] text-[#A97824]"
                 }`}
               >
-                <MapPinned className="w-5 h-5" />
-                {hasLocation ? "Lokatsiya belgilandi ✅" : "Xaritadan tanlash"}
+                <MapPinned className="h-5 w-5" />
+
+                {hasLocation
+                  ? "Lokatsiya belgilandi"
+                  : "Xaritadan lokatsiya tanlash"}
               </button>
 
               {hasLocation && (
-                <div className="rounded-2xl border border-emerald-800/40 bg-emerald-950/20 px-4 py-2.5 text-xs text-emerald-200 font-bold leading-relaxed">
-                  {latitude}, {longitude}
+                <div className="rounded-[14px] border border-emerald-200 bg-emerald-50 px-3 py-2.5 text-[10px] font-bold leading-[1.45] text-emerald-700">
+                  Koordinatalar: {latitude}, {longitude}
                 </div>
               )}
             </>
           )}
         </SectionCard>
 
-        <SectionCard title="To‘lov va izoh" compact>
+        <SectionCard
+          title="To‘lov va izoh"
+          subtitle="To‘lov turini tanlang va kerakli izohni yozing"
+          compact
+        >
           <OptionSelector
-            label="To‘lov"
+            label="To‘lov turi"
             options={paymentTypeOptions}
             selectedValue={paymentType}
             onChange={setPaymentType}
           />
 
           <div className="relative">
-            <MessageSquare className="absolute top-3.5 left-4 w-5 h-5 text-[#776B60] opacity-80" />
+            <MessageSquare className="pointer-events-none absolute left-4 top-3.5 h-5 w-5 text-[#A97824]" />
+
             <textarea
               value={comment}
-              onChange={(e) => setComment(e.target.value)}
-              placeholder="Izoh: achchiq bo‘lmasin..."
-              rows={2}
-              className="w-full pl-12 pr-4 py-3.5 bg-[#FFFAF2] border border-[#E9DCC7] rounded-2xl text-base text-[#2C211A] focus:outline-none focus:ring-2 focus:ring-[#C89438]/45 focus:border-[#C89438] placeholder-[#776B60]/50 font-semibold resize-none"
+              onChange={(event) => setComment(event.target.value)}
+              placeholder="Masalan: achchiq bo‘lmasin..."
+              rows={3}
+              maxLength={500}
+              className="w-full resize-none rounded-[16px] border border-[#E9DCC7] bg-[#FFFAF2] py-3.5 pl-12 pr-4 text-[14px] font-bold text-[#241812] outline-none transition placeholder:font-semibold placeholder:text-[#A59B92] focus:border-[#C89438] focus:ring-2 focus:ring-[#C89438]/20"
             />
+
+            <span className="absolute bottom-2.5 right-3 text-[9px] font-bold text-[#A59B92]">
+              {comment.length}/500
+            </span>
           </div>
         </SectionCard>
 
         <PriceSummary
           subtotal={subtotal}
           deliveryPrice={deliveryPrice}
-          title="Hisob"
+          title="Buyurtma hisobi"
         />
 
-        <div className="rounded-2xl border border-[#E9DCC7] bg-white/80 px-4 py-2.5 text-xs leading-snug text-[#776B60] font-bold flex gap-2.5">
-          <ShieldCheck className="w-4 h-4 text-[#A97824] shrink-0 mt-0.5" />
-          <span>To‘lov buyurtma tasdiqlangandan keyin qilinadi.</span>
-        </div>
+        {isBelowMinimum && (
+          <div className="rounded-[16px] border border-red-200 bg-red-50 px-4 py-3 text-[11px] font-bold leading-[1.45] text-red-600">
+            Minimal buyurtma summasi{" "}
+            {minOrderAmount.toLocaleString("uz-UZ")} so‘m. Yana{" "}
+            {(minOrderAmount - subtotal).toLocaleString(
+              "uz-UZ"
+            )}{" "}
+            so‘mlik mahsulot qo‘shish kerak.
+          </div>
+        )}
 
-        <div className="mt-1 sticky bottom-4 z-30 safe-bottom">
-          <button
-            type="submit"
-            disabled={isSubmitting || !isOpen}
-            className="w-full py-4 bg-[#C89438] hover:bg-[#A97824] text-white disabled:bg-stone-200 disabled:text-stone-400 rounded-2xl text-base font-black flex items-center justify-center gap-2 transition-all active:scale-[0.98] shadow-2xl shadow-[#2C211A]/14 border border-[#EFD9AE] cursor-pointer disabled:cursor-not-allowed"
-          >
-            {isSubmitting ? (
-              <>
-                <Loader2 className="w-5 h-5 animate-spin text-white" />
-                <span>Yuborilmoqda...</span>
-              </>
-            ) : (
-              <>
-                <span>{isOpen ? "Tasdiqlash" : "Restoran yopiq"}</span>
-                <ArrowRight className="w-5 h-5 text-white" />
-              </>
-            )}
-          </button>
+        <div className="flex gap-2.5 rounded-[16px] border border-[#E9DCC7] bg-white px-4 py-3 text-[11px] font-bold leading-[1.45] text-[#776B60]">
+          <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-[#A97824]" />
+          <span>
+            To‘lov buyurtma operator tomonidan tasdiqlangandan keyin
+            amalga oshiriladi.
+          </span>
         </div>
       </form>
+
+      <div className="fixed inset-x-0 bottom-0 z-40 mx-auto w-full max-w-[480px] border-t border-[#E9E3DA] bg-white/95 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 shadow-[0_-14px_34px_-28px_rgba(36,24,18,0.7)] backdrop-blur-xl">
+        <div className="mb-2 flex items-center justify-between gap-3">
+          <div>
+            <p className="text-[9px] font-black uppercase tracking-[0.12em] text-[#8B8178]">
+              Jami to‘lov
+            </p>
+
+            <p className="mt-0.5 text-[19px] font-black tracking-[-0.035em] text-[#241812]">
+              {totalPrice.toLocaleString("uz-UZ")} so‘m
+            </p>
+          </div>
+
+          <span className="rounded-full bg-[#FFF0D3] px-3 py-1.5 text-[10px] font-black text-[#A97824]">
+            {isDelivery ? "Dastavka" : "Olib ketish"}
+          </span>
+        </div>
+
+        <button
+          type="button"
+          onClick={handleSubmit}
+          disabled={
+            isSubmitting ||
+            !isOpen ||
+            cartItems.length === 0 ||
+            isBelowMinimum
+          }
+          className="flex h-[56px] w-full items-center justify-between rounded-[18px] bg-[#C89438] px-4 text-white shadow-[0_14px_28px_-18px_rgba(169,120,36,0.95)] transition active:scale-[0.98] disabled:bg-stone-200 disabled:text-stone-400 disabled:shadow-none"
+        >
+          <span className="flex items-center gap-2 text-[14px] font-black">
+            {isSubmitting && (
+              <Loader2 className="h-5 w-5 animate-spin" />
+            )}
+
+            {isSubmitting
+              ? "Yuborilmoqda..."
+              : !isOpen
+                ? "Restoran yopiq"
+                : isBelowMinimum
+                  ? "Minimal summa yetarli emas"
+                  : "Buyurtmani tasdiqlash"}
+          </span>
+
+          {!isSubmitting && <ArrowRight className="h-5 w-5" />}
+        </button>
+      </div>
 
       <MapPickerModal
         isOpen={isMapOpen}
