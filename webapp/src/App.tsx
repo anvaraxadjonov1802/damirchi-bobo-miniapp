@@ -11,6 +11,7 @@ import MenuPage from "./pages/MenuPage";
 import CartPage from "./pages/CartPage";
 import CheckoutPage from "./pages/CheckoutPage";
 import SuccessPage from "./pages/SuccessPage";
+import OrdersPage from "./pages/OrdersPage";
 
 import { client } from "./api/client";
 import {
@@ -22,6 +23,7 @@ import { useToast } from "./components/ToastProvider";
 
 const CART_STORAGE_KEY = "damirchi_cart_v1";
 const ORDER_TYPE_STORAGE_KEY = "damirchi_order_type_v1";
+const ORDER_HISTORY_STORAGE_KEY = "damirchi_order_history_v1";
 
 const DEFAULT_RESTAURANT_SETTINGS = {
   restaurant_name: "Damirchi",
@@ -36,6 +38,31 @@ const DEFAULT_RESTAURANT_SETTINGS = {
   instagram_url: null,
   telegram_url: null,
 };
+
+function loadStoredOrderHistory() {
+  if (typeof window === "undefined") return [];
+
+  try {
+    const raw = window.localStorage.getItem(ORDER_HISTORY_STORAGE_KEY);
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveStoredOrderHistory(orders: any[]) {
+  if (typeof window === "undefined") return;
+
+  try {
+    window.localStorage.setItem(
+      ORDER_HISTORY_STORAGE_KEY,
+      JSON.stringify(orders)
+    );
+  } catch {
+    // Ignore storage errors.
+  }
+}
 
 function loadStoredOrderType() {
   if (typeof window === "undefined") return "delivery";
@@ -111,6 +138,9 @@ export default function App() {
 
   const [submittingOrder, setSubmittingOrder] = useState(false);
   const [completedOrderDetails, setCompletedOrderDetails] = useState<any>(null);
+  const [orderHistory, setOrderHistory] = useState<any[]>(() =>
+    loadStoredOrderHistory()
+  );
 
   const [orderType, setOrderType] = useState(() => loadStoredOrderType());
   useEffect(() => {
@@ -137,6 +167,10 @@ export default function App() {
   useEffect(() => {
     saveStoredCart(cart);
   }, [cart]);
+
+  useEffect(() => {
+    saveStoredOrderHistory(orderHistory);
+  }, [orderHistory]);
 
   const fetchInitialMenu = async () => {
     setIsLoading(true);
@@ -177,6 +211,11 @@ export default function App() {
 
     if (currentScreen === "checkout") {
       setCurrentScreen("cart");
+      return;
+    }
+
+    if (currentScreen === "orders") {
+      setCurrentScreen("menu");
       return;
     }
 
@@ -290,6 +329,48 @@ export default function App() {
     try {
       const response = await client.createOrder(orderPayload);
 
+      const currentCartItems = Object.values(cart).map((item: any) => ({
+        product_id: item.product.id,
+        name_uz: item.product.name_uz,
+        price: Number(item.product.price || 0),
+        quantity: Number(item.quantity || 0),
+      }));
+
+      const subtotal = currentCartItems.reduce(
+        (total: number, item: any) =>
+          total + item.price * item.quantity,
+        0
+      );
+
+      const localOrder = {
+        ...response,
+        id: response?.id ?? Date.now(),
+        status: response?.status ?? "new",
+        created_at: response?.created_at ?? new Date().toISOString(),
+        order_type: response?.order_type ?? orderPayload.order_type,
+        payment_type:
+          response?.payment_type ?? orderPayload.payment_type,
+        phone: response?.phone ?? orderPayload.phone,
+        address: response?.address ?? orderPayload.address,
+        delivery_price:
+          response?.delivery_price ??
+          Number(orderPayload.delivery_price || 0),
+        total_price:
+          response?.total_price ??
+          subtotal + Number(orderPayload.delivery_price || 0),
+        items:
+          Array.isArray(response?.items) && response.items.length > 0
+            ? response.items
+            : currentCartItems,
+      };
+
+      setOrderHistory((previousOrders) => [
+        localOrder,
+        ...previousOrders.filter(
+          (order) => String(order?.id) !== String(localOrder.id)
+        ),
+      ].slice(0, 50));
+
       hapticFeedback("success");
       showToast("Buyurtma qabul qilindi ✅", "success");
 
@@ -359,7 +440,7 @@ export default function App() {
     }
 
     if (screen === "orders") {
-      showToast("Buyurtmalar bo‘limi tez orada qo‘shiladi.", "info");
+      setCurrentScreen("orders");
       return;
     }
 
@@ -427,6 +508,13 @@ export default function App() {
             />
           )}
 
+          {currentScreen === "orders" && (
+            <OrdersPage
+              orders={orderHistory}
+              onGoToMenu={() => setCurrentScreen("menu")}
+            />
+          )}
+
           {currentScreen === "checkout" && (
             <CheckoutPage
               cart={cart}
@@ -464,7 +552,13 @@ export default function App() {
 
         {currentScreen !== "checkout" && currentScreen !== "success" && (
           <BottomNavbar
-            active={currentScreen === "cart" ? "cart" : "menu"}
+            active={
+              currentScreen === "cart"
+                ? "cart"
+                : currentScreen === "orders"
+                  ? "orders"
+                  : "menu"
+            }
             cartCount={totalCartCount}
             onNavigate={handleBottomNavigate}
           />
