@@ -12,6 +12,7 @@ import CartPage from "./pages/CartPage";
 import CheckoutPage from "./pages/CheckoutPage";
 import SuccessPage from "./pages/SuccessPage";
 import OrdersPage from "./pages/OrdersPage";
+import ProfilePage from "./pages/ProfilePage";
 
 import { client } from "./api/client";
 import {
@@ -214,7 +215,7 @@ export default function App() {
       return;
     }
 
-    if (currentScreen === "orders") {
+    if (currentScreen === "orders" || currentScreen === "profile") {
       setCurrentScreen("menu");
       return;
     }
@@ -445,7 +446,7 @@ export default function App() {
     }
 
     if (screen === "profile") {
-      showToast("Profil bo‘limi tez orada qo‘shiladi.", "info");
+      setCurrentScreen("profile");
     }
   };
 
@@ -515,6 +516,15 @@ export default function App() {
             />
           )}
 
+          {currentScreen === "profile" && (
+            <ProfilePage
+              settings={restaurantSettings}
+              orderType={orderType}
+              orderCount={orderHistory.length}
+              onGoToOrders={() => setCurrentScreen("orders")}
+            />
+          )}
+
           {currentScreen === "checkout" && (
             <CheckoutPage
               cart={cart}
@@ -557,7 +567,9 @@ export default function App() {
                 ? "cart"
                 : currentScreen === "orders"
                   ? "orders"
-                  : "menu"
+                  : currentScreen === "profile"
+                    ? "profile"
+                    : "menu"
             }
             cartCount={totalCartCount}
             onNavigate={handleBottomNavigate}
