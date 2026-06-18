@@ -90,39 +90,41 @@ function PromoCarousel() {
 
   return (
     <section className="mx-4 mt-4">
-      <div className="relative min-h-[112px] overflow-hidden rounded-[18px] bg-[#C89438] px-4 py-4 text-white shadow-[0_16px_34px_-26px_rgba(0,0,0,0.6)]">
-        <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-white/12" />
+      <div className="relative h-[128px] overflow-hidden rounded-[20px] bg-gradient-to-br from-[#C89438] to-[#6F4624] px-4 py-4 text-white shadow-[0_16px_34px_-26px_rgba(0,0,0,0.6)]">
+        <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-white/10" />
         <div className="absolute -bottom-14 right-7 h-36 w-36 rounded-full bg-white/10" />
 
-        <div className="relative z-10 flex items-center justify-between gap-4">
-          <div className="max-w-[220px]">
-            <div className="mb-2 inline-flex items-center gap-1 rounded-full bg-white/18 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider">
+        <div className="relative z-10 flex h-full items-center justify-between gap-4 pb-4">
+          <div className="flex min-w-0 flex-1 flex-col justify-center">
+            <div className="mb-2 inline-flex w-fit items-center gap-1 rounded-full bg-white/15 px-2.5 py-1 text-[9px] font-black uppercase tracking-wider">
               <BadgePercent className="h-3.5 w-3.5" />
               Aksiya
             </div>
 
-            <h2 className="text-[20px] font-black leading-[1.05] tracking-[-0.04em]">
+            <h2 className="line-clamp-2 min-h-[42px] text-[19px] font-black leading-[1.08] tracking-[-0.035em]">
               {banner.title}
             </h2>
 
-            <p className="mt-1.5 text-[11px] font-bold leading-snug text-white/82">
+            <p className="mt-1 line-clamp-1 h-[16px] text-[11px] font-bold leading-[16px] text-white/80">
               {banner.subtitle}
             </p>
           </div>
 
-          <div className="flex h-[74px] w-[74px] shrink-0 rotate-3 items-center justify-center rounded-[22px] bg-white/16">
+          <div className="flex h-[72px] w-[72px] shrink-0 rotate-3 items-center justify-center rounded-[22px] border border-white/15 bg-white/12">
             <Icon className="h-9 w-9" />
           </div>
         </div>
 
-        <div className="absolute bottom-2.5 left-4 z-10 flex gap-1.5">
+        <div className="absolute bottom-3 left-4 z-20 flex items-center gap-1.5">
           {banners.map((item, index) => (
             <button
               key={item.title}
               type="button"
               onClick={() => setActiveIndex(index)}
-              className={`h-1.5 rounded-full transition-all ${
-                activeIndex === index ? "w-5 bg-white" : "w-1.5 bg-white/45"
+              className={`h-1.5 rounded-full transition-all duration-300 ${
+                activeIndex === index
+                  ? "w-5 bg-white"
+                  : "w-1.5 bg-white/40"
               }`}
               aria-label={`Banner ${index + 1}`}
             />
