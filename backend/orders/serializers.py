@@ -1,16 +1,17 @@
-from rest_framework import serializers
-from django.db import transaction
 from django.conf import settings
+from django.db import transaction
+from rest_framework import serializers
 
+from common.models import RestaurantSettings
 from customers.models import Customer
 from customers.telegram_auth import validate_telegram_init_data
 from menu.models import Product
-from common.models import RestaurantSettings
 from .models import Order, OrderItem
 
 
 class OrderItemCreateSerializer(serializers.Serializer):
-    product = serializers.IntegerField()
+    # Product IDs are MongoDB ObjectIds and arrive from the frontend as strings.
+    product = serializers.CharField()
     quantity = serializers.IntegerField(min_value=1)
 
 
@@ -94,7 +95,6 @@ class OrderCreateSerializer(serializers.ModelSerializer):
                 )
             ) or "Telegram foydalanuvchisi"
             username = telegram_user.get("username", "") or ""
-
         else:
             allow_unverified = getattr(
                 settings,
@@ -138,7 +138,7 @@ class OrderCreateSerializer(serializers.ModelSerializer):
                     is_active=True,
                     is_available=True,
                 )
-            except Product.DoesNotExist:
+            except (Product.DoesNotExist, ValueError, TypeError):
                 raise serializers.ValidationError(
                     {"items": f"Product with id {product_id} not found or unavailable."}
                 )
