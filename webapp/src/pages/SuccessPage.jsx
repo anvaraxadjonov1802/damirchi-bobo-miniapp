@@ -1,10 +1,18 @@
-import React from "react";
-import { CheckCircle2, ChevronRight, Home, ReceiptText } from "lucide-react";
+import React, { useEffect, useRef } from "react";
+import {
+  CheckCircle2,
+  ChevronRight,
+  CreditCard,
+  Home,
+  ReceiptText,
+} from "lucide-react";
 
 import { formatPrice } from "../utils/format";
-import { hapticFeedback } from "../telegram/telegram";
+import { hapticFeedback, openExternalLink } from "../telegram/telegram";
 
 export default function SuccessPage({ orderDetails, onGoHome }) {
+  const paymentOpenedRef = useRef(false);
+
   const handleHomeClick = () => {
     hapticFeedback("medium");
 
@@ -15,7 +23,27 @@ export default function SuccessPage({ orderDetails, onGoHome }) {
 
   const orderId = orderDetails?.id || Math.floor(100000 + Math.random() * 900000);
   const totalPrice = orderDetails?.total_price || 0;
-  const paymentText = orderDetails?.payment_type === "card" ? "Karta" : "Naqd";
+  const paymentType = orderDetails?.payment_type || "cash";
+  const paymentStatus = orderDetails?.payment_status || "unpaid";
+  const paymentUrl = orderDetails?.payment_url || "";
+  const isOnlinePayment = paymentType === "click" || paymentType === "payme";
+
+  const paymentText =
+    paymentType === "click"
+      ? "Click"
+      : paymentType === "payme"
+        ? "Payme"
+        : "Naqd";
+
+  const paymentStatusText =
+    {
+      unpaid: "To‘lanmagan",
+      pending: "Kutilmoqda",
+      paid: "To‘langan",
+      failed: "Xatolik",
+      cancelled: "Bekor qilingan",
+      refunded: "Qaytarilgan",
+    }[paymentStatus] || paymentStatus;
 
   const statusText =
     {
@@ -28,6 +56,23 @@ export default function SuccessPage({ orderDetails, onGoHome }) {
     }[orderDetails?.status] ||
     orderDetails?.status ||
     "Yangi";
+
+  useEffect(() => {
+    if (
+      !paymentOpenedRef.current &&
+      isOnlinePayment &&
+      paymentStatus === "pending" &&
+      paymentUrl
+    ) {
+      paymentOpenedRef.current = true;
+      openExternalLink(paymentUrl);
+    }
+  }, [isOnlinePayment, paymentStatus, paymentUrl]);
+
+  const handleOpenPayment = () => {
+    hapticFeedback("medium");
+    openExternalLink(paymentUrl);
+  };
 
   return (
     <div className="px-4 py-6 pb-28 flex flex-col items-center justify-center min-h-[calc(100dvh-90px)] text-center animate-fade-in text-[#2C211A]">
@@ -45,8 +90,9 @@ export default function SuccessPage({ orderDetails, onGoHome }) {
       </h2>
 
       <p className="text-sm text-[#776B60] leading-snug max-w-sm font-semibold mt-2 mb-5">
-        Buyurtmangiz Damirchi operatoriga yuborildi. Holat o‘zgarsa Telegram
-        orqali xabar beramiz.
+        {isOnlinePayment && paymentStatus === "pending"
+          ? `${paymentText} to‘lov oynasi ochiladi. To‘lov tasdiqlangach buyurtma holati yangilanadi.`
+          : "Buyurtmangiz Damirchi operatoriga yuborildi. Holat o‘zgarsa Telegram orqali xabar beramiz."}
       </p>
 
       <div className="w-full max-w-sm bg-white border border-[#E9DCC7] rounded-3xl p-4 shadow-lg text-left mb-5 relative overflow-hidden">
@@ -66,7 +112,7 @@ export default function SuccessPage({ orderDetails, onGoHome }) {
           <div className="flex flex-col gap-2.5 text-sm">
             <div className="flex justify-between items-center gap-3 text-[#776B60]">
               <span className="font-semibold">Raqam</span>
-              <span className="font-mono font-black text-[#2C211A]">
+              <span className="font-mono font-black text-[#2C211A] break-all text-right">
                 #{orderId}
               </span>
             </div>
@@ -83,6 +129,13 @@ export default function SuccessPage({ orderDetails, onGoHome }) {
               <span className="font-black text-[#2C211A]">{paymentText}</span>
             </div>
 
+            {isOnlinePayment && (
+              <div className="flex justify-between items-center gap-3 text-[#776B60]">
+                <span className="font-semibold">To‘lov holati</span>
+                <span className="font-black text-[#2C211A]">{paymentStatusText}</span>
+              </div>
+            )}
+
             <div className="border-t border-dashed border-[#E9DCC7] my-1" />
 
             <div className="flex justify-between items-end gap-3">
@@ -94,6 +147,17 @@ export default function SuccessPage({ orderDetails, onGoHome }) {
           </div>
         </div>
       </div>
+
+      {isOnlinePayment && paymentUrl && paymentStatus === "pending" && (
+        <button
+          type="button"
+          onClick={handleOpenPayment}
+          className="w-full max-w-sm mb-3 py-4 bg-[#2C211A] hover:bg-black text-white rounded-2xl text-sm font-black flex items-center justify-center gap-2 transition-all active:scale-[0.98] shadow-lg cursor-pointer"
+        >
+          <CreditCard className="w-4 h-4" />
+          <span>{paymentText} orqali to‘lash</span>
+        </button>
+      )}
 
       <button
         type="button"
