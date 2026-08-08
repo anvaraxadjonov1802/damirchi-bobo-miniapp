@@ -10,6 +10,7 @@ urlpatterns = [
     path("api/", include("common.urls")),
     path("api/", include("menu.urls")),
     path("api/", include("orders.urls")),
+    path("api/", include("payments.urls")),
 ]
 
 # Demo/test uchun media files serve qilish
