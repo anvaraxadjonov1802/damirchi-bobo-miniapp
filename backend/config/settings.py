@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "menu",
     "customers",
     "orders",
+    "payments",
     "common",
 ]
 
@@ -192,3 +193,13 @@ BOT_TOKEN = os.getenv("BOT_TOKEN", "")
 ALLOW_UNVERIFIED_TELEGRAM_IN_DEBUG = (
     os.getenv("ALLOW_UNVERIFIED_TELEGRAM_IN_DEBUG", "False") == "True"
 )
+
+# Payment providers. Secrets must only live in .env/Render environment.
+CLICK_ENABLED = os.getenv("CLICK_ENABLED", "False") == "True"
+CLICK_SERVICE_ID = os.getenv("CLICK_SERVICE_ID", "")
+CLICK_MERCHANT_ID = os.getenv("CLICK_MERCHANT_ID", "")
+CLICK_SECRET_KEY = os.getenv("CLICK_SECRET_KEY", "")
+
+PAYME_ENABLED = os.getenv("PAYME_ENABLED", "False") == "True"
+PAYME_MERCHANT_ID = os.getenv("PAYME_MERCHANT_ID", "")
+PAYME_SECRET_KEY = os.getenv("PAYME_SECRET_KEY", "")
