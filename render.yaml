@@ -18,13 +18,9 @@ services:
       - key: MONGODB_DB_NAME
         value: damirchi
       - key: ALLOWED_HOSTS
-        sync: false
+        value: damirchi-bobo-api.onrender.com,localhost,127.0.0.1
       - key: CORS_ALLOW_ALL_ORIGINS
         value: "False"
-      - key: CORS_ALLOWED_ORIGINS
-        sync: false
-      - key: CSRF_TRUSTED_ORIGINS
-        sync: false
       - key: BOT_TOKEN
         sync: false
       - key: OPERATOR_CHAT_ID
@@ -37,20 +33,8 @@ services:
         value: "False"
       - key: CLICK_ENABLED
         value: "False"
-      - key: CLICK_SERVICE_ID
-        sync: false
-      - key: CLICK_MERCHANT_ID
-        sync: false
-      - key: CLICK_SECRET_KEY
-        sync: false
       - key: PAYME_ENABLED
         value: "False"
-      - key: PAYME_MERCHANT_ID
-        sync: false
-      - key: PAYME_LOGIN
-        sync: false
-      - key: PAYME_SECRET_KEY
-        sync: false
       - key: PAYME_ACCOUNT_FIELD
         value: order_id
       - key: USE_SUPABASE_STORAGE
