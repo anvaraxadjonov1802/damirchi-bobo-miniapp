@@ -29,11 +29,21 @@ class PaymentTransaction(models.Model):
         db_index=True,
     )
 
+    # Stored in whole UZS for both providers. Payme converts this to tiyin at the API edge.
     amount = models.PositiveIntegerField()
     idempotency_key = models.CharField(max_length=120, unique=True)
 
     external_id = models.CharField(max_length=255, blank=True, null=True, db_index=True)
     provider_prepare_id = models.CharField(max_length=255, blank=True, null=True)
+
+    # Payme bookkeeping. Millisecond timestamps are required by Merchant API/GetStatement.
+    provider_time_ms = models.BigIntegerField(blank=True, null=True, db_index=True)
+    create_time_ms = models.BigIntegerField(blank=True, null=True)
+    perform_time_ms = models.BigIntegerField(default=0)
+    cancel_time_ms = models.BigIntegerField(default=0)
+    provider_state = models.IntegerField(blank=True, null=True, db_index=True)
+    cancel_reason = models.IntegerField(blank=True, null=True)
+    account = models.JSONField(default=dict, blank=True)
 
     raw_payload = models.JSONField(default=dict, blank=True)
     last_error = models.TextField(blank=True, null=True)
