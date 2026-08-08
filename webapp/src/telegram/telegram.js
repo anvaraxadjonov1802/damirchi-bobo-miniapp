@@ -25,7 +25,7 @@ export function initTelegramApp() {
   try {
     tg.ready?.();
     tg.expand?.();
-    
+
     const applyTelegramSafeArea = () => {
       const topInset =
         tg?.safeAreaInset?.top ||
@@ -138,6 +138,28 @@ export function showConfirm(message, callback) {
 
   const result = confirm(message);
   callback?.(result);
+}
+
+export function openExternalLink(url) {
+  if (!url || typeof window === "undefined") return false;
+
+  const tg = getWindowTelegramApp();
+
+  if (tg?.openLink) {
+    try {
+      tg.openLink(url);
+      return true;
+    } catch {
+      // Oddiy browser fallbackga tushadi.
+    }
+  }
+
+  try {
+    const opened = window.open(url, "_blank", "noopener,noreferrer");
+    return Boolean(opened);
+  } catch {
+    return false;
+  }
 }
 
 export function hapticFeedback(type = "light") {
