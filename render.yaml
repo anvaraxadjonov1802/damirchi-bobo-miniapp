@@ -1,0 +1,57 @@
+services:
+  - type: web
+    name: damirchi-bobo-api
+    runtime: python
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput
+    preDeployCommand: python manage.py migrate
+    startCommand: gunicorn config.wsgi:application --bind 0.0.0.0:$PORT
+    healthCheckPath: /api/settings/
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "False"
+      - key: MONGODB_URI
+        sync: false
+      - key: MONGODB_DB_NAME
+        value: damirchi
+      - key: ALLOWED_HOSTS
+        sync: false
+      - key: CORS_ALLOW_ALL_ORIGINS
+        value: "False"
+      - key: CORS_ALLOWED_ORIGINS
+        sync: false
+      - key: CSRF_TRUSTED_ORIGINS
+        sync: false
+      - key: BOT_TOKEN
+        sync: false
+      - key: OPERATOR_CHAT_ID
+        sync: false
+      - key: OPERATOR_API_KEY
+        sync: false
+      - key: TELEGRAM_INIT_DATA_MAX_AGE_SECONDS
+        value: "86400"
+      - key: ALLOW_UNVERIFIED_TELEGRAM_IN_DEBUG
+        value: "False"
+      - key: CLICK_ENABLED
+        value: "False"
+      - key: CLICK_SERVICE_ID
+        sync: false
+      - key: CLICK_MERCHANT_ID
+        sync: false
+      - key: CLICK_SECRET_KEY
+        sync: false
+      - key: PAYME_ENABLED
+        value: "False"
+      - key: PAYME_MERCHANT_ID
+        sync: false
+      - key: PAYME_LOGIN
+        sync: false
+      - key: PAYME_SECRET_KEY
+        sync: false
+      - key: PAYME_ACCOUNT_FIELD
+        value: order_id
+      - key: USE_SUPABASE_STORAGE
+        value: "False"
