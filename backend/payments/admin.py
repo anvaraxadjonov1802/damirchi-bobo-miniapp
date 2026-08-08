@@ -12,11 +12,12 @@ class PaymentTransactionAdmin(admin.ModelAdmin):
         "status",
         "amount",
         "external_id",
+        "provider_state",
         "created_at",
         "paid_at",
     )
-    list_filter = ("provider", "status", "created_at")
-    search_fields = ("external_id", "idempotency_key")
+    list_filter = ("provider", "status", "provider_state", "created_at")
+    search_fields = ("external_id", "idempotency_key", "provider_prepare_id")
     readonly_fields = (
         "order",
         "provider",
@@ -25,6 +26,13 @@ class PaymentTransactionAdmin(admin.ModelAdmin):
         "idempotency_key",
         "external_id",
         "provider_prepare_id",
+        "provider_time_ms",
+        "create_time_ms",
+        "perform_time_ms",
+        "cancel_time_ms",
+        "provider_state",
+        "cancel_reason",
+        "account",
         "raw_payload",
         "last_error",
         "created_at",
