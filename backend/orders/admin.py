@@ -16,15 +16,29 @@ class OrderAdmin(admin.ModelAdmin):
         "phone",
         "order_type",
         "payment_type",
+        "payment_status",
         "status",
         "total_price",
         "created_at",
     )
-    list_filter = ("order_type", "payment_type", "status", "created_at")
+    list_filter = (
+        "order_type",
+        "payment_type",
+        "payment_status",
+        "status",
+        "created_at",
+    )
     search_fields = ("phone", "address", "customer__full_name", "customer__username")
     list_editable = ("status",)
     inlines = [OrderItemInline]
-    readonly_fields = ("subtotal", "delivery_price", "total_price", "created_at")
+    readonly_fields = (
+        "subtotal",
+        "delivery_price",
+        "total_price",
+        "payment_status",
+        "paid_at",
+        "created_at",
+    )
 
 
 @admin.register(OrderItem)
