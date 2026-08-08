@@ -167,7 +167,7 @@ else:
         },
     }
 
-CORS_ALLOW_HEADERS = list(default_headers) + ["x-telegram-init-data"]
+CORS_ALLOW_HEADERS = list(default_headers) + ["x-telegram-init-data", "x-operator-key"]
 CORS_ALLOW_ALL_ORIGINS = os.getenv("CORS_ALLOW_ALL_ORIGINS", "False") == "True"
 CORS_ALLOWED_ORIGINS = [
     origin.strip()
@@ -195,11 +195,26 @@ ALLOW_UNVERIFIED_TELEGRAM_IN_DEBUG = (
 )
 
 # Payment providers. Secrets must only live in .env/Render environment.
+PAYMENT_RETURN_URL = os.getenv("PAYMENT_RETURN_URL", "").strip()
+
 CLICK_ENABLED = os.getenv("CLICK_ENABLED", "False") == "True"
-CLICK_SERVICE_ID = os.getenv("CLICK_SERVICE_ID", "")
-CLICK_MERCHANT_ID = os.getenv("CLICK_MERCHANT_ID", "")
-CLICK_SECRET_KEY = os.getenv("CLICK_SECRET_KEY", "")
+CLICK_SERVICE_ID = os.getenv("CLICK_SERVICE_ID", "").strip()
+CLICK_MERCHANT_ID = os.getenv("CLICK_MERCHANT_ID", "").strip()
+CLICK_SECRET_KEY = os.getenv("CLICK_SECRET_KEY", "").strip()
+CLICK_CHECKOUT_URL = os.getenv(
+    "CLICK_CHECKOUT_URL",
+    "https://my.click.uz/services/pay",
+).strip()
 
 PAYME_ENABLED = os.getenv("PAYME_ENABLED", "False") == "True"
-PAYME_MERCHANT_ID = os.getenv("PAYME_MERCHANT_ID", "")
-PAYME_SECRET_KEY = os.getenv("PAYME_SECRET_KEY", "")
+PAYME_MERCHANT_ID = os.getenv("PAYME_MERCHANT_ID", "").strip()
+PAYME_LOGIN = os.getenv("PAYME_LOGIN", "").strip()
+PAYME_SECRET_KEY = os.getenv("PAYME_SECRET_KEY", "").strip()
+PAYME_ACCOUNT_FIELD = os.getenv("PAYME_ACCOUNT_FIELD", "order_id").strip() or "order_id"
+PAYME_CHECKOUT_URL = os.getenv(
+    "PAYME_CHECKOUT_URL",
+    "https://checkout.paycom.uz",
+).strip()
+
+# Bot -> backend status update protection. Configure the same value in bot env.
+OPERATOR_API_KEY = os.getenv("OPERATOR_API_KEY", "").strip()
