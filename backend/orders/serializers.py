@@ -188,12 +188,19 @@ class OrderCreateSerializer(serializers.ModelSerializer):
                 )
 
         total_price = subtotal + delivery_price
+        payment_type = validated_data.get("payment_type", Order.PaymentType.CASH)
+        payment_status = (
+            Order.PaymentStatus.PENDING
+            if payment_type in {Order.PaymentType.CLICK, Order.PaymentType.PAYME}
+            else Order.PaymentStatus.UNPAID
+        )
 
         order = Order.objects.create(
             customer=customer,
             subtotal=subtotal,
             delivery_price=delivery_price,
             total_price=total_price,
+            payment_status=payment_status,
             **validated_data,
         )
 
@@ -221,6 +228,8 @@ class OrderDetailSerializer(serializers.ModelSerializer):
             "customer_telegram_id",
             "order_type",
             "payment_type",
+            "payment_status",
+            "paid_at",
             "status",
             "phone",
             "address",
