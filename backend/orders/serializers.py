@@ -7,6 +7,7 @@ from common.models import RestaurantSettings
 from customers.models import Customer
 from customers.telegram_auth import validate_telegram_init_data
 from menu.models import Product
+from payments.links import build_payment_url
 from .models import Order, OrderItem
 
 
@@ -62,6 +63,29 @@ class OrderCreateSerializer(serializers.ModelSerializer):
         if not items:
             raise serializers.ValidationError("Order items cannot be empty.")
         return items
+
+    def validate_payment_type(self, value):
+        if value == Order.PaymentType.CLICK:
+            ready = bool(
+                getattr(settings, "CLICK_ENABLED", False)
+                and getattr(settings, "CLICK_SERVICE_ID", "")
+                and getattr(settings, "CLICK_MERCHANT_ID", "")
+                and getattr(settings, "CLICK_SECRET_KEY", "")
+            )
+            if not ready:
+                raise serializers.ValidationError("Click to‘lovi hozircha faol emas.")
+
+        if value == Order.PaymentType.PAYME:
+            ready = bool(
+                getattr(settings, "PAYME_ENABLED", False)
+                and getattr(settings, "PAYME_MERCHANT_ID", "")
+                and getattr(settings, "PAYME_LOGIN", "")
+                and getattr(settings, "PAYME_SECRET_KEY", "")
+            )
+            if not ready:
+                raise serializers.ValidationError("Payme to‘lovi hozircha faol emas.")
+
+        return value
 
     @transaction.atomic
     def create(self, validated_data):
@@ -218,6 +242,7 @@ class OrderDetailSerializer(serializers.ModelSerializer):
         source="customer.telegram_id",
         read_only=True,
     )
+    payment_url = serializers.SerializerMethodField()
 
     class Meta:
         model = Order
@@ -229,6 +254,7 @@ class OrderDetailSerializer(serializers.ModelSerializer):
             "order_type",
             "payment_type",
             "payment_status",
+            "payment_url",
             "paid_at",
             "status",
             "phone",
@@ -242,3 +268,6 @@ class OrderDetailSerializer(serializers.ModelSerializer):
             "items",
             "created_at",
         )
+
+    def get_payment_url(self, obj):
+        return build_payment_url(obj)
