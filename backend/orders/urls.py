@@ -4,6 +4,6 @@ from .views import OrderCreateAPIView, OrderDetailAPIView, OrderStatusUpdateAPIV
 
 urlpatterns = [
     path("orders/", OrderCreateAPIView.as_view(), name="order-create"),
-    path("orders/<int:pk>/", OrderDetailAPIView.as_view(), name="order-detail"),
-    path("orders/<int:pk>/status/", OrderStatusUpdateAPIView.as_view(), name="order-status-update"),
+    path("orders/<str:pk>/", OrderDetailAPIView.as_view(), name="order-detail"),
+    path("orders/<str:pk>/status/", OrderStatusUpdateAPIView.as_view(), name="order-status-update"),
 ]
