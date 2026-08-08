@@ -170,15 +170,22 @@ else:
 CORS_ALLOW_HEADERS = list(default_headers) + ["x-telegram-init-data", "x-operator-key"]
 CORS_ALLOW_ALL_ORIGINS = os.getenv("CORS_ALLOW_ALL_ORIGINS", "False") == "True"
 CORS_ALLOWED_ORIGINS = [
-    origin.strip()
+    origin.strip().rstrip("/")
     for origin in os.getenv("CORS_ALLOWED_ORIGINS", "").split(",")
     if origin.strip()
 ]
 CSRF_TRUSTED_ORIGINS = [
-    origin.strip()
+    origin.strip().rstrip("/")
     for origin in os.getenv("CSRF_TRUSTED_ORIGINS", "").split(",")
     if origin.strip()
 ]
+
+# Production frontend must remain allowed even if a Render Blueprint/env sync is delayed.
+PRODUCTION_FRONTEND_ORIGIN = "https://damirchi.vercel.app"
+if PRODUCTION_FRONTEND_ORIGIN not in CORS_ALLOWED_ORIGINS:
+    CORS_ALLOWED_ORIGINS.append(PRODUCTION_FRONTEND_ORIGIN)
+if PRODUCTION_FRONTEND_ORIGIN not in CSRF_TRUSTED_ORIGINS:
+    CSRF_TRUSTED_ORIGINS.append(PRODUCTION_FRONTEND_ORIGIN)
 
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
