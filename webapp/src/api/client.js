@@ -3,8 +3,23 @@
  * Real API first. Mock data is available only when VITE_USE_MOCK_DATA=true.
  */
 
-const API_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000/api";
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://127.0.0.1:8000";
+const DEFAULT_BACKEND_URL = import.meta.env.PROD
+  ? "https://damirchi-bobo-api.onrender.com"
+  : "http://127.0.0.1:8000";
+
+function normalizeBackendUrl(value) {
+  return String(value || DEFAULT_BACKEND_URL).replace(/\/+$/, "");
+}
+
+function normalizeApiUrl(value) {
+  const clean = String(value || `${DEFAULT_BACKEND_URL}/api`).replace(/\/+$/, "");
+  return clean.endsWith("/api") ? clean : `${clean}/api`;
+}
+
+const API_URL = normalizeApiUrl(import.meta.env.VITE_API_URL);
+const BACKEND_URL = normalizeBackendUrl(
+  import.meta.env.VITE_BACKEND_URL || API_URL.replace(/\/api$/, "")
+);
 const USE_MOCK_DATA = import.meta.env.VITE_USE_MOCK_DATA === "true";
 
 const FALLBACK_IMAGES = {
