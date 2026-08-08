@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.core.exceptions import ValidationError as DjangoValidationError
-from django.db import transaction
+from django_mongodb_backend import transaction
 from rest_framework import serializers
 
 from common.models import RestaurantSettings
