@@ -20,6 +20,12 @@ services:
         value: damirchi-bobo-api.onrender.com,localhost,127.0.0.1
       - key: CORS_ALLOW_ALL_ORIGINS
         value: "False"
+      - key: CORS_ALLOWED_ORIGINS
+        value: https://damirchi.vercel.app
+      - key: CSRF_TRUSTED_ORIGINS
+        value: https://damirchi.vercel.app
+      - key: PAYMENT_RETURN_URL
+        value: https://damirchi.vercel.app
       - key: BOT_TOKEN
         sync: false
       - key: OPERATOR_CHAT_ID
