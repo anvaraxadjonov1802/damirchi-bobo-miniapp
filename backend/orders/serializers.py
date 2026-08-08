@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db import transaction
 from rest_framework import serializers
 
@@ -138,7 +139,12 @@ class OrderCreateSerializer(serializers.ModelSerializer):
                     is_active=True,
                     is_available=True,
                 )
-            except (Product.DoesNotExist, ValueError, TypeError):
+            except (
+                Product.DoesNotExist,
+                DjangoValidationError,
+                ValueError,
+                TypeError,
+            ):
                 raise serializers.ValidationError(
                     {"items": f"Product with id {product_id} not found or unavailable."}
                 )
