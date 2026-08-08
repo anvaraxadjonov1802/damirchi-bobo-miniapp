@@ -101,6 +101,8 @@ export default function CheckoutPage({
 
   const isOpen = settings?.is_open !== false;
   const isDelivery = orderType === "delivery";
+  const clickEnabled = settings?.click_enabled === true;
+  const paymeEnabled = settings?.payme_enabled === true;
   const isOnlinePayment = paymentType === "click" || paymentType === "payme";
   const hasLocation = Boolean(latitude && longitude);
 
@@ -138,17 +140,35 @@ export default function CheckoutPage({
       label: "Naqd",
       icon: DollarSign,
     },
-    {
-      value: "click",
-      label: "Click",
-      icon: CreditCard,
-    },
-    {
-      value: "payme",
-      label: "Payme",
-      icon: CreditCard,
-    },
+    ...(clickEnabled
+      ? [
+          {
+            value: "click",
+            label: "Click",
+            icon: CreditCard,
+          },
+        ]
+      : []),
+    ...(paymeEnabled
+      ? [
+          {
+            value: "payme",
+            label: "Payme",
+            icon: CreditCard,
+          },
+        ]
+      : []),
   ];
+
+  useEffect(() => {
+    if (paymentType === "click" && !clickEnabled) {
+      setPaymentType("cash");
+    }
+
+    if (paymentType === "payme" && !paymeEnabled) {
+      setPaymentType("cash");
+    }
+  }, [paymentType, clickEnabled, paymeEnabled]);
 
   const notify = (message, type = "error") => {
     showToast(message, type);
@@ -396,7 +416,11 @@ export default function CheckoutPage({
 
         <SectionCard
           title="To‘lov va izoh"
-          subtitle="Naqd, Click yoki Payme orqali to‘lang"
+          subtitle={
+            clickEnabled || paymeEnabled
+              ? "Naqd yoki onlayn to‘lov turini tanlang"
+              : "Hozircha naqd to‘lov mavjud"
+          }
           compact
         >
           <OptionSelector
