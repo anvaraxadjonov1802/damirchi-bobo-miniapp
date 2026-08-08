@@ -2,55 +2,34 @@ from django.db import models
 
 
 class RestaurantSettings(models.Model):
+    SINGLETON_KEY = "default"
+
+    singleton_key = models.CharField(
+        max_length=32,
+        unique=True,
+        default=SINGLETON_KEY,
+        editable=False,
+    )
     restaurant_name = models.CharField(
         max_length=150,
-        default="Damirchi BOBO"
+        default="Damirchi BOBO",
     )
     tagline = models.CharField(
         max_length=255,
-        default="Mazali taomlar, tezkor buyurtma"
+        default="Mazali taomlar, tezkor buyurtma",
     )
-
-    phone = models.CharField(
-        max_length=30,
-        blank=True,
-        null=True
-    )
-    address = models.CharField(
-        max_length=255,
-        blank=True,
-        null=True
-    )
-
-    delivery_price = models.PositiveIntegerField(
-        default=15000
-    )
+    phone = models.CharField(max_length=30, blank=True, null=True)
+    address = models.CharField(max_length=255, blank=True, null=True)
+    delivery_price = models.PositiveIntegerField(default=15000)
     min_order_amount = models.PositiveIntegerField(
         default=0,
-        help_text="Dastavka uchun minimal buyurtma summasi. 0 bo‘lsa cheklov yo‘q."
+        help_text="Dastavka uchun minimal buyurtma summasi. 0 bo‘lsa cheklov yo‘q.",
     )
-
-    is_open = models.BooleanField(
-        default=True
-    )
-    open_time = models.TimeField(
-        blank=True,
-        null=True
-    )
-    close_time = models.TimeField(
-        blank=True,
-        null=True
-    )
-
-    instagram_url = models.URLField(
-        blank=True,
-        null=True
-    )
-    telegram_url = models.URLField(
-        blank=True,
-        null=True
-    )
-
+    is_open = models.BooleanField(default=True)
+    open_time = models.TimeField(blank=True, null=True)
+    close_time = models.TimeField(blank=True, null=True)
+    instagram_url = models.URLField(blank=True, null=True)
+    telegram_url = models.URLField(blank=True, null=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
@@ -61,10 +40,13 @@ class RestaurantSettings(models.Model):
         return self.restaurant_name
 
     def save(self, *args, **kwargs):
-        self.pk = 1
+        # MongoDB primary keys are ObjectIds, therefore the previous `pk = 1`
+        # singleton approach is not valid. A unique stable key keeps the same
+        # one-row semantics without forcing an integer primary key.
+        self.singleton_key = self.SINGLETON_KEY
         super().save(*args, **kwargs)
 
     @classmethod
     def load(cls):
-        settings, _ = cls.objects.get_or_create(pk=1)
+        settings, _ = cls.objects.get_or_create(singleton_key=cls.SINGLETON_KEY)
         return settings
