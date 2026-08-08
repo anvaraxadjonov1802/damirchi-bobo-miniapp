@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import Order
+from .permissions import HasOperatorAPIKey
 from .serializers import OrderCreateSerializer, OrderDetailSerializer
 from .services import send_order_to_operator_group
 
@@ -23,12 +24,16 @@ class OrderCreateAPIView(generics.CreateAPIView):
         detail_serializer = OrderDetailSerializer(order)
         return Response(detail_serializer.data, status=201)
 
+
 class OrderDetailAPIView(generics.RetrieveAPIView):
     queryset = Order.objects.all()
     serializer_class = OrderDetailSerializer
+    permission_classes = [HasOperatorAPIKey]
 
 
 class OrderStatusUpdateAPIView(APIView):
+    permission_classes = [HasOperatorAPIKey]
+
     def patch(self, request, pk):
         try:
             order = Order.objects.get(pk=pk)
@@ -41,7 +46,7 @@ class OrderStatusUpdateAPIView(APIView):
         if status_value not in valid_statuses:
             return Response(
                 {"detail": "Invalid status."},
-                status=400
+                status=400,
             )
 
         order.status = status_value

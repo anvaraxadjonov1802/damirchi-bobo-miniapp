@@ -76,9 +76,31 @@ def build_order_items_text(order: Order) -> str:
     return "\n".join(lines)
 
 
+def payment_type_label(order: Order) -> str:
+    labels = {
+        Order.PaymentType.CASH: "💵 Naqd",
+        Order.PaymentType.CLICK: "🟢 Click",
+        Order.PaymentType.PAYME: "🔵 Payme",
+    }
+    return labels.get(order.payment_type, safe_text(order.payment_type))
+
+
+def payment_status_label(order: Order) -> str:
+    labels = {
+        Order.PaymentStatus.UNPAID: "To‘lanmagan",
+        Order.PaymentStatus.PENDING: "To‘lov kutilmoqda",
+        Order.PaymentStatus.PAID: "To‘langan",
+        Order.PaymentStatus.FAILED: "To‘lov xatosi",
+        Order.PaymentStatus.CANCELLED: "Bekor qilingan",
+        Order.PaymentStatus.REFUNDED: "Qaytarilgan",
+    }
+    return labels.get(order.payment_status, safe_text(order.payment_status))
+
+
 def build_order_message(order: Order) -> str:
     order_type = "🚚 Dastavka" if order.order_type == "delivery" else "🏃 Olib ketish"
-    payment_type = "💵 Naqd" if order.payment_type == "cash" else "💳 Karta"
+    payment_type = payment_type_label(order)
+    payment_status = payment_status_label(order)
 
     customer_name = "Noma’lum"
     customer_username = ""
@@ -119,7 +141,8 @@ def build_order_message(order: Order) -> str:
         f"👤 <b>Mijoz:</b> {customer_name}{customer_username}\n"
         f"📞 <b>Telefon:</b> {phone}\n"
         f"📦 <b>Turi:</b> {order_type}\n"
-        f"💳 <b>To‘lov:</b> {payment_type}"
+        f"💳 <b>To‘lov:</b> {payment_type}\n"
+        f"💰 <b>To‘lov holati:</b> {payment_status}"
         f"{address_text}"
         f"{location_text}"
         f"{comment_text}\n\n"
@@ -133,7 +156,7 @@ def build_order_message(order: Order) -> str:
     return message
 
 
-def build_status_keyboard(order_id: int, order: Order | None = None) -> dict:
+def build_status_keyboard(order_id: str, order: Order | None = None) -> dict:
     inline_keyboard = []
 
     if order:
@@ -181,7 +204,7 @@ def send_order_to_operator_group(order: Order) -> None:
         "text": build_order_message(order),
         "parse_mode": "HTML",
         "disable_web_page_preview": True,
-        "reply_markup": build_status_keyboard(order.id, order),
+        "reply_markup": build_status_keyboard(str(order.id), order),
     }
 
     try:

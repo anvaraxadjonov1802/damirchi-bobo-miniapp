@@ -11,7 +11,16 @@ class Order(models.Model):
 
     class PaymentType(models.TextChoices):
         CASH = "cash", "Cash"
-        CARD = "card", "Card"
+        CLICK = "click", "Click"
+        PAYME = "payme", "Payme"
+
+    class PaymentStatus(models.TextChoices):
+        UNPAID = "unpaid", "Unpaid"
+        PENDING = "pending", "Pending"
+        PAID = "paid", "Paid"
+        FAILED = "failed", "Failed"
+        CANCELLED = "cancelled", "Cancelled"
+        REFUNDED = "refunded", "Refunded"
 
     class Status(models.TextChoices):
         NEW = "new", "New"
@@ -26,23 +35,31 @@ class Order(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name="orders"
+        related_name="orders",
     )
 
     order_type = models.CharField(
         max_length=20,
         choices=OrderType.choices,
-        default=OrderType.DELIVERY
+        default=OrderType.DELIVERY,
     )
     payment_type = models.CharField(
         max_length=20,
         choices=PaymentType.choices,
-        default=PaymentType.CASH
+        default=PaymentType.CASH,
     )
+    payment_status = models.CharField(
+        max_length=20,
+        choices=PaymentStatus.choices,
+        default=PaymentStatus.UNPAID,
+        db_index=True,
+    )
+    paid_at = models.DateTimeField(blank=True, null=True)
+
     status = models.CharField(
         max_length=20,
         choices=Status.choices,
-        default=Status.NEW
+        default=Status.NEW,
     )
 
     phone = models.CharField(max_length=30)
@@ -60,6 +77,13 @@ class Order(models.Model):
     class Meta:
         ordering = ["-created_at"]
 
+    @property
+    def is_online_payment(self):
+        return self.payment_type in {
+            self.PaymentType.CLICK,
+            self.PaymentType.PAYME,
+        }
+
     def __str__(self):
         return f"Order #{self.id} - {self.phone}"
 
@@ -68,12 +92,12 @@ class OrderItem(models.Model):
     order = models.ForeignKey(
         Order,
         on_delete=models.CASCADE,
-        related_name="items"
+        related_name="items",
     )
     product = models.ForeignKey(
         Product,
         on_delete=models.PROTECT,
-        related_name="order_items"
+        related_name="order_items",
     )
     product_name = models.CharField(max_length=150)
     quantity = models.PositiveIntegerField(default=1)

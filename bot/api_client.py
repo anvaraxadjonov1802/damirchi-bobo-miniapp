@@ -21,6 +21,7 @@ async def read_response_json(response: aiohttp.ClientResponse) -> dict:
 
 async def patch_order_status(
     backend_api_url: str,
+    operator_api_key: str,
     order_id: str | int,
     status: str,
 ) -> dict:
@@ -29,7 +30,11 @@ async def patch_order_status(
 
     try:
         async with aiohttp.ClientSession(timeout=timeout) as session:
-            async with session.patch(url, json={'status': status}) as response:
+            async with session.patch(
+                url,
+                json={'status': status},
+                headers={'X-Operator-Key': operator_api_key},
+            ) as response:
                 data = await read_response_json(response)
 
                 if response.status not in [200, 201]:

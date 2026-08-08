@@ -13,6 +13,7 @@ class Config:
     webapp_url: str
     backend_api_url: str
     operator_chat_id: int | None
+    operator_api_key: str
 
 
 def get_required_env(name: str) -> str:
@@ -42,6 +43,7 @@ def load_config() -> Config:
     bot_token = get_required_env('BOT_TOKEN')
     webapp_url = get_required_env('WEBAPP_URL')
     backend_api_url = get_required_env('BACKEND_API_URL')
+    operator_api_key = get_required_env('OPERATOR_API_KEY')
     operator_chat_id_raw = os.getenv('OPERATOR_CHAT_ID')
 
     if not webapp_url.startswith('https://'):
@@ -66,4 +68,5 @@ def load_config() -> Config:
         webapp_url=webapp_url.rstrip('/'),
         backend_api_url=backend_api_url,
         operator_chat_id=parse_operator_chat_id(operator_chat_id_raw),
+        operator_api_key=operator_api_key,
     )

@@ -1,16 +1,19 @@
-from rest_framework import serializers
-from django.db import transaction
 from django.conf import settings
+from django.core.exceptions import ValidationError as DjangoValidationError
+from django_mongodb_backend import transaction
+from rest_framework import serializers
 
+from common.models import RestaurantSettings
 from customers.models import Customer
 from customers.telegram_auth import validate_telegram_init_data
 from menu.models import Product
-from common.models import RestaurantSettings
+from payments.links import build_payment_url
 from .models import Order, OrderItem
 
 
 class OrderItemCreateSerializer(serializers.Serializer):
-    product = serializers.IntegerField()
+    # Product IDs are MongoDB ObjectIds and arrive from the frontend as strings.
+    product = serializers.CharField()
     quantity = serializers.IntegerField(min_value=1)
 
 
@@ -61,6 +64,29 @@ class OrderCreateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Order items cannot be empty.")
         return items
 
+    def validate_payment_type(self, value):
+        if value == Order.PaymentType.CLICK:
+            ready = bool(
+                getattr(settings, "CLICK_ENABLED", False)
+                and getattr(settings, "CLICK_SERVICE_ID", "")
+                and getattr(settings, "CLICK_MERCHANT_ID", "")
+                and getattr(settings, "CLICK_SECRET_KEY", "")
+            )
+            if not ready:
+                raise serializers.ValidationError("Click to‘lovi hozircha faol emas.")
+
+        if value == Order.PaymentType.PAYME:
+            ready = bool(
+                getattr(settings, "PAYME_ENABLED", False)
+                and getattr(settings, "PAYME_MERCHANT_ID", "")
+                and getattr(settings, "PAYME_LOGIN", "")
+                and getattr(settings, "PAYME_SECRET_KEY", "")
+            )
+            if not ready:
+                raise serializers.ValidationError("Payme to‘lovi hozircha faol emas.")
+
+        return value
+
     @transaction.atomic
     def create(self, validated_data):
         items_data = validated_data.pop("items")
@@ -94,7 +120,6 @@ class OrderCreateSerializer(serializers.ModelSerializer):
                 )
             ) or "Telegram foydalanuvchisi"
             username = telegram_user.get("username", "") or ""
-
         else:
             allow_unverified = getattr(
                 settings,
@@ -138,7 +163,12 @@ class OrderCreateSerializer(serializers.ModelSerializer):
                     is_active=True,
                     is_available=True,
                 )
-            except Product.DoesNotExist:
+            except (
+                Product.DoesNotExist,
+                DjangoValidationError,
+                ValueError,
+                TypeError,
+            ):
                 raise serializers.ValidationError(
                     {"items": f"Product with id {product_id} not found or unavailable."}
                 )
@@ -182,12 +212,19 @@ class OrderCreateSerializer(serializers.ModelSerializer):
                 )
 
         total_price = subtotal + delivery_price
+        payment_type = validated_data.get("payment_type", Order.PaymentType.CASH)
+        payment_status = (
+            Order.PaymentStatus.PENDING
+            if payment_type in {Order.PaymentType.CLICK, Order.PaymentType.PAYME}
+            else Order.PaymentStatus.UNPAID
+        )
 
         order = Order.objects.create(
             customer=customer,
             subtotal=subtotal,
             delivery_price=delivery_price,
             total_price=total_price,
+            payment_status=payment_status,
             **validated_data,
         )
 
@@ -205,6 +242,7 @@ class OrderDetailSerializer(serializers.ModelSerializer):
         source="customer.telegram_id",
         read_only=True,
     )
+    payment_url = serializers.SerializerMethodField()
 
     class Meta:
         model = Order
@@ -215,6 +253,9 @@ class OrderDetailSerializer(serializers.ModelSerializer):
             "customer_telegram_id",
             "order_type",
             "payment_type",
+            "payment_status",
+            "payment_url",
+            "paid_at",
             "status",
             "phone",
             "address",
@@ -227,3 +268,6 @@ class OrderDetailSerializer(serializers.ModelSerializer):
             "items",
             "created_at",
         )
+
+    def get_payment_url(self, obj):
+        return build_payment_url(obj)

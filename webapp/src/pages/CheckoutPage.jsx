@@ -101,6 +101,9 @@ export default function CheckoutPage({
 
   const isOpen = settings?.is_open !== false;
   const isDelivery = orderType === "delivery";
+  const clickEnabled = settings?.click_enabled === true;
+  const paymeEnabled = settings?.payme_enabled === true;
+  const isOnlinePayment = paymentType === "click" || paymentType === "payme";
   const hasLocation = Boolean(latitude && longitude);
 
   const backendDeliveryPrice = Number(
@@ -137,12 +140,35 @@ export default function CheckoutPage({
       label: "Naqd",
       icon: DollarSign,
     },
-    {
-      value: "card",
-      label: "Karta",
-      icon: CreditCard,
-    },
+    ...(clickEnabled
+      ? [
+          {
+            value: "click",
+            label: "Click",
+            icon: CreditCard,
+          },
+        ]
+      : []),
+    ...(paymeEnabled
+      ? [
+          {
+            value: "payme",
+            label: "Payme",
+            icon: CreditCard,
+          },
+        ]
+      : []),
   ];
+
+  useEffect(() => {
+    if (paymentType === "click" && !clickEnabled) {
+      setPaymentType("cash");
+    }
+
+    if (paymentType === "payme" && !paymeEnabled) {
+      setPaymentType("cash");
+    }
+  }, [paymentType, clickEnabled, paymeEnabled]);
 
   const notify = (message, type = "error") => {
     showToast(message, type);
@@ -390,7 +416,11 @@ export default function CheckoutPage({
 
         <SectionCard
           title="To‘lov va izoh"
-          subtitle="To‘lov turini tanlang va kerakli izohni yozing"
+          subtitle={
+            clickEnabled || paymeEnabled
+              ? "Naqd yoki onlayn to‘lov turini tanlang"
+              : "Hozircha naqd to‘lov mavjud"
+          }
           compact
         >
           <OptionSelector
@@ -399,6 +429,14 @@ export default function CheckoutPage({
             selectedValue={paymentType}
             onChange={setPaymentType}
           />
+
+          {isOnlinePayment && (
+            <div className="rounded-[14px] border border-[#E9DCC7] bg-[#FFFAF2] px-3.5 py-3 text-[11px] font-bold leading-[1.5] text-[#776B60]">
+              {paymentType === "click" ? "Click" : "Payme"} orqali to‘lov
+              holati faqat to‘lov tizimi backendimizga tasdiq yuborgandan keyin
+              “To‘langan” deb belgilanadi.
+            </div>
+          )}
 
           <div className="relative">
             <MessageSquare className="pointer-events-none absolute left-4 top-3.5 h-5 w-5 text-[#A97824]" />
@@ -438,8 +476,9 @@ export default function CheckoutPage({
         <div className="flex gap-2.5 rounded-[16px] border border-[#E9DCC7] bg-white px-4 py-3 text-[11px] font-bold leading-[1.45] text-[#776B60]">
           <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-[#A97824]" />
           <span>
-            To‘lov buyurtma operator tomonidan tasdiqlangandan keyin
-            amalga oshiriladi.
+            {isOnlinePayment
+              ? "To‘lov natijasiga frontend emas, faqat Click/Payme server tasdig‘i ishonchli hisoblanadi."
+              : "Naqd to‘lov buyurtma yetkazilganda yoki olib ketishda amalga oshiriladi."}
           </span>
         </div>
       </form>
@@ -457,7 +496,11 @@ export default function CheckoutPage({
           </div>
 
           <span className="rounded-full bg-[#FFF0D3] px-3 py-1.5 text-[10px] font-black text-[#A97824]">
-            {isDelivery ? "Dastavka" : "Olib ketish"}
+            {paymentType === "cash"
+              ? "Naqd"
+              : paymentType === "click"
+                ? "Click"
+                : "Payme"}
           </span>
         </div>
 
@@ -483,7 +526,9 @@ export default function CheckoutPage({
                 ? "Restoran yopiq"
                 : isBelowMinimum
                   ? "Minimal summa yetarli emas"
-                  : "Buyurtmani tasdiqlash"}
+                  : isOnlinePayment
+                    ? "Buyurtma va to‘lovni davom ettirish"
+                    : "Buyurtmani tasdiqlash"}
           </span>
 
           {!isSubmitting && <ArrowRight className="h-5 w-5" />}

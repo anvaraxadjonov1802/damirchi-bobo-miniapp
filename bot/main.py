@@ -150,6 +150,7 @@ async def start_handler(message: Message):
         )
         remember_bot_message(sent_message.chat.id, sent_message.message_id)
 
+
 @dp.message(Command('menu'))
 async def menu_command_handler(message: Message):
     full_name = message.from_user.full_name if message.from_user else 'mijoz'
@@ -275,6 +276,7 @@ async def order_status_handler(callback: CallbackQuery):
     try:
         data = await patch_order_status(
             config.backend_api_url,
+            operator_api_key=config.operator_api_key,
             order_id=order_id,
             status=new_status,
         )
