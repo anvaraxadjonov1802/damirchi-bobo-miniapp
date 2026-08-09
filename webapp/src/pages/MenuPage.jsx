@@ -261,7 +261,7 @@ export default function MenuPage({
       <main className="px-4 pt-4">
         {groupedSections.length > 0 ? (
           <div className="flex flex-col gap-5">
-            {groupedSections.map((section) => (
+            {groupedSections.map((section, sectionIndex) => (
               <section key={section.id}>
                 <div className="mb-3 flex items-end justify-between gap-3">
                   <div className="min-w-0">
@@ -287,7 +287,7 @@ export default function MenuPage({
                 </div>
 
                 <div className="grid grid-cols-2 items-stretch gap-3">
-                  {section.products.map((product) => {
+                  {section.products.map((product, productIndex) => {
                     const quantity =
                       cart?.[product.id]?.quantity || 0;
 
@@ -296,6 +296,7 @@ export default function MenuPage({
                         key={product.id}
                         product={product}
                         quantity={quantity}
+                        priority={sectionIndex === 0 && productIndex < 4}
                         onAdd={onAddToCart}
                         onIncrease={onIncreaseQuantity}
                         onDecrease={onDecreaseQuantity}
