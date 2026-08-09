@@ -18,6 +18,9 @@ class OrderItemCreateSerializer(serializers.Serializer):
 
 
 class OrderItemSerializer(serializers.ModelSerializer):
+    id = serializers.CharField(read_only=True)
+    product = serializers.CharField(source="product_id", read_only=True)
+
     class Meta:
         model = OrderItem
         fields = (
@@ -31,6 +34,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
 
 class OrderCreateSerializer(serializers.ModelSerializer):
+    id = serializers.CharField(read_only=True)
     telegram_init_data = serializers.CharField(
         write_only=True,
         required=False,
@@ -235,6 +239,7 @@ class OrderCreateSerializer(serializers.ModelSerializer):
 
 
 class OrderDetailSerializer(serializers.ModelSerializer):
+    id = serializers.CharField(read_only=True)
     items = OrderItemSerializer(many=True, read_only=True)
     customer_name = serializers.CharField(source="customer.full_name", read_only=True)
     customer_username = serializers.CharField(source="customer.username", read_only=True)
