@@ -11,6 +11,7 @@ urlpatterns = [
     path("api/", include("menu.urls")),
     path("api/", include("orders.urls")),
     path("api/", include("payments.urls")),
+    path("api/", include("telegrambot.urls")),
 ]
 
 # Demo/test uchun media files serve qilish
