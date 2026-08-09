@@ -5,7 +5,7 @@ services:
     plan: free
     rootDir: backend
     buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput
-    startCommand: python manage.py migrate && gunicorn config.wsgi:application --bind 0.0.0.0:$PORT
+    startCommand: python manage.py migrate && python manage.py configure_telegram_webhook && gunicorn config.wsgi:application --bind 0.0.0.0:$PORT
     healthCheckPath: /api/settings/
     envVars:
       - key: SECRET_KEY
@@ -24,6 +24,10 @@ services:
         value: https://damirchi.vercel.app
       - key: CSRF_TRUSTED_ORIGINS
         value: https://damirchi.vercel.app
+      - key: WEBAPP_URL
+        value: https://damirchi.vercel.app
+      - key: BACKEND_PUBLIC_URL
+        value: https://damirchi-bobo-api.onrender.com
       - key: PAYMENT_RETURN_URL
         value: https://damirchi.vercel.app
       - key: BOT_TOKEN
