@@ -12,6 +12,7 @@ export default function ProductCard({
   onIncrease,
   onDecrease,
   onDetails,
+  priority = false,
 }) {
   const [imageError, setImageError] = useState(false);
 
@@ -65,7 +66,11 @@ export default function ProductCard({
           <img
             src={imageSrc}
             alt={product.name_uz}
-            loading="lazy"
+            width="420"
+            height="420"
+            loading={priority ? "eager" : "lazy"}
+            fetchPriority={priority ? "high" : "auto"}
+            decoding="async"
             referrerPolicy="no-referrer"
             onError={() => setImageError(true)}
             className="h-full w-full object-cover transition duration-300"
