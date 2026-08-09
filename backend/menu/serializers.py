@@ -1,3 +1,4 @@
+from django.conf import settings
 from rest_framework import serializers
 
 from .models import Category, Product
@@ -8,6 +9,18 @@ class SafeImageMixin:
         image = getattr(obj, "image", None)
         if not image:
             return None
+
+        image_name = (getattr(image, "name", "") or "").lstrip("/")
+        public_media_url = (
+            getattr(settings, "SUPABASE_PUBLIC_MEDIA_URL", "") or ""
+        ).rstrip("/")
+
+        if (
+            getattr(settings, "USE_SUPABASE_STORAGE", False)
+            and public_media_url
+            and image_name
+        ):
+            return f"{public_media_url}/{image_name}"
 
         try:
             url = image.url
