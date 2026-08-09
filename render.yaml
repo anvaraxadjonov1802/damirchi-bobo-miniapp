@@ -50,6 +50,8 @@ services:
         value: "False"
       - key: PAYME_ACCOUNT_FIELD
         value: order_id
+      - key: IMGBB_API_KEY
+        sync: false
       - key: USE_SUPABASE_STORAGE
         value: "False"
       - key: SUPABASE_STORAGE_BUCKET
