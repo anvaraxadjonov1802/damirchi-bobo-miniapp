@@ -1,6 +1,8 @@
-const IMAGE_CACHE = "damirchi-imgbb-images-v2";
+const IMAGE_CACHE = "damirchi-imgbb-images-v3";
 const IMAGE_HOSTS = new Set(["i.ibb.co"]);
 const PRODUCTS_API = "https://damirchi-bobo-api.onrender.com/api/products/";
+
+let prewarmStarted = false;
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -92,7 +94,6 @@ self.addEventListener("activate", (event) => {
       );
 
       await self.clients.claim();
-      await prewarmMenuImages();
     })()
   );
 });
@@ -113,6 +114,11 @@ self.addEventListener("fetch", (event) => {
 
   if (!IMAGE_HOSTS.has(url.hostname)) {
     return;
+  }
+
+  if (!prewarmStarted) {
+    prewarmStarted = true;
+    event.waitUntil(prewarmMenuImages());
   }
 
   event.respondWith(
