@@ -9,4 +9,6 @@ class RestaurantSettingsAPIView(APIView):
     def get(self, request):
         settings = RestaurantSettings.load()
         serializer = RestaurantSettingsSerializer(settings)
-        return Response(serializer.data)
+        response = Response(serializer.data)
+        response["Cache-Control"] = "public, max-age=60, stale-while-revalidate=300"
+        return response
