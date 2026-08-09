@@ -1,7 +1,7 @@
+import os
 from pathlib import Path
 
 import requests
-from django.conf import settings
 
 
 class ImgBBUploadError(RuntimeError):
@@ -9,7 +9,7 @@ class ImgBBUploadError(RuntimeError):
 
 
 def upload_image_to_imgbb(uploaded_file, *, name: str = "") -> dict:
-    api_key = (getattr(settings, "IMGBB_API_KEY", "") or "").strip()
+    api_key = os.getenv("IMGBB_API_KEY", "").strip()
     if not api_key:
         raise ImgBBUploadError("IMGBB_API_KEY Render Environment ichida sozlanmagan.")
 
