@@ -6,6 +6,16 @@ from .models import Category, Product
 
 class SafeImageMixin:
     def get_image(self, obj):
+        # ImgBB URL is preferred. It is uploaded once from Django admin and the
+        # URL stays in MongoDB, so API reads never re-upload the image.
+        remote_url = (
+            getattr(obj, "image_thumb_url", None)
+            or getattr(obj, "image_url", None)
+        )
+        if remote_url:
+            return remote_url
+
+        # Legacy/local/Supabase fallback for older records.
         image = getattr(obj, "image", None)
         if not image:
             return None
@@ -32,13 +42,14 @@ class SafeImageMixin:
             return request.build_absolute_uri(url)
         return url
 
+    def get_image_original(self, obj):
+        return getattr(obj, "image_url", None) or self.get_image(obj)
+
 
 class CategorySerializer(SafeImageMixin, serializers.ModelSerializer):
-    # django-mongodb-backend uses ObjectId primary keys. DRF's default
-    # ModelSerializer field can leave them as bson.ObjectId objects, which are
-    # not JSON serializable. CharField guarantees a stable string for the web app.
     id = serializers.CharField(read_only=True)
     image = serializers.SerializerMethodField()
+    image_original = serializers.SerializerMethodField()
 
     class Meta:
         model = Category
@@ -47,6 +58,7 @@ class CategorySerializer(SafeImageMixin, serializers.ModelSerializer):
             "name_uz",
             "name_ru",
             "image",
+            "image_original",
             "sort_order",
         )
 
@@ -56,6 +68,7 @@ class ProductSerializer(SafeImageMixin, serializers.ModelSerializer):
     category = serializers.CharField(source="category_id", read_only=True)
     category_name = serializers.CharField(source="category.name_uz", read_only=True)
     image = serializers.SerializerMethodField()
+    image_original = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
@@ -69,6 +82,7 @@ class ProductSerializer(SafeImageMixin, serializers.ModelSerializer):
             "description_ru",
             "price",
             "image",
+            "image_original",
             "is_available",
             "sort_order",
         )
