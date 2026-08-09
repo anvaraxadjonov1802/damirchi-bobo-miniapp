@@ -5,6 +5,15 @@ class Category(models.Model):
     name_uz = models.CharField(max_length=100)
     name_ru = models.CharField(max_length=100, blank=True, null=True)
     image = models.ImageField(upload_to="categories/", blank=True, null=True)
+    image_url = models.URLField(max_length=1000, blank=True, null=True)
+    image_thumb_url = models.URLField(max_length=1000, blank=True, null=True)
+    image_delete_url = models.URLField(
+        max_length=1000,
+        blank=True,
+        null=True,
+        editable=False,
+    )
+    image_provider = models.CharField(max_length=32, blank=True, default="")
     is_active = models.BooleanField(default=True)
     sort_order = models.PositiveIntegerField(default=0)
 
@@ -29,6 +38,15 @@ class Product(models.Model):
     description_ru = models.TextField(blank=True, null=True)
     price = models.PositiveIntegerField()
     image = models.ImageField(upload_to="products/", blank=True, null=True)
+    image_url = models.URLField(max_length=1000, blank=True, null=True)
+    image_thumb_url = models.URLField(max_length=1000, blank=True, null=True)
+    image_delete_url = models.URLField(
+        max_length=1000,
+        blank=True,
+        null=True,
+        editable=False,
+    )
+    image_provider = models.CharField(max_length=32, blank=True, default="")
     is_available = models.BooleanField(default=True)
     is_active = models.BooleanField(default=True)
     sort_order = models.PositiveIntegerField(default=0)
