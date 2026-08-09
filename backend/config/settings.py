@@ -134,25 +134,50 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
-# Media storage is intentionally independent from the database. Supabase S3
-# can remain enabled until media files are migrated to another object store.
+# Media storage is independent from MongoDB. In production, Supabase Storage
+# can be used through its S3-compatible API. S3 access keys are server-side
+# secrets and must never be exposed to the Vite frontend.
 USE_SUPABASE_STORAGE = os.getenv("USE_SUPABASE_STORAGE", "False") == "True"
+SUPABASE_PUBLIC_MEDIA_URL = os.getenv("SUPABASE_PUBLIC_MEDIA_URL", "").strip().rstrip("/")
 
 if USE_SUPABASE_STORAGE:
-    AWS_ACCESS_KEY_ID = os.getenv("SUPABASE_S3_ACCESS_KEY_ID", "")
-    AWS_SECRET_ACCESS_KEY = os.getenv("SUPABASE_S3_SECRET_ACCESS_KEY", "")
-    AWS_STORAGE_BUCKET_NAME = os.getenv("SUPABASE_STORAGE_BUCKET", "damirchi-media")
-    AWS_S3_ENDPOINT_URL = os.getenv(
-        "SUPABASE_S3_ENDPOINT_URL",
-        "https://your-project-ref.supabase.co/storage/v1/s3",
+    AWS_ACCESS_KEY_ID = os.getenv("SUPABASE_S3_ACCESS_KEY_ID", "").strip()
+    AWS_SECRET_ACCESS_KEY = os.getenv("SUPABASE_S3_SECRET_ACCESS_KEY", "").strip()
+    AWS_STORAGE_BUCKET_NAME = (
+        os.getenv("SUPABASE_STORAGE_BUCKET", "damirchi-media").strip()
+        or "damirchi-media"
     )
-    AWS_S3_REGION_NAME = os.getenv("SUPABASE_S3_REGION_NAME", "auto")
+    AWS_S3_ENDPOINT_URL = os.getenv("SUPABASE_S3_ENDPOINT_URL", "").strip().rstrip("/")
+    AWS_S3_REGION_NAME = os.getenv("SUPABASE_S3_REGION_NAME", "auto").strip() or "auto"
     AWS_S3_ADDRESSING_STYLE = "path"
     AWS_S3_SIGNATURE_VERSION = "s3v4"
     AWS_QUERYSTRING_AUTH = False
     AWS_DEFAULT_ACL = None
     AWS_S3_FILE_OVERWRITE = False
     AWS_S3_OBJECT_PARAMETERS = {"CacheControl": "max-age=86400"}
+
+    missing_storage_settings = [
+        name
+        for name, value in (
+            ("SUPABASE_S3_ACCESS_KEY_ID", AWS_ACCESS_KEY_ID),
+            ("SUPABASE_S3_SECRET_ACCESS_KEY", AWS_SECRET_ACCESS_KEY),
+            ("SUPABASE_S3_ENDPOINT_URL", AWS_S3_ENDPOINT_URL),
+        )
+        if not value
+    ]
+    if missing_storage_settings:
+        raise RuntimeError(
+            "USE_SUPABASE_STORAGE=True but these settings are missing: "
+            + ", ".join(missing_storage_settings)
+        )
+
+    # If a public media URL was not explicitly configured, derive it from the
+    # standard Supabase S3 endpoint: https://<ref>.supabase.co/storage/v1/s3
+    if not SUPABASE_PUBLIC_MEDIA_URL and "/storage/v1/s3" in AWS_S3_ENDPOINT_URL:
+        supabase_project_url = AWS_S3_ENDPOINT_URL.split("/storage/v1/s3", 1)[0]
+        SUPABASE_PUBLIC_MEDIA_URL = (
+            f"{supabase_project_url}/storage/v1/object/public/{AWS_STORAGE_BUCKET_NAME}"
+        )
 
     STORAGES = {
         "default": {"BACKEND": "storages.backends.s3.S3Storage"},
