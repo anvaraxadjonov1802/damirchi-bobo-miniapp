@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "orders",
     "payments",
     "common",
+    "telegrambot.apps.TelegramBotConfig",
 ]
 
 MIDDLEWARE = [
@@ -193,10 +194,17 @@ REST_FRAMEWORK = {
     ],
 }
 
+# Telegram Mini App + webhook.
 TELEGRAM_INIT_DATA_MAX_AGE_SECONDS = int(
     os.getenv("TELEGRAM_INIT_DATA_MAX_AGE_SECONDS", "86400")
 )
-BOT_TOKEN = os.getenv("BOT_TOKEN", "")
+BOT_TOKEN = os.getenv("BOT_TOKEN", "").strip()
+WEBAPP_URL = os.getenv("WEBAPP_URL", "https://damirchi.vercel.app").strip().rstrip("/")
+BACKEND_PUBLIC_URL = os.getenv(
+    "BACKEND_PUBLIC_URL",
+    "https://damirchi-bobo-api.onrender.com",
+).strip().rstrip("/")
+OPERATOR_CHAT_ID = os.getenv("OPERATOR_CHAT_ID", "").strip()
 ALLOW_UNVERIFIED_TELEGRAM_IN_DEBUG = (
     os.getenv("ALLOW_UNVERIFIED_TELEGRAM_IN_DEBUG", "False") == "True"
 )
@@ -223,5 +231,9 @@ PAYME_CHECKOUT_URL = os.getenv(
     "https://checkout.paycom.uz",
 ).strip()
 
-# Bot -> backend status update protection. Configure the same value in bot env.
+# Bot -> backend status update protection. This value is also a safe default
+# for Telegram's webhook secret because token_urlsafe() uses allowed characters.
 OPERATOR_API_KEY = os.getenv("OPERATOR_API_KEY", "").strip()
+TELEGRAM_WEBHOOK_SECRET = (
+    os.getenv("TELEGRAM_WEBHOOK_SECRET", "").strip() or OPERATOR_API_KEY
+)
