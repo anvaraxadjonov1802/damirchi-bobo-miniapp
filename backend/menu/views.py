@@ -6,6 +6,9 @@ from .models import Category, Product
 from .serializers import CategorySerializer, ProductSerializer
 
 
+MENU_CACHE_CONTROL = "public, max-age=60, stale-while-revalidate=300"
+
+
 class MenuBootstrapAPIView(APIView):
     """Return active categories and products in one request for fast app startup."""
 
@@ -30,20 +33,30 @@ class MenuBootstrapAPIView(APIView):
                 ).data,
             }
         )
-        # Browser/WebView may reuse the menu briefly while the app also keeps a
-        # persistent local copy for instant subsequent launches.
-        response["Cache-Control"] = "public, max-age=60, stale-while-revalidate=300"
+        response["Cache-Control"] = MENU_CACHE_CONTROL
         return response
 
 
-class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
+class CachedReadOnlyModelViewSet(viewsets.ReadOnlyModelViewSet):
+    def list(self, request, *args, **kwargs):
+        response = super().list(request, *args, **kwargs)
+        response["Cache-Control"] = MENU_CACHE_CONTROL
+        return response
+
+    def retrieve(self, request, *args, **kwargs):
+        response = super().retrieve(request, *args, **kwargs)
+        response["Cache-Control"] = MENU_CACHE_CONTROL
+        return response
+
+
+class CategoryViewSet(CachedReadOnlyModelViewSet):
     serializer_class = CategorySerializer
 
     def get_queryset(self):
         return Category.objects.filter(is_active=True)
 
 
-class ProductViewSet(viewsets.ReadOnlyModelViewSet):
+class ProductViewSet(CachedReadOnlyModelViewSet):
     serializer_class = ProductSerializer
 
     def get_queryset(self):
