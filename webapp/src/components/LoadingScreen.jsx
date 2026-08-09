@@ -1,27 +1,77 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Utensils } from "lucide-react";
 
-export default function LoadingScreen() {
+function MenuSkeleton() {
   return (
-    <div className="fixed inset-0 bg-[#FFFAF2] flex flex-col items-center justify-center p-6 z-50 animate-fade-in text-[#2C211A] overflow-hidden">
-      <div
-        className="absolute inset-0 opacity-[0.055] pointer-events-none"
-        style={{
-          backgroundImage: "radial-gradient(#C89438 1px, transparent 1px)",
-          backgroundSize: "16px 16px",
-        }}
-      />
+    <div className="min-h-[100dvh] bg-[#F7F3EB] text-[#241812]">
+      <div className="mx-auto w-full max-w-[480px]">
+        <div className="flex h-[64px] items-center justify-between border-b border-[#ECE5DC] bg-white px-4">
+          <div className="h-8 w-28 animate-pulse rounded-xl bg-[#EEE7DE]" />
+          <div className="h-9 w-9 animate-pulse rounded-xl bg-[#EEE7DE]" />
+        </div>
 
-      <div className="absolute -top-20 -right-20 w-52 h-52 rounded-full border border-[#E9DCC7]" />
-      <div className="absolute -bottom-24 -left-24 w-64 h-64 rounded-full border border-[#E9DCC7]" />
+        <div className="px-4 pt-3">
+          <div className="grid grid-cols-2 gap-2 rounded-[20px] border border-[#E9E3DA] bg-white p-2">
+            <div className="h-12 animate-pulse rounded-[16px] bg-[#E8D5B2]" />
+            <div className="h-12 animate-pulse rounded-[16px] bg-[#F0EBE4]" />
+          </div>
 
-      <div className="relative flex flex-col items-center max-w-xs text-center">
-        <div className="relative mb-6">
-          <div className="w-24 h-24 rounded-full border-2 border-[#E9DCC7] border-t-[#C89438] animate-spin" />
+          <div className="mt-4 h-[138px] animate-pulse rounded-[22px] bg-[#E8DED1]" />
+          <div className="mt-4 h-11 animate-pulse rounded-[16px] bg-white" />
 
+          <div className="mt-3 flex gap-2 overflow-hidden">
+            {[1, 2, 3, 4].map((item) => (
+              <div
+                key={item}
+                className="h-9 w-24 shrink-0 animate-pulse rounded-full bg-white"
+              />
+            ))}
+          </div>
+
+          <div className="mt-5 h-6 w-36 animate-pulse rounded-lg bg-[#E3DAD0]" />
+
+          <div className="mt-3 grid grid-cols-2 gap-3">
+            {[1, 2, 3, 4].map((item) => (
+              <div
+                key={item}
+                className="overflow-hidden rounded-[20px] border border-[#E9E3DA] bg-white"
+              >
+                <div className="h-[145px] animate-pulse bg-[#E8E1D8]" />
+                <div className="space-y-2 p-3">
+                  <div className="h-4 w-4/5 animate-pulse rounded bg-[#E8E1D8]" />
+                  <div className="h-3 w-full animate-pulse rounded bg-[#F0EBE4]" />
+                  <div className="h-3 w-2/3 animate-pulse rounded bg-[#F0EBE4]" />
+                  <div className="mt-3 h-4 w-20 animate-pulse rounded bg-[#E8D5B2]" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function LoadingScreen() {
+  const [showBrandSplash, setShowBrandSplash] = useState(true);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => setShowBrandSplash(false), 320);
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  if (!showBrandSplash) {
+    return <MenuSkeleton />;
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center overflow-hidden bg-[#FFFAF2] p-6 text-[#2C211A]">
+      <div className="relative flex max-w-xs flex-col items-center text-center">
+        <div className="relative mb-4">
+          <div className="h-20 w-20 animate-spin rounded-full border-2 border-[#E9DCC7] border-t-[#C89438]" />
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-16 h-16 rounded-full bg-white border border-[#E9DCC7] shadow-lg flex items-center justify-center">
-              <Utensils className="w-7 h-7 text-[#A97824]" />
+            <div className="flex h-13 w-13 items-center justify-center rounded-full border border-[#E9DCC7] bg-white shadow-md">
+              <Utensils className="h-6 w-6 text-[#A97824]" />
             </div>
           </div>
         </div>
@@ -29,17 +79,8 @@ export default function LoadingScreen() {
         <h1 className="font-serif text-3xl font-black leading-none text-[#2C211A]">
           Damirchi
         </h1>
-
-        <p className="text-[#A97824] text-[10px] font-black uppercase tracking-[0.2em] mt-2 mb-6">
+        <p className="mt-2 text-[10px] font-black uppercase tracking-[0.2em] text-[#A97824]">
           Online menu
-        </p>
-
-        <div className="w-40 h-1 bg-[#C89438]/10 rounded-full overflow-hidden mb-3.5">
-          <div className="h-full w-1/2 bg-[#C89438] rounded-full animate-loading-bar" />
-        </div>
-
-        <p className="text-[#776B60] text-xs font-bold uppercase tracking-wider animate-pulse">
-          Menyu yuklanmoqda...
         </p>
       </div>
     </div>
