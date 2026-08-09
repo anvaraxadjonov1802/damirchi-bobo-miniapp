@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   ImageOff,
   Minus,
@@ -22,8 +22,17 @@ export default function ProductDetailsModal({
   );
   const [imageError, setImageError] = useState(false);
 
+  const thumbSrc = useMemo(
+    () => client.getImageUrl(product?.image),
+    [product?.image]
+  );
+  const originalSrc = useMemo(
+    () => client.getImageUrl(product?.image_original || product?.image),
+    [product?.image_original, product?.image]
+  );
+  const [imageSrc, setImageSrc] = useState(thumbSrc);
+
   const isAvailable = product?.is_available !== false;
-  const imageSrc = client.getImageUrl(product?.image);
 
   useEffect(() => {
     document.body.style.overflow = "hidden";
@@ -36,6 +45,35 @@ export default function ProductDetailsModal({
   useEffect(() => {
     setQuantity(currentQuantity > 0 ? currentQuantity : 1);
   }, [currentQuantity, product?.id]);
+
+  useEffect(() => {
+    setImageError(false);
+    setImageSrc(thumbSrc);
+
+    if (!originalSrc || originalSrc === thumbSrc) return undefined;
+
+    let cancelled = false;
+    const image = new Image();
+    image.decoding = "async";
+    image.src = originalSrc;
+
+    const promoteOriginal = async () => {
+      try {
+        if (typeof image.decode === "function") {
+          await image.decode();
+        }
+        if (!cancelled) setImageSrc(originalSrc);
+      } catch {
+        // Thumbnail remains visible if the larger image cannot be decoded.
+      }
+    };
+
+    promoteOriginal();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [thumbSrc, originalSrc, product?.id]);
 
   if (!product) return null;
 
@@ -85,6 +123,11 @@ export default function ProductDetailsModal({
             <img
               src={imageSrc}
               alt={product.name_uz}
+              width="960"
+              height="960"
+              decoding="async"
+              fetchPriority="high"
+              referrerPolicy="no-referrer"
               onError={() => setImageError(true)}
               className="h-full w-full object-cover"
             />
