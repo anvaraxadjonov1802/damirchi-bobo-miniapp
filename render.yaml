@@ -44,12 +44,31 @@ services:
         value: "86400"
       - key: ALLOW_UNVERIFIED_TELEGRAM_IN_DEBUG
         value: "False"
+
+      # Click Business / Shop API
+      # Keep disabled until all credentials + callback URLs are configured.
       - key: CLICK_ENABLED
         value: "False"
+      - key: CLICK_SERVICE_ID
+        sync: false
+      - key: CLICK_MERCHANT_ID
+        sync: false
+      - key: CLICK_SECRET_KEY
+        sync: false
+
+      # Payme Business / Merchant API
+      # Keep disabled until merchant credentials + endpoint are configured.
       - key: PAYME_ENABLED
         value: "False"
+      - key: PAYME_MERCHANT_ID
+        sync: false
+      - key: PAYME_LOGIN
+        sync: false
+      - key: PAYME_SECRET_KEY
+        sync: false
       - key: PAYME_ACCOUNT_FIELD
         value: order_id
+
       - key: IMGBB_API_KEY
         sync: false
       - key: USE_SUPABASE_STORAGE
