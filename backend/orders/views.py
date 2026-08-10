@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework import generics, status
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
@@ -45,12 +46,16 @@ class OrderPaymentStatusAPIView(APIView):
         try:
             telegram_user = validate_telegram_init_data(init_data)
         except Exception as exc:
-            detail = getattr(exc, "detail", None) or "Telegram tasdiqlash ma’lumoti noto‘g‘ri."
+            detail = getattr(exc, "detail", None)
+            if isinstance(detail, dict):
+                detail = detail.get("detail") or "Telegram tasdiqlash ma’lumoti noto‘g‘ri."
+            elif not detail:
+                detail = "Telegram tasdiqlash ma’lumoti noto‘g‘ri."
             return Response({"detail": detail}, status=status.HTTP_401_UNAUTHORIZED)
 
         try:
             order = Order.objects.get(pk=pk)
-        except Order.DoesNotExist:
+        except (Order.DoesNotExist, DjangoValidationError, ValueError, TypeError):
             return Response({"detail": "Order not found."}, status=status.HTTP_404_NOT_FOUND)
 
         customer_telegram_id = getattr(getattr(order, "customer", None), "telegram_id", None)
