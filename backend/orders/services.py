@@ -215,3 +215,37 @@ def send_order_to_operator_group(order: Order) -> None:
 
     except requests.RequestException as exc:
         print("Telegram request xatoligi:", exc)
+
+
+def send_payment_confirmation_to_customer(order: Order) -> None:
+    """Best-effort Telegram confirmation after Click/Payme server callback."""
+    bot_token = os.getenv("BOT_TOKEN")
+    telegram_id = getattr(getattr(order, "customer", None), "telegram_id", None)
+
+    if not bot_token or not telegram_id:
+        return
+
+    provider = "Click" if order.payment_type == Order.PaymentType.CLICK else "Payme"
+    text = (
+        f"✅ <b>To‘lov tasdiqlandi</b>\n\n"
+        f"Buyurtma: <b>#{safe_text(order.id)}</b>\n"
+        f"To‘lov turi: <b>{provider}</b>\n"
+        f"Summa: <b>{money(order.total_price)}</b>\n\n"
+        "Buyurtmangiz Damirchi operatoriga yuborildi."
+    )
+
+    try:
+        response = requests.post(
+            f"https://api.telegram.org/bot{bot_token}/sendMessage",
+            json={
+                "chat_id": telegram_id,
+                "text": text,
+                "parse_mode": "HTML",
+                "disable_web_page_preview": True,
+            },
+            timeout=15,
+        )
+        if response.status_code != 200:
+            print("Mijozga payment confirmation yuborilmadi:", response.text)
+    except requests.RequestException as exc:
+        print("Payment confirmation Telegram xatoligi:", exc)
