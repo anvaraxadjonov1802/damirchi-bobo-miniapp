@@ -169,6 +169,8 @@ export const client = {
       return {
         id: Math.floor(100000 + Math.random() * 900000),
         status: "new",
+        payment_status:
+          payload.payment_type === "cash" ? "unpaid" : "pending",
         total_price: payload.__total_price || 0,
         payment_type: payload.payment_type,
         created_at: new Date().toISOString(),
@@ -184,6 +186,26 @@ export const client = {
       method: "POST",
       headers: initData ? { "X-Telegram-Init-Data": initData } : {},
       body: JSON.stringify(cleanPayload),
+    });
+  },
+
+  async getPaymentStatus(orderId, telegramInitData) {
+    if (!orderId) throw new Error("Order ID topilmadi.");
+
+    if (USE_MOCK_DATA) {
+      return {
+        id: String(orderId),
+        payment_status: "paid",
+        status: "new",
+      };
+    }
+
+    return request(`/orders/${encodeURIComponent(orderId)}/payment-status/`, {
+      method: "GET",
+      cache: "no-store",
+      headers: telegramInitData
+        ? { "X-Telegram-Init-Data": telegramInitData }
+        : {},
     });
   },
 
