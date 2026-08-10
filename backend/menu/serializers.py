@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import serializers
 
 from .models import Category, Product
@@ -76,7 +77,7 @@ class ProductSerializer(SafeImageMixin, serializers.ModelSerializer):
 
         try:
             return obj.category.name_uz
-        except (AttributeError, Product.category.RelatedObjectDoesNotExist):
+        except (AttributeError, ObjectDoesNotExist):
             return ""
 
     class Meta:
