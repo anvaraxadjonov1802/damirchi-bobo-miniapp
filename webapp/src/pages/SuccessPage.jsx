@@ -1,32 +1,50 @@
-import React, { useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   CheckCircle2,
   ChevronRight,
   CreditCard,
   Home,
+  Loader2,
   ReceiptText,
+  RefreshCw,
 } from "lucide-react";
 
+import { client } from "../api/client";
 import { formatPrice } from "../utils/format";
-import { hapticFeedback, openExternalLink } from "../telegram/telegram";
+import {
+  getTelegramInitData,
+  hapticFeedback,
+  openExternalLink,
+} from "../telegram/telegram";
 
 export default function SuccessPage({ orderDetails, onGoHome }) {
   const paymentOpenedRef = useRef(false);
+  const lastPaidRef = useRef(false);
+
+  const orderId = orderDetails?.id || "";
+  const totalPrice = orderDetails?.total_price || 0;
+  const paymentType = orderDetails?.payment_type || "cash";
+  const initialPaymentStatus = orderDetails?.payment_status || "unpaid";
+  const initialPaymentUrl = orderDetails?.payment_url || "";
+  const isOnlinePayment = paymentType === "click" || paymentType === "payme";
+
+  const [paymentStatus, setPaymentStatus] = useState(initialPaymentStatus);
+  const [paymentUrl, setPaymentUrl] = useState(initialPaymentUrl);
+  const [orderStatus, setOrderStatus] = useState(orderDetails?.status || "new");
+  const [isCheckingPayment, setIsCheckingPayment] = useState(false);
+
+  useEffect(() => {
+    setPaymentStatus(initialPaymentStatus);
+    setPaymentUrl(initialPaymentUrl);
+    setOrderStatus(orderDetails?.status || "new");
+    paymentOpenedRef.current = false;
+    lastPaidRef.current = initialPaymentStatus === "paid";
+  }, [orderId, initialPaymentStatus, initialPaymentUrl, orderDetails?.status]);
 
   const handleHomeClick = () => {
     hapticFeedback("medium");
-
-    if (onGoHome) {
-      onGoHome();
-    }
+    onGoHome?.();
   };
-
-  const orderId = orderDetails?.id || Math.floor(100000 + Math.random() * 900000);
-  const totalPrice = orderDetails?.total_price || 0;
-  const paymentType = orderDetails?.payment_type || "cash";
-  const paymentStatus = orderDetails?.payment_status || "unpaid";
-  const paymentUrl = orderDetails?.payment_url || "";
-  const isOnlinePayment = paymentType === "click" || paymentType === "payme";
 
   const paymentText =
     paymentType === "click"
@@ -53,9 +71,39 @@ export default function SuccessPage({ orderDetails, onGoHome }) {
       on_way: "Yo‘lda",
       completed: "Yetkazildi",
       cancelled: "Bekor qilindi",
-    }[orderDetails?.status] ||
-    orderDetails?.status ||
-    "Yangi";
+    }[orderStatus] || orderStatus || "Yangi";
+
+  const checkPaymentStatus = useCallback(
+    async ({ silent = false } = {}) => {
+      if (!isOnlinePayment || !orderId) return;
+
+      const initData = getTelegramInitData();
+      if (!initData) return;
+
+      if (!silent) setIsCheckingPayment(true);
+
+      try {
+        const result = await client.getPaymentStatus(orderId, initData);
+        const nextPaymentStatus = result?.payment_status || paymentStatus;
+
+        setPaymentStatus(nextPaymentStatus);
+        setOrderStatus(result?.status || orderStatus);
+        if (result?.payment_url) setPaymentUrl(result.payment_url);
+
+        if (nextPaymentStatus === "paid" && !lastPaidRef.current) {
+          lastPaidRef.current = true;
+          hapticFeedback("success");
+        }
+      } catch (error) {
+        if (!silent) {
+          console.warn("Payment status check failed:", error);
+          hapticFeedback("warning");
+        }
+      } finally {
+        if (!silent) setIsCheckingPayment(false);
+      }
+    }, [isOnlinePayment, orderId, orderStatus, paymentStatus]
+  );
 
   useEffect(() => {
     if (
@@ -69,37 +117,82 @@ export default function SuccessPage({ orderDetails, onGoHome }) {
     }
   }, [isOnlinePayment, paymentStatus, paymentUrl]);
 
+  useEffect(() => {
+    if (!isOnlinePayment || paymentStatus !== "pending" || !orderId) {
+      return undefined;
+    }
+
+    const timer = window.setInterval(() => {
+      checkPaymentStatus({ silent: true });
+    }, 2500);
+
+    const handleVisibility = () => {
+      if (document.visibilityState === "visible") {
+        checkPaymentStatus({ silent: true });
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibility);
+
+    return () => {
+      window.clearInterval(timer);
+      document.removeEventListener("visibilitychange", handleVisibility);
+    };
+  }, [checkPaymentStatus, isOnlinePayment, orderId, paymentStatus]);
+
   const handleOpenPayment = () => {
     hapticFeedback("medium");
-    openExternalLink(paymentUrl);
+    if (paymentUrl) openExternalLink(paymentUrl);
   };
+
+  const isPaid = paymentStatus === "paid";
+  const paymentCanRetry = ["pending", "cancelled", "failed"].includes(paymentStatus);
+
+  const headline =
+    isOnlinePayment && !isPaid
+      ? paymentStatus === "pending"
+        ? "To‘lov kutilmoqda"
+        : "To‘lov yakunlanmadi"
+      : isOnlinePayment
+        ? "To‘lov tasdiqlandi"
+        : "Buyurtma qabul qilindi";
+
+  const description = isOnlinePayment
+    ? isPaid
+      ? "To‘lov server orqali tasdiqlandi. Buyurtmangiz Damirchi operatoriga yuborildi."
+      : paymentStatus === "pending"
+        ? `${paymentText} to‘lov oynasida to‘lovni yakunlang. Tasdiq kelishi bilan bu sahifa avtomatik yangilanadi.`
+        : "To‘lov tasdiqlanmadi. Quyidagi tugma orqali qayta urinishingiz mumkin."
+    : "Buyurtmangiz Damirchi operatoriga yuborildi. Holat o‘zgarsa Telegram orqali xabar beramiz.";
 
   return (
     <div className="px-4 py-6 pb-28 flex flex-col items-center justify-center min-h-[calc(100dvh-90px)] text-center animate-fade-in text-[#2C211A]">
       <div className="relative mb-5">
-        <div className="w-20 h-20 bg-emerald-950/25 rounded-full border-4 border-emerald-500/15 flex items-center justify-center animate-pulse shadow-[0_0_18px_rgba(16,185,129,0.14)]">
-          <CheckCircle2 className="w-12 h-12 text-emerald-400 animate-scale-in" />
+        <div
+          className={`w-20 h-20 rounded-full border-4 flex items-center justify-center shadow-sm ${
+            isOnlinePayment && !isPaid
+              ? "bg-amber-50 border-amber-200"
+              : "bg-emerald-50 border-emerald-200"
+          }`}
+        >
+          {isOnlinePayment && !isPaid ? (
+            <CreditCard className="w-10 h-10 text-[#A97824]" />
+          ) : (
+            <CheckCircle2 className="w-12 h-12 text-emerald-500 animate-scale-in" />
+          )}
         </div>
-
-        <div className="absolute top-1 right-1 w-4 h-4 rounded-full bg-emerald-500 animate-ping opacity-75" />
-        <div className="absolute top-1 right-1 w-4 h-4 rounded-full bg-emerald-500" />
       </div>
 
       <h2 className="font-serif font-black text-2xl text-[#2C211A] leading-tight">
-        Buyurtma qabul qilindi
+        {headline}
       </h2>
 
       <p className="text-sm text-[#776B60] leading-snug max-w-sm font-semibold mt-2 mb-5">
-        {isOnlinePayment && paymentStatus === "pending"
-          ? `${paymentText} to‘lov oynasi ochiladi. To‘lov tasdiqlangach buyurtma holati yangilanadi.`
-          : "Buyurtmangiz Damirchi operatoriga yuborildi. Holat o‘zgarsa Telegram orqali xabar beramiz."}
+        {description}
       </p>
 
       <div className="w-full max-w-sm bg-white border border-[#E9DCC7] rounded-3xl p-4 shadow-lg text-left mb-5 relative overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_0%_0%,rgba(200,148,56,0.10),transparent_38%)]" />
-
-        <div className="absolute -left-2 top-1/2 -mt-2 w-4 h-4 bg-[#FFFAF2] rounded-full border-r border-[#E9DCC7]" />
-        <div className="absolute -right-2 top-1/2 -mt-2 w-4 h-4 bg-[#FFFAF2] rounded-full border-l border-[#E9DCC7]" />
 
         <div className="relative">
           <div className="flex items-center gap-2 mb-3 border-b border-dashed border-[#E9DCC7] pb-2.5">
@@ -119,7 +212,7 @@ export default function SuccessPage({ orderDetails, onGoHome }) {
 
             <div className="flex justify-between items-center gap-3 text-[#776B60]">
               <span className="font-semibold">Status</span>
-              <span className="bg-emerald-50 border border-emerald-200 text-emerald-700 text-[10px] font-black px-2 py-1 rounded-full uppercase tracking-wider">
+              <span className="bg-[#FFF0D3] border border-[#E9DCC7] text-[#A97824] text-[10px] font-black px-2 py-1 rounded-full uppercase tracking-wider">
                 {statusText}
               </span>
             </div>
@@ -132,7 +225,17 @@ export default function SuccessPage({ orderDetails, onGoHome }) {
             {isOnlinePayment && (
               <div className="flex justify-between items-center gap-3 text-[#776B60]">
                 <span className="font-semibold">To‘lov holati</span>
-                <span className="font-black text-[#2C211A]">{paymentStatusText}</span>
+                <span
+                  className={`font-black ${
+                    isPaid
+                      ? "text-emerald-600"
+                      : paymentStatus === "pending"
+                        ? "text-[#A97824]"
+                        : "text-red-600"
+                  }`}
+                >
+                  {paymentStatusText}
+                </span>
               </div>
             )}
 
@@ -148,21 +251,41 @@ export default function SuccessPage({ orderDetails, onGoHome }) {
         </div>
       </div>
 
-      {isOnlinePayment && paymentUrl && paymentStatus === "pending" && (
+      {isOnlinePayment && paymentCanRetry && paymentUrl && (
         <button
           type="button"
           onClick={handleOpenPayment}
-          className="w-full max-w-sm mb-3 py-4 bg-[#2C211A] hover:bg-black text-white rounded-2xl text-sm font-black flex items-center justify-center gap-2 transition-all active:scale-[0.98] shadow-lg cursor-pointer"
+          className="w-full max-w-sm mb-3 py-4 bg-[#2C211A] text-white rounded-2xl text-sm font-black flex items-center justify-center gap-2 transition-all active:scale-[0.98] shadow-lg"
         >
           <CreditCard className="w-4 h-4" />
-          <span>{paymentText} orqali to‘lash</span>
+          <span>
+            {paymentStatus === "pending"
+              ? `${paymentText} orqali to‘lash`
+              : `${paymentText} orqali qayta to‘lash`}
+          </span>
+        </button>
+      )}
+
+      {isOnlinePayment && !isPaid && (
+        <button
+          type="button"
+          onClick={() => checkPaymentStatus({ silent: false })}
+          disabled={isCheckingPayment}
+          className="w-full max-w-sm mb-3 py-3.5 border border-[#E9DCC7] bg-white text-[#A97824] rounded-2xl text-sm font-black flex items-center justify-center gap-2 transition active:scale-[0.98] disabled:opacity-60"
+        >
+          {isCheckingPayment ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            <RefreshCw className="w-4 h-4" />
+          )}
+          <span>{isCheckingPayment ? "Tekshirilmoqda..." : "To‘lov holatini tekshirish"}</span>
         </button>
       )}
 
       <button
         type="button"
         onClick={handleHomeClick}
-        className="w-full max-w-sm py-4 bg-[#C89438] hover:bg-[#A97824] text-white rounded-2xl text-sm font-black flex items-center justify-center gap-2 transition-all active:scale-[0.98] shadow-lg shadow-[#C89438]/10 group cursor-pointer"
+        className="w-full max-w-sm py-4 bg-[#C89438] text-white rounded-2xl text-sm font-black flex items-center justify-center gap-2 transition-all active:scale-[0.98] shadow-lg group"
       >
         <Home className="w-4 h-4 text-white" />
         <span>Menyuga qaytish</span>
