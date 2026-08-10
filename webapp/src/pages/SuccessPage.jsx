@@ -17,7 +17,7 @@ import {
   openExternalLink,
 } from "../telegram/telegram";
 
-export default function SuccessPage({ orderDetails, onGoHome }) {
+export default function SuccessPage({ orderDetails, onGoHome, onPaymentUpdate }) {
   const paymentOpenedRef = useRef(false);
   const lastPaidRef = useRef(false);
 
@@ -89,6 +89,7 @@ export default function SuccessPage({ orderDetails, onGoHome }) {
         setPaymentStatus(nextPaymentStatus);
         setOrderStatus(result?.status || orderStatus);
         if (result?.payment_url) setPaymentUrl(result.payment_url);
+        onPaymentUpdate?.(result);
 
         if (nextPaymentStatus === "paid" && !lastPaidRef.current) {
           lastPaidRef.current = true;
@@ -102,7 +103,7 @@ export default function SuccessPage({ orderDetails, onGoHome }) {
       } finally {
         if (!silent) setIsCheckingPayment(false);
       }
-    }, [isOnlinePayment, orderId, orderStatus, paymentStatus]
+    }, [isOnlinePayment, onPaymentUpdate, orderId, orderStatus, paymentStatus]
   );
 
   useEffect(() => {
