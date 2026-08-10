@@ -32,13 +32,30 @@ def get_order(order_id: str) -> Order | None:
         return None
 
 
-def mark_order_paid(order: Order) -> None:
+def mark_order_paid(order: Order) -> bool:
+    """Mark an order paid once and report whether this call changed the state."""
     if order.payment_status == Order.PaymentStatus.PAID:
-        return
+        return False
 
     order.payment_status = Order.PaymentStatus.PAID
     order.paid_at = timezone.now()
     order.save(update_fields=["payment_status", "paid_at"])
+    return True
+
+
+def notify_paid_order(order: Order) -> None:
+    """Best-effort notifications after the payment DB transaction is committed."""
+    try:
+        from orders.services import (
+            send_order_to_operator_group,
+            send_payment_confirmation_to_customer,
+        )
+
+        send_order_to_operator_group(order)
+        send_payment_confirmation_to_customer(order)
+    except Exception as exc:
+        # Payment confirmation must never be rolled back because Telegram is down.
+        print(f"Paid order Telegram notification error: {exc}")
 
 
 def mark_order_payment_status(order: Order, status: str) -> None:
@@ -284,6 +301,7 @@ def handle_click_complete(payload: dict) -> dict:
         return click_response(payload, -8)
 
     try:
+        became_paid = False
         with transaction.atomic():
             tx.raw_payload = dict(payload)
 
@@ -307,7 +325,10 @@ def handle_click_complete(payload: dict) -> dict:
                     "updated_at",
                 ]
             )
-            mark_order_paid(order)
+            became_paid = mark_order_paid(order)
+
+        if became_paid:
+            notify_paid_order(order)
 
         return click_response(
             payload,
@@ -621,6 +642,9 @@ def handle_payme_rpc(payload: dict) -> dict:
         _expire_payme_transaction_if_needed(tx)
 
         if tx.provider_state == 2:
+            became_paid = mark_order_paid(tx.order)
+            if became_paid:
+                notify_paid_order(tx.order)
             return payme_result(
                 request_id,
                 {
@@ -634,6 +658,7 @@ def handle_payme_rpc(payload: dict) -> dict:
             return _payme_operation_error(request_id)
 
         try:
+            became_paid = False
             with transaction.atomic():
                 performed_ms = now_ms()
                 tx.provider_state = 2
@@ -653,7 +678,10 @@ def handle_payme_rpc(payload: dict) -> dict:
                         "updated_at",
                     ]
                 )
-                mark_order_paid(tx.order)
+                became_paid = mark_order_paid(tx.order)
+
+            if became_paid:
+                notify_paid_order(tx.order)
 
             return payme_result(
                 request_id,
