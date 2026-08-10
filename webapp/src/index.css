@@ -42,12 +42,12 @@ body,
 #root {
   min-height: 100%;
   background: var(--app-bg);
-  -webkit-overflow-scrolling: touch;
 }
 
 html {
+  overflow-x: hidden;
+  overflow-y: auto;
   scroll-behavior: smooth;
-  overscroll-behavior-y: contain;
 }
 
 body {
@@ -61,31 +61,32 @@ body {
   -moz-osx-font-smoothing: grayscale;
   -webkit-tap-highlight-color: transparent;
   overflow-x: hidden;
-  overscroll-behavior-y: contain;
-  touch-action: pan-y;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 #root {
   min-height: 100dvh;
+  overflow: visible;
   background: transparent;
 }
 
 .app-viewport {
-  touch-action: pan-y;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior-y: contain;
+  min-height: 100dvh;
+  overflow: visible;
 }
 
 .header-compositor,
 .bottom-nav-compositor {
-  transform: translateZ(0);
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
 }
 
+/* Keep sections in normal document flow. content-visibility can break body
+   scrolling in some Telegram Android/iOS WebView versions. */
 .menu-section {
-  content-visibility: auto;
-  contain-intrinsic-size: 760px;
+  contain: none;
+  content-visibility: visible;
 }
 
 * {
@@ -279,7 +280,12 @@ select:focus {
 }
 
 .no-scrollbar::-webkit-scrollbar { display: none; }
-.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x;
+}
 
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(5px); }
@@ -388,7 +394,7 @@ select:focus {
   border-radius: 50%;
   position: absolute;
 }
-.map-modal-open { overflow: hidden; }
+.map-modal-open { overflow: hidden !important; }
 
 @media (max-width: 380px) {
   .checkout-readable input,
