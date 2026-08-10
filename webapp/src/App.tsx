@@ -332,6 +332,9 @@ export default function App() {
         created_at: response?.created_at ?? new Date().toISOString(),
         order_type: response?.order_type ?? orderPayload.order_type,
         payment_type: response?.payment_type ?? orderPayload.payment_type,
+        payment_status:
+          response?.payment_status ??
+          (["click", "payme"].includes(orderPayload.payment_type) ? "pending" : "unpaid"),
         phone: response?.phone ?? orderPayload.phone,
         address: response?.address ?? orderPayload.address,
         delivery_price: response?.delivery_price ?? Number(orderPayload.delivery_price || 0),
@@ -345,20 +348,29 @@ export default function App() {
         localOrder,
         ...previousOrders.filter((order) => String(order?.id) !== String(localOrder.id)),
       ].slice(0, 50));
+
+      const isOnlinePayment = ["click", "payme"].includes(localOrder.payment_type);
       hapticFeedback("success");
-      showToast("Buyurtma qabul qilindi ✅", "success");
+      showToast(
+        isOnlinePayment
+          ? "Buyurtma yaratildi. To‘lovni yakunlang."
+          : "Buyurtma qabul qilindi ✅",
+        "success"
+      );
       setNotifications((prev) => [
         {
           id: `order-${Date.now()}`,
           type: "order",
-          title: "Buyurtma qabul qilindi",
-          message: "Buyurtmangiz operatorga yuborildi. Status o‘zgarsa, sizga xabar beramiz.",
+          title: isOnlinePayment ? "To‘lov kutilmoqda" : "Buyurtma qabul qilindi",
+          message: isOnlinePayment
+            ? "To‘lov tasdiqlangach buyurtmangiz avtomatik operatorga yuboriladi."
+            : "Buyurtmangiz operatorga yuborildi. Status o‘zgarsa, sizga xabar beramiz.",
           time: "Hozir",
           read: false,
         },
         ...prev,
       ]);
-      setCompletedOrderDetails(response);
+      setCompletedOrderDetails(localOrder);
       clearStoredCart();
       setCart({});
       navigate("success");
@@ -372,6 +384,24 @@ export default function App() {
     } finally {
       setSubmittingOrder(false);
     }
+  };
+
+  const handlePaymentUpdate = (update: any) => {
+    const orderId = update?.id || completedOrderDetails?.id;
+    if (!orderId) return;
+
+    setCompletedOrderDetails((current: any) => {
+      if (!current || String(current.id) !== String(orderId)) return current;
+      return { ...current, ...update };
+    });
+
+    setOrderHistory((currentOrders) =>
+      currentOrders.map((order) =>
+        String(order?.id) === String(orderId)
+          ? { ...order, ...update }
+          : order
+      )
+    );
   };
 
   const totalCartCount = useMemo(
@@ -483,7 +513,11 @@ export default function App() {
               />
             )}
             {currentScreen === "success" && (
-              <SuccessPage orderDetails={completedOrderDetails} onGoHome={handleGoHome} />
+              <SuccessPage
+                orderDetails={completedOrderDetails}
+                onGoHome={handleGoHome}
+                onPaymentUpdate={handlePaymentUpdate}
+              />
             )}
             {selectedProduct && (
               <ProductDetailsModal
