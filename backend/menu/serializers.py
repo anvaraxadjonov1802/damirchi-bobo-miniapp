@@ -6,8 +6,6 @@ from .models import Category, Product
 
 class SafeImageMixin:
     def get_image(self, obj):
-        # ImgBB URL is preferred. It is uploaded once from Django admin and the
-        # URL stays in MongoDB, so API reads never re-upload the image.
         remote_url = (
             getattr(obj, "image_thumb_url", None)
             or getattr(obj, "image_url", None)
@@ -15,7 +13,6 @@ class SafeImageMixin:
         if remote_url:
             return remote_url
 
-        # Legacy/local/Supabase fallback for older records.
         image = getattr(obj, "image", None)
         if not image:
             return None
@@ -66,9 +63,21 @@ class CategorySerializer(SafeImageMixin, serializers.ModelSerializer):
 class ProductSerializer(SafeImageMixin, serializers.ModelSerializer):
     id = serializers.CharField(read_only=True)
     category = serializers.CharField(source="category_id", read_only=True)
-    category_name = serializers.CharField(source="category.name_uz", read_only=True)
+    category_name = serializers.SerializerMethodField()
     image = serializers.SerializerMethodField()
     image_original = serializers.SerializerMethodField()
+
+    def get_category_name(self, obj):
+        category_names = self.context.get("category_names")
+        category_id = str(getattr(obj, "category_id", "") or "")
+
+        if category_names is not None:
+            return category_names.get(category_id, "")
+
+        try:
+            return obj.category.name_uz
+        except (AttributeError, Product.category.RelatedObjectDoesNotExist):
+            return ""
 
     class Meta:
         model = Product
