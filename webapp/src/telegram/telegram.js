@@ -1,6 +1,7 @@
 /** Telegram Web App helpers with safe browser fallback. */
 
 const BRAND_DARK = "#FAF7F0";
+let advancedUiScheduled = false;
 
 function getWindowTelegramApp() {
   if (typeof window === "undefined") return null;
@@ -9,7 +10,6 @@ function getWindowTelegramApp() {
 
 function supportsTelegramVersion(tg, requiredVersion) {
   if (!tg?.isVersionAtLeast) return false;
-
   try {
     return tg.isVersionAtLeast(requiredVersion);
   } catch {
@@ -17,29 +17,57 @@ function supportsTelegramVersion(tg, requiredVersion) {
   }
 }
 
+function scheduleAdvancedTelegramUi(tg) {
+  if (!tg || advancedUiScheduled || typeof window === "undefined") return;
+  advancedUiScheduled = true;
+
+  const run = () => {
+    try {
+      if (supportsTelegramVersion(tg, "8.0")) {
+        tg.requestFullscreen?.();
+        try {
+          tg.lockOrientation?.();
+        } catch {}
+      }
+
+      if (supportsTelegramVersion(tg, "7.7")) {
+        tg.disableVerticalSwipes?.();
+      }
+    } catch (error) {
+      console.warn("Telegram advanced UI warning:", error);
+    }
+  };
+
+  if (window.requestIdleCallback) {
+    window.requestIdleCallback(run, { timeout: 1200 });
+  } else {
+    window.setTimeout(run, 700);
+  }
+}
+
 export function initTelegramApp() {
   const tg = getWindowTelegramApp();
-
-  if (!tg) return null;
+  if (!tg) {
+    // The SDK is loaded with defer. Retry once after document scripts finish.
+    if (typeof window !== "undefined") {
+      window.setTimeout(() => {
+        const delayedTg = getWindowTelegramApp();
+        if (delayedTg) initTelegramApp();
+      }, 120);
+    }
+    return null;
+  }
 
   try {
     tg.ready?.();
     tg.expand?.();
 
     const applyTelegramSafeArea = () => {
-      const topInset =
-        tg?.safeAreaInset?.top ||
-        tg?.contentSafeAreaInset?.top ||
-        0;
-
-      document.documentElement.style.setProperty(
-        "--tg-safe-top",
-        `${topInset}px`
-      );
+      const topInset = tg?.safeAreaInset?.top || tg?.contentSafeAreaInset?.top || 0;
+      document.documentElement.style.setProperty("--tg-safe-top", `${topInset}px`);
     };
 
     applyTelegramSafeArea();
-
     tg.onEvent?.("safeAreaChanged", applyTelegramSafeArea);
     tg.onEvent?.("contentSafeAreaChanged", applyTelegramSafeArea);
     tg.onEvent?.("viewportChanged", applyTelegramSafeArea);
@@ -49,20 +77,7 @@ export function initTelegramApp() {
       tg.setBackgroundColor?.(BRAND_DARK);
     }
 
-    // Yangi Telegram clientlarda Mini App fullscreen bo‘lib ochiladi.
-    if (supportsTelegramVersion(tg, "8.0")) {
-      tg.requestFullscreen?.();
-
-      try {
-        tg.lockOrientation?.();
-      } catch {
-        // Orientation lock hamma clientda ishlamasligi mumkin.
-      }
-    }
-
-    if (supportsTelegramVersion(tg, "7.7")) {
-      tg.disableVerticalSwipes?.();
-    }
+    scheduleAdvancedTelegramUi(tg);
   } catch (error) {
     console.warn("Telegram Mini App init warning:", error);
   }
@@ -86,9 +101,7 @@ export function getTelegramUser() {
   if (user?.id) {
     return {
       id: user.id,
-      fullName:
-        [user.first_name, user.last_name].filter(Boolean).join(" ") ||
-        "Telegram foydalanuvchisi",
+      fullName: [user.first_name, user.last_name].filter(Boolean).join(" ") || "Telegram foydalanuvchisi",
       username: user.username || "",
       firstName: user.first_name || "",
       lastName: user.last_name || "",
@@ -97,7 +110,6 @@ export function getTelegramUser() {
     };
   }
 
-  // Browser fallback. Production order CheckoutPage’da initData yo‘q bo‘lsa bloklanadi.
   return {
     id: 123456789,
     fullName: "Test User",
@@ -111,52 +123,37 @@ export function getTelegramUser() {
 
 export function showAlert(message) {
   const tg = getWindowTelegramApp();
-
   if (tg?.showAlert) {
     try {
       tg.showAlert(message);
       return;
-    } catch {
-      // Browser alert fallbackga tushadi.
-    }
+    } catch {}
   }
-
   alert(message);
 }
 
 export function showConfirm(message, callback) {
   const tg = getWindowTelegramApp();
-
   if (tg?.showConfirm) {
     try {
       tg.showConfirm(message, callback);
       return;
-    } catch {
-      // Browser confirm fallbackga tushadi.
-    }
+    } catch {}
   }
-
-  const result = confirm(message);
-  callback?.(result);
+  callback?.(confirm(message));
 }
 
 export function openExternalLink(url) {
   if (!url || typeof window === "undefined") return false;
-
   const tg = getWindowTelegramApp();
-
   if (tg?.openLink) {
     try {
       tg.openLink(url);
       return true;
-    } catch {
-      // Oddiy browser fallbackga tushadi.
-    }
+    } catch {}
   }
-
   try {
-    const opened = window.open(url, "_blank", "noopener,noreferrer");
-    return Boolean(opened);
+    return Boolean(window.open(url, "_blank", "noopener,noreferrer"));
   } catch {
     return false;
   }
@@ -164,29 +161,14 @@ export function openExternalLink(url) {
 
 export function hapticFeedback(type = "light") {
   const haptic = getWindowTelegramApp()?.HapticFeedback;
-
   if (!haptic) return;
-
   try {
-    if (type === "success") {
-      haptic.notificationOccurred("success");
+    if (["success", "error", "warning"].includes(type)) {
+      haptic.notificationOccurred(type);
       return;
     }
-
-    if (type === "error") {
-      haptic.notificationOccurred("error");
-      return;
-    }
-
-    if (type === "warning") {
-      haptic.notificationOccurred("warning");
-      return;
-    }
-
     haptic.impactOccurred(type === "medium" ? "medium" : "light");
-  } catch {
-    // Telegram client support can differ; ignore haptic errors.
-  }
+  } catch {}
 }
 
 export function getTelegramApp() {
@@ -194,34 +176,22 @@ export function getTelegramApp() {
 }
 
 export function configureBackButton(visible, onClick) {
-  const tg = getTelegramApp();
-  const backButton = tg?.BackButton;
-
+  const backButton = getTelegramApp()?.BackButton;
   if (!backButton) return () => {};
 
   try {
     if (visible) {
       backButton.show();
-
-      if (onClick) {
-        backButton.onClick(onClick);
-      }
+      if (onClick) backButton.onClick(onClick);
     } else {
       backButton.hide();
     }
 
     return () => {
       try {
-        if (onClick) {
-          backButton.offClick(onClick);
-        }
-
-        if (!visible) {
-          backButton.hide();
-        }
-      } catch {
-        // Ignore cleanup failures.
-      }
+        if (onClick) backButton.offClick(onClick);
+        if (!visible) backButton.hide();
+      } catch {}
     };
   } catch {
     return () => {};
@@ -229,11 +199,7 @@ export function configureBackButton(visible, onClick) {
 }
 
 export function closeTelegramApp() {
-  const tg = getTelegramApp();
-
   try {
-    tg?.close?.();
-  } catch {
-    // Ignore close failures.
-  }
+    getTelegramApp()?.close?.();
+  } catch {}
 }
