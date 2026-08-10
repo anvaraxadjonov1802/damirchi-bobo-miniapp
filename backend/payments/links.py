@@ -74,9 +74,10 @@ def build_payme_payment_url(order: Order) -> str | None:
 
 
 def build_payment_url(order: Order) -> str | None:
+    # Paid/refunded orders are terminal. Failed/cancelled attempts may be retried
+    # from the same order so the customer does not need to rebuild the cart.
     if order.payment_status in {
         Order.PaymentStatus.PAID,
-        Order.PaymentStatus.CANCELLED,
         Order.PaymentStatus.REFUNDED,
     }:
         return None
