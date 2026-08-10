@@ -1,7 +1,7 @@
 /** Telegram Web App helpers with safe browser fallback. */
 
 const BRAND_DARK = "#FAF7F0";
-let advancedUiScheduled = false;
+let retryCount = 0;
 
 function getWindowTelegramApp() {
   if (typeof window === "undefined") return null;
@@ -17,46 +17,18 @@ function supportsTelegramVersion(tg, requiredVersion) {
   }
 }
 
-function scheduleAdvancedTelegramUi(tg) {
-  if (!tg || advancedUiScheduled || typeof window === "undefined") return;
-  advancedUiScheduled = true;
-
-  const run = () => {
-    try {
-      if (supportsTelegramVersion(tg, "8.0")) {
-        tg.requestFullscreen?.();
-        try {
-          tg.lockOrientation?.();
-        } catch {}
-      }
-
-      if (supportsTelegramVersion(tg, "7.7")) {
-        tg.disableVerticalSwipes?.();
-      }
-    } catch (error) {
-      console.warn("Telegram advanced UI warning:", error);
-    }
-  };
-
-  if (window.requestIdleCallback) {
-    window.requestIdleCallback(run, { timeout: 1200 });
-  } else {
-    window.setTimeout(run, 700);
-  }
-}
-
 export function initTelegramApp() {
   const tg = getWindowTelegramApp();
+
   if (!tg) {
-    // The SDK is loaded with defer. Retry once after document scripts finish.
-    if (typeof window !== "undefined") {
-      window.setTimeout(() => {
-        const delayedTg = getWindowTelegramApp();
-        if (delayedTg) initTelegramApp();
-      }, 120);
+    if (typeof window !== "undefined" && retryCount < 20) {
+      retryCount += 1;
+      window.setTimeout(initTelegramApp, 100);
     }
     return null;
   }
+
+  retryCount = 0;
 
   try {
     tg.ready?.();
@@ -76,8 +48,6 @@ export function initTelegramApp() {
       tg.setHeaderColor?.(BRAND_DARK);
       tg.setBackgroundColor?.(BRAND_DARK);
     }
-
-    scheduleAdvancedTelegramUi(tg);
   } catch (error) {
     console.warn("Telegram Mini App init warning:", error);
   }
@@ -86,8 +56,7 @@ export function initTelegramApp() {
 }
 
 export function getTelegramInitData() {
-  const tg = getWindowTelegramApp();
-  return tg?.initData || "";
+  return getWindowTelegramApp()?.initData || "";
 }
 
 export function isTelegramEnvironment() {
@@ -95,8 +64,7 @@ export function isTelegramEnvironment() {
 }
 
 export function getTelegramUser() {
-  const tg = getWindowTelegramApp();
-  const user = tg?.initDataUnsafe?.user || null;
+  const user = getWindowTelegramApp()?.initDataUnsafe?.user || null;
 
   if (user?.id) {
     return {
