@@ -16,8 +16,9 @@ class MenuBootstrapAPIView(APIView):
     permission_classes = []
 
     def get(self, request):
-        categories = Category.objects.filter(is_active=True)
-        products = Product.objects.filter(is_active=True)
+        categories = list(Category.objects.filter(is_active=True))
+        category_names = {str(category.id): category.name_uz for category in categories}
+        products = list(Product.objects.filter(is_active=True))
 
         response = Response(
             {
@@ -29,7 +30,10 @@ class MenuBootstrapAPIView(APIView):
                 "products": ProductSerializer(
                     products,
                     many=True,
-                    context={"request": request},
+                    context={
+                        "request": request,
+                        "category_names": category_names,
+                    },
                 ).data,
             }
         )
