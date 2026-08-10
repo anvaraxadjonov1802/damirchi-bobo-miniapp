@@ -1,10 +1,8 @@
-@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap");
 @import "tailwindcss";
 
 @theme {
-  --font-serif: "Playfair Display", Georgia, serif;
-  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
-
+  --font-serif: Georgia, "Times New Roman", serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
   --color-brand-bg: #f7f3eb;
   --color-brand-dark: #241812;
   --color-brand-card: #ffffff;
@@ -15,39 +13,28 @@
   --color-brand-muted: #776b60;
 }
 
-/* =========================
-   Damirchi / MaxWay-like base
-========================= */
-
 :root {
   color-scheme: light;
-
   --app-bg: #f7f3eb;
   --app-bg-soft: #fffaf2;
   --app-card: #ffffff;
   --app-card-soft: #fff7eb;
-
   --app-text: #241812;
   --app-text-soft: #4b3628;
   --app-muted: #776b60;
-
   --app-border: #eadcc7;
   --app-border-soft: rgba(234, 220, 199, 0.72);
-
   --app-accent: #c89438;
   --app-accent-dark: #a97824;
   --app-accent-soft: #fff0d3;
-
   --app-danger: #dc2626;
   --app-success: #16a34a;
-
   --app-radius-sm: 14px;
   --app-radius-md: 18px;
   --app-radius-lg: 24px;
   --app-radius-xl: 30px;
-
-  --app-shadow-card: 0 12px 30px -24px rgba(36, 24, 18, 0.38);
-  --app-shadow-button: 0 10px 24px -18px rgba(169, 120, 36, 0.8);
+  --app-shadow-card: 0 8px 24px -22px rgba(36, 24, 18, 0.36);
+  --app-shadow-button: 0 8px 20px -16px rgba(169, 120, 36, 0.72);
 }
 
 html,
@@ -55,11 +42,12 @@ body,
 #root {
   min-height: 100%;
   background: var(--app-bg);
+  -webkit-overflow-scrolling: touch;
 }
 
 html {
   scroll-behavior: smooth;
-  overscroll-behavior: none;
+  overscroll-behavior-y: contain;
 }
 
 body {
@@ -68,19 +56,36 @@ body {
   min-height: 100dvh;
   font-family: var(--font-sans);
   color: var(--app-text);
-  background:
-    radial-gradient(circle at top left, rgba(200, 148, 56, 0.12), transparent 320px),
-    linear-gradient(180deg, #fffaf2 0%, #f7f3eb 42%, #f4eadb 100%);
+  background: var(--app-bg);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-tap-highlight-color: transparent;
   overflow-x: hidden;
-  overscroll-behavior-y: none;
+  overscroll-behavior-y: contain;
+  touch-action: pan-y;
 }
 
 #root {
   min-height: 100dvh;
   background: transparent;
+}
+
+.app-viewport {
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+}
+
+.header-compositor,
+.bottom-nav-compositor {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.menu-section {
+  content-visibility: auto;
+  contain-intrinsic-size: 760px;
 }
 
 * {
@@ -123,18 +128,12 @@ textarea {
   user-select: text;
 }
 
-/* =========================
-   Mobile shell
-========================= */
-
 .mobile-shell {
   width: 100%;
   max-width: 480px;
   min-height: 100dvh;
   margin: 0 auto;
-  background:
-    radial-gradient(circle at top right, rgba(200, 148, 56, 0.1), transparent 220px),
-    linear-gradient(180deg, #fffaf2 0%, #f7f3eb 46%, #f4eadb 100%);
+  background: var(--app-bg);
 }
 
 .safe-top {
@@ -151,10 +150,6 @@ textarea {
 .bottom-safe-space {
   padding-bottom: calc(6.5rem + env(safe-area-inset-bottom));
 }
-
-/* =========================
-   MaxWay-like reusable UI
-========================= */
 
 .maxway-page {
   min-height: 100dvh;
@@ -196,56 +191,44 @@ textarea {
   gap: 0.4rem;
   border-radius: 999px;
   border: 1px solid var(--app-border);
-  background: #ffffff;
+  background: #fff;
   color: var(--app-text);
   font-size: 12px;
   font-weight: 900;
   white-space: nowrap;
 }
 
+.maxway-primary-button,
+.maxway-secondary-button,
+.transition-click {
+  transition: transform 0.1s ease, opacity 0.1s ease;
+}
+
 .maxway-primary-button {
   border-radius: 18px;
   background: var(--app-accent);
-  color: #ffffff;
+  color: #fff;
   font-weight: 900;
   box-shadow: var(--app-shadow-button);
-  transition: transform 0.12s ease, opacity 0.12s ease, box-shadow 0.16s ease;
-}
-
-.maxway-primary-button:active {
-  transform: scale(0.97);
-  opacity: 0.92;
 }
 
 .maxway-secondary-button {
   border-radius: 18px;
   border: 1px solid var(--app-border);
-  background: #ffffff;
+  background: #fff;
   color: var(--app-text);
   font-weight: 900;
-  transition: transform 0.12s ease, opacity 0.12s ease;
 }
 
-.maxway-secondary-button:active {
-  transform: scale(0.97);
-  opacity: 0.92;
-}
-
-/* =========================
-   Legacy compatibility
-========================= */
-
-.font-title {
-  font-family: var(--font-serif);
-}
-
-.transition-click {
-  transition: transform 0.1s ease, opacity 0.1s ease, box-shadow 0.16s ease;
-}
-
+.maxway-primary-button:active,
+.maxway-secondary-button:active,
 .transition-click:active {
   transform: scale(0.97);
   opacity: 0.92;
+}
+
+.font-title {
+  font-family: var(--font-serif);
 }
 
 .premium-card {
@@ -255,42 +238,24 @@ textarea {
 }
 
 .premium-shadow {
-  box-shadow: 0 18px 40px -26px rgba(36, 24, 18, 0.42);
+  box-shadow: 0 12px 30px -26px rgba(36, 24, 18, 0.4);
 }
 
-.bg-brand-bg {
-  background-color: var(--app-bg) !important;
-}
-
-.bg-brand-card {
-  background-color: var(--app-card) !important;
-}
-
-.text-brand-dark {
-  color: var(--app-text) !important;
-}
-
-.text-brand-muted {
-  color: var(--app-muted) !important;
-}
-
-.border-brand-brown {
-  border-color: rgba(111, 70, 36, 0.2) !important;
-}
+.bg-brand-bg { background-color: var(--app-bg) !important; }
+.bg-brand-card { background-color: var(--app-card) !important; }
+.text-brand-dark { color: var(--app-text) !important; }
+.text-brand-muted { color: var(--app-muted) !important; }
+.border-brand-brown { border-color: rgba(111, 70, 36, 0.2) !important; }
 
 ::selection {
   background: rgba(200, 148, 56, 0.24);
   color: var(--app-text);
 }
 
-/* =========================
-   Forms
-========================= */
-
 input,
 textarea,
 select {
-  background-color: #ffffff;
+  background-color: #fff;
   border-color: var(--app-border);
 }
 
@@ -313,135 +278,49 @@ select:focus {
   line-height: 1.45;
 }
 
-/* =========================
-   Scrollbar
-========================= */
-
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-/* =========================
-   Animations
-========================= */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes shake {
-  0%,
-  100% {
-    transform: translateX(0);
-  }
-
-  20% {
-    transform: translateX(-4px);
-  }
-
-  40% {
-    transform: translateX(4px);
-  }
-
-  60% {
-    transform: translateX(-3px);
-  }
-
-  80% {
-    transform: translateX(3px);
-  }
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-4px); }
+  40% { transform: translateX(4px); }
+  60% { transform: translateX(-3px); }
+  80% { transform: translateX(3px); }
 }
 
 @keyframes scaleIn {
-  from {
-    opacity: 0;
-    transform: scale(0.75);
-  }
-
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+  from { opacity: 0; transform: scale(0.82); }
+  to { opacity: 1; transform: scale(1); }
 }
 
 @keyframes toastDown {
-  from {
-    opacity: 0;
-    transform: translateY(-18px) scale(0.98);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
+  from { opacity: 0; transform: translateY(-14px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 @keyframes mapSheet {
-  from {
-    transform: translateY(24px);
-    opacity: 0.4;
-  }
-
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
+  from { transform: translateY(18px); opacity: 0.55; }
+  to { transform: translateY(0); opacity: 1; }
 }
 
 @keyframes loadingBar {
-  0% {
-    transform: translateX(-120%);
-  }
-
-  50% {
-    transform: translateX(45%);
-  }
-
-  100% {
-    transform: translateX(130%);
-  }
+  0% { transform: translateX(-120%); }
+  50% { transform: translateX(45%); }
+  100% { transform: translateX(130%); }
 }
 
-.animate-fade-in {
-  animation: fadeIn 0.22s ease-out both;
-}
-
-.animate-shake {
-  animation: shake 0.28s ease-in-out both;
-}
-
-.animate-scale-in {
-  animation: scaleIn 0.18s ease-out both;
-}
-
-.animate-toast-down {
-  animation: toastDown 0.22s ease-out both;
-}
-
-.animate-map-sheet {
-  animation: mapSheet 0.2s ease-out both;
-}
-
-.animate-loading-bar {
-  animation: loadingBar 1.35s infinite ease-in-out;
-}
-
-/* =========================
-   Text utilities
-========================= */
+.animate-fade-in { animation: fadeIn 0.16s ease-out both; }
+.animate-shake { animation: shake 0.28s ease-in-out both; }
+.animate-scale-in { animation: scaleIn 0.14s ease-out both; }
+.animate-toast-down { animation: toastDown 0.18s ease-out both; }
+.animate-map-sheet { animation: mapSheet 0.16s ease-out both; }
+.animate-loading-bar { animation: loadingBar 1.2s infinite ease-in-out; }
 
 .line-clamp-2 {
   display: -webkit-box;
@@ -457,10 +336,6 @@ select:focus {
   overflow: hidden;
 }
 
-/* =========================
-   Leaflet / Map Picker
-========================= */
-
 .leaflet-container {
   width: 100%;
   height: 100%;
@@ -469,81 +344,64 @@ select:focus {
   z-index: 1;
 }
 
-.leaflet-control-container {
-  font-family: var(--font-sans);
-}
-
+.leaflet-control-container { font-family: var(--font-sans); }
 .leaflet-control-zoom {
   border: 1px solid rgba(200, 148, 56, 0.24) !important;
   border-radius: 1rem !important;
   overflow: hidden;
-  box-shadow: 0 12px 30px rgba(36, 24, 18, 0.14) !important;
+  box-shadow: 0 8px 22px rgba(36, 24, 18, 0.12) !important;
 }
-
 .leaflet-control-zoom a {
   width: 38px !important;
   height: 38px !important;
   line-height: 38px !important;
-  background: #ffffff !important;
+  background: #fff !important;
   color: var(--app-text) !important;
   border-color: rgba(200, 148, 56, 0.22) !important;
   font-weight: 900 !important;
 }
-
 .leaflet-control-attribution {
-  background: rgba(255, 250, 242, 0.84) !important;
+  background: rgba(255, 250, 242, 0.9) !important;
   color: rgba(36, 24, 18, 0.58) !important;
   font-size: 10px !important;
 }
-
-.leaflet-control-attribution a {
-  color: rgba(169, 120, 36, 0.92) !important;
-}
-
-.damirchi-map-marker {
-  background: transparent;
-  border: 0;
-}
-
+.leaflet-control-attribution a { color: rgba(169, 120, 36, 0.92) !important; }
+.damirchi-map-marker { background: transparent; border: 0; }
 .damirchi-map-pin {
   width: 42px;
   height: 42px;
   border-radius: 50% 50% 50% 0;
   transform: rotate(-45deg);
   background: var(--app-accent);
-  border: 3px solid #ffffff;
-  box-shadow: 0 10px 30px rgba(36, 24, 18, 0.28);
+  border: 3px solid #fff;
+  box-shadow: 0 8px 24px rgba(36, 24, 18, 0.22);
   display: flex;
   align-items: center;
   justify-content: center;
   color: transparent;
 }
-
 .damirchi-map-pin::before {
   content: "";
   width: 11px;
   height: 11px;
-  background: #ffffff;
+  background: #fff;
   border-radius: 50%;
   position: absolute;
 }
-
-.map-modal-open {
-  overflow: hidden;
-}
-
-/* =========================
-   Small screens
-========================= */
+.map-modal-open { overflow: hidden; }
 
 @media (max-width: 380px) {
   .checkout-readable input,
   .checkout-readable textarea,
-  .checkout-readable button {
-    font-size: 0.95rem;
-  }
+  .checkout-readable button { font-size: 0.95rem; }
+  .maxway-section-title { font-size: 18px; }
+}
 
-  .maxway-section-title {
-    font-size: 18px;
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
