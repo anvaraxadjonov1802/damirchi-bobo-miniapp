@@ -38,6 +38,8 @@ services:
         sync: false
       - key: OPERATOR_CHAT_ID
         sync: false
+      - key: FEEDBACK_CHAT_ID
+        sync: false
       - key: OPERATOR_API_KEY
         sync: false
       - key: TELEGRAM_INIT_DATA_MAX_AGE_SECONDS
