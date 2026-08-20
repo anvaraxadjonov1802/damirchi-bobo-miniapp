@@ -40,6 +40,16 @@ services:
         sync: false
       - key: FEEDBACK_CHAT_ID
         sync: false
+      - key: TELEGRAM_TOPIC_MAIN_ID
+        sync: false
+      - key: TELEGRAM_TOPIC_MENU_ID
+        sync: false
+      - key: TELEGRAM_TOPIC_FEEDBACK_ID
+        sync: false
+      - key: TELEGRAM_TOPIC_PAYMENTS_ID
+        sync: false
+      - key: TELEGRAM_TOPIC_ORDERS_ID
+        sync: false
       - key: OPERATOR_API_KEY
         sync: false
       - key: TELEGRAM_INIT_DATA_MAX_AGE_SECONDS
