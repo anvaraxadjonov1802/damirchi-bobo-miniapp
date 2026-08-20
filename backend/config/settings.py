@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "orders",
     "payments",
     "common",
+    "feedback.apps.FeedbackConfig",
     "telegrambot.apps.TelegramBotConfig",
 ]
 
@@ -230,6 +231,7 @@ BACKEND_PUBLIC_URL = os.getenv(
     "https://damirchi-bobo-api.onrender.com",
 ).strip().rstrip("/")
 OPERATOR_CHAT_ID = os.getenv("OPERATOR_CHAT_ID", "").strip()
+FEEDBACK_CHAT_ID = os.getenv("FEEDBACK_CHAT_ID", "").strip()
 ALLOW_UNVERIFIED_TELEGRAM_IN_DEBUG = (
     os.getenv("ALLOW_UNVERIFIED_TELEGRAM_IN_DEBUG", "False") == "True"
 )
