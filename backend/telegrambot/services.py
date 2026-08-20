@@ -32,13 +32,32 @@ def telegram_api(method: str, payload: dict | None = None, timeout: int = 15):
     return data.get("result")
 
 
-def send_message(chat_id, text: str, reply_markup: dict | None = None):
+def _thread_id(value):
+    if value in (None, ""):
+        return None
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def send_message(
+    chat_id,
+    text: str,
+    reply_markup: dict | None = None,
+    message_thread_id=None,
+):
     payload = {
         "chat_id": chat_id,
         "text": text,
         "parse_mode": "HTML",
         "disable_web_page_preview": True,
     }
+
+    thread_id = _thread_id(message_thread_id)
+    if thread_id is not None:
+        payload["message_thread_id"] = thread_id
+
     if reply_markup:
         payload["reply_markup"] = reply_markup
     return telegram_api("sendMessage", payload)

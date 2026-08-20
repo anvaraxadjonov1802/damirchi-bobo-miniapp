@@ -1,8 +1,9 @@
-import os
 from decimal import Decimal
 from html import escape
 
-import requests
+from django.conf import settings
+
+from telegrambot.services import TelegramAPIError, send_message
 
 from .models import Order
 
@@ -156,6 +157,22 @@ def build_order_message(order: Order) -> str:
     return message
 
 
+def build_payment_operator_message(order: Order) -> str:
+    customer_name = "Noma’lum"
+    if order.customer:
+        customer_name = safe_text(order.customer.full_name or "Noma’lum")
+
+    return (
+        "💳 <b>TO‘LOV TASDIQLANDI</b>\n\n"
+        f"🧾 <b>Buyurtma:</b> #{safe_text(order.id)}\n"
+        f"👤 <b>Mijoz:</b> {customer_name}\n"
+        f"📞 <b>Telefon:</b> {safe_text(order.phone)}\n"
+        f"💳 <b>To‘lov turi:</b> {payment_type_label(order)}\n"
+        f"✅ <b>Holati:</b> {payment_status_label(order)}\n"
+        f"💰 <b>Summa:</b> {money(order.total_price)}"
+    )
+
+
 def build_status_keyboard(order_id: str, order: Order | None = None) -> dict:
     inline_keyboard = []
 
@@ -190,39 +207,44 @@ def build_status_keyboard(order_id: str, order: Order | None = None) -> dict:
 
 
 def send_order_to_operator_group(order: Order) -> None:
-    bot_token = os.getenv("BOT_TOKEN")
-    operator_chat_id = os.getenv("OPERATOR_CHAT_ID")
+    operator_chat_id = getattr(settings, "OPERATOR_CHAT_ID", "") or ""
 
-    if not bot_token or not operator_chat_id:
-        print("BOT_TOKEN yoki OPERATOR_CHAT_ID .env ichida yo‘q.")
+    if not operator_chat_id:
+        print("OPERATOR_CHAT_ID .env ichida yo‘q.")
         return
 
-    url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
-
-    payload = {
-        "chat_id": operator_chat_id,
-        "text": build_order_message(order),
-        "parse_mode": "HTML",
-        "disable_web_page_preview": True,
-        "reply_markup": build_status_keyboard(str(order.id), order),
-    }
+    # Online payment callback orqali tasdiqlangan bo‘lsa, avval to‘lov mavzusiga
+    # qisqa moliyaviy xabar yuboramiz, keyin buyurtmani buyurtmalar mavzusiga.
+    if order.is_online_payment and order.payment_status == Order.PaymentStatus.PAID:
+        try:
+            send_message(
+                operator_chat_id,
+                build_payment_operator_message(order),
+                message_thread_id=(
+                    getattr(settings, "TELEGRAM_TOPIC_PAYMENTS_ID", "") or None
+                ),
+            )
+        except TelegramAPIError as exc:
+            print("To‘lov mavzusiga Telegram xabari yuborilmadi:", exc)
 
     try:
-        response = requests.post(url, json=payload, timeout=15)
-
-        if response.status_code != 200:
-            print("Telegramga xabar yuborishda xatolik:", response.text)
-
-    except requests.RequestException as exc:
-        print("Telegram request xatoligi:", exc)
+        send_message(
+            operator_chat_id,
+            build_order_message(order),
+            reply_markup=build_status_keyboard(str(order.id), order),
+            message_thread_id=(
+                getattr(settings, "TELEGRAM_TOPIC_ORDERS_ID", "") or None
+            ),
+        )
+    except TelegramAPIError as exc:
+        print("Telegramga buyurtma yuborishda xatolik:", exc)
 
 
 def send_payment_confirmation_to_customer(order: Order) -> None:
     """Best-effort Telegram confirmation after Click/Payme server callback."""
-    bot_token = os.getenv("BOT_TOKEN")
     telegram_id = getattr(getattr(order, "customer", None), "telegram_id", None)
 
-    if not bot_token or not telegram_id:
+    if not getattr(settings, "BOT_TOKEN", "") or not telegram_id:
         return
 
     provider = "Click" if order.payment_type == Order.PaymentType.CLICK else "Payme"
@@ -235,17 +257,6 @@ def send_payment_confirmation_to_customer(order: Order) -> None:
     )
 
     try:
-        response = requests.post(
-            f"https://api.telegram.org/bot{bot_token}/sendMessage",
-            json={
-                "chat_id": telegram_id,
-                "text": text,
-                "parse_mode": "HTML",
-                "disable_web_page_preview": True,
-            },
-            timeout=15,
-        )
-        if response.status_code != 200:
-            print("Mijozga payment confirmation yuborilmadi:", response.text)
-    except requests.RequestException as exc:
+        send_message(telegram_id, text)
+    except TelegramAPIError as exc:
         print("Payment confirmation Telegram xatoligi:", exc)

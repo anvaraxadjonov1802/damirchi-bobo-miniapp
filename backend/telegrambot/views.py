@@ -29,6 +29,26 @@ from .services import (
 logger = logging.getLogger(__name__)
 
 
+TOPIC_ENV_BY_ALIAS = {
+    "main": "TELEGRAM_TOPIC_MAIN_ID",
+    "asosiy": "TELEGRAM_TOPIC_MAIN_ID",
+    "menu": "TELEGRAM_TOPIC_MENU_ID",
+    "elektronmenu": "TELEGRAM_TOPIC_MENU_ID",
+    "feedback": "TELEGRAM_TOPIC_FEEDBACK_ID",
+    "shikoyat": "TELEGRAM_TOPIC_FEEDBACK_ID",
+    "shikoyatlar": "TELEGRAM_TOPIC_FEEDBACK_ID",
+    "taklif": "TELEGRAM_TOPIC_FEEDBACK_ID",
+    "payments": "TELEGRAM_TOPIC_PAYMENTS_ID",
+    "payment": "TELEGRAM_TOPIC_PAYMENTS_ID",
+    "tolov": "TELEGRAM_TOPIC_PAYMENTS_ID",
+    "tolovlar": "TELEGRAM_TOPIC_PAYMENTS_ID",
+    "orders": "TELEGRAM_TOPIC_ORDERS_ID",
+    "order": "TELEGRAM_TOPIC_ORDERS_ID",
+    "buyurtma": "TELEGRAM_TOPIC_ORDERS_ID",
+    "buyurtmalar": "TELEGRAM_TOPIC_ORDERS_ID",
+}
+
+
 def _webapp_url() -> str:
     return (getattr(settings, "WEBAPP_URL", "") or "").rstrip("/")
 
@@ -74,6 +94,49 @@ def _send_or_edit(chat_id, message_id, text: str, reply_markup: dict | None = No
     return send_message(chat_id, text, reply_markup)
 
 
+def _topic_id_message(chat_id, message_thread_id, raw_argument: str) -> str:
+    thread_text = str(message_thread_id) if message_thread_id is not None else "topilmadi"
+    lines = [
+        "🧵 <b>Telegram mavzu ma’lumoti</b>",
+        "",
+        f"💬 Chat ID: <code>{chat_id}</code>",
+        f"📌 Topic ID: <code>{thread_text}</code>",
+    ]
+
+    alias = (raw_argument or "").strip().lower().replace("‘", "").replace("’", "").replace("'", "")
+    env_name = TOPIC_ENV_BY_ALIAS.get(alias)
+
+    if message_thread_id is None:
+        lines.extend(
+            [
+                "",
+                "⚠️ Topic ID olinmadi. Buyruqni kerakli mavzu ichida yuboring.",
+            ]
+        )
+    elif env_name:
+        lines.extend(
+            [
+                "",
+                "Render Environment uchun:",
+                f"<code>{env_name}={message_thread_id}</code>",
+            ]
+        )
+    else:
+        lines.extend(
+            [
+                "",
+                "Variable nomini ham olish uchun:",
+                "<code>/topicid main</code>",
+                "<code>/topicid menu</code>",
+                "<code>/topicid feedback</code>",
+                "<code>/topicid payments</code>",
+                "<code>/topicid orders</code>",
+            ]
+        )
+
+    return "\n".join(lines)
+
+
 def _handle_message(message: dict):
     chat = message.get("chat") or {}
     chat_id = chat.get("id")
@@ -81,13 +144,27 @@ def _handle_message(message: dict):
     if chat_id is None:
         return
 
+    message_thread_id = message.get("message_thread_id")
     text = (message.get("text") or "").strip()
     user = message.get("from") or {}
     command = text.split(maxsplit=1)[0].split("@", 1)[0].lower() if text.startswith("/") else ""
+    argument = text.split(maxsplit=1)[1] if command and len(text.split(maxsplit=1)) > 1 else ""
     webapp_url = _webapp_url()
 
     if command == "/chatid":
-        send_message(chat_id, f"Chat ID: <code>{chat_id}</code>")
+        send_message(
+            chat_id,
+            f"Chat ID: <code>{chat_id}</code>",
+            message_thread_id=message_thread_id,
+        )
+        return
+
+    if command == "/topicid":
+        send_message(
+            chat_id,
+            _topic_id_message(chat_id, message_thread_id, argument),
+            message_thread_id=message_thread_id,
+        )
         return
 
     if chat_type != "private":
@@ -163,6 +240,7 @@ def _handle_order_status_callback(callback: dict, data: str):
     message = callback.get("message") or {}
     chat = message.get("chat") or {}
     chat_id = chat.get("id")
+    message_thread_id = message.get("message_thread_id")
 
     operator_chat_id = _operator_chat_id()
     if operator_chat_id is not None and chat_id != operator_chat_id:
@@ -205,6 +283,7 @@ def _handle_order_status_callback(callback: dict, data: str):
         send_message(
             chat_id,
             f"✅ <b>Buyurtma #{order.id}</b> statusi: <b>{status_text}</b>",
+            message_thread_id=message_thread_id,
         )
 
     customer = order.customer

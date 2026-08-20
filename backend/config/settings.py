@@ -232,6 +232,14 @@ BACKEND_PUBLIC_URL = os.getenv(
 ).strip().rstrip("/")
 OPERATOR_CHAT_ID = os.getenv("OPERATOR_CHAT_ID", "").strip()
 FEEDBACK_CHAT_ID = os.getenv("FEEDBACK_CHAT_ID", "").strip()
+
+# Telegram forum topic IDs for the operator group.
+TELEGRAM_TOPIC_MAIN_ID = os.getenv("TELEGRAM_TOPIC_MAIN_ID", "").strip()
+TELEGRAM_TOPIC_MENU_ID = os.getenv("TELEGRAM_TOPIC_MENU_ID", "").strip()
+TELEGRAM_TOPIC_FEEDBACK_ID = os.getenv("TELEGRAM_TOPIC_FEEDBACK_ID", "").strip()
+TELEGRAM_TOPIC_PAYMENTS_ID = os.getenv("TELEGRAM_TOPIC_PAYMENTS_ID", "").strip()
+TELEGRAM_TOPIC_ORDERS_ID = os.getenv("TELEGRAM_TOPIC_ORDERS_ID", "").strip()
+
 ALLOW_UNVERIFIED_TELEGRAM_IN_DEBUG = (
     os.getenv("ALLOW_UNVERIFIED_TELEGRAM_IN_DEBUG", "False") == "True"
 )
