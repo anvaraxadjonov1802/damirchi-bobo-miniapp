@@ -59,10 +59,15 @@ class FeedbackCreateView(APIView):
             getattr(settings, "FEEDBACK_CHAT_ID", "")
             or getattr(settings, "OPERATOR_CHAT_ID", "")
         )
+        topic_id = getattr(settings, "TELEGRAM_TOPIC_FEEDBACK_ID", "") or None
 
         if chat_id:
             try:
-                send_message(chat_id, _build_telegram_message(feedback))
+                send_message(
+                    chat_id,
+                    _build_telegram_message(feedback),
+                    message_thread_id=topic_id,
+                )
                 feedback.telegram_sent = True
                 feedback.telegram_error = ""
                 feedback.save(update_fields=["telegram_sent", "telegram_error"])
