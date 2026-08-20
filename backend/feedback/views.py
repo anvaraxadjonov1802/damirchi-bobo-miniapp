@@ -1,3 +1,4 @@
+import logging
 from html import escape
 
 from django.conf import settings
@@ -11,6 +12,9 @@ from rest_framework.views import APIView
 from telegrambot.services import TelegramAPIError, send_message
 
 from .serializers import FeedbackSerializer
+
+
+logger = logging.getLogger(__name__)
 
 
 class FeedbackRateThrottle(AnonRateThrottle):
@@ -45,6 +49,17 @@ def _build_telegram_message(feedback):
     )
 
 
+def _save_telegram_state(feedback, *, sent: bool, error: str = ""):
+    try:
+        feedback.telegram_sent = sent
+        feedback.telegram_error = error[:1000]
+        feedback.save(update_fields=["telegram_sent", "telegram_error"])
+    except Exception:
+        # Feedback itself is already persisted. Notification bookkeeping must
+        # never turn a successful customer submission into a 500 response.
+        logger.exception("Could not persist Telegram delivery state for feedback %s", feedback.pk)
+
+
 class FeedbackCreateView(APIView):
     permission_classes = [AllowAny]
     authentication_classes = []
@@ -68,21 +83,26 @@ class FeedbackCreateView(APIView):
                     _build_telegram_message(feedback),
                     message_thread_id=topic_id,
                 )
-                feedback.telegram_sent = True
-                feedback.telegram_error = ""
-                feedback.save(update_fields=["telegram_sent", "telegram_error"])
+                _save_telegram_state(feedback, sent=True)
             except TelegramAPIError as exc:
-                feedback.telegram_error = str(exc)[:1000]
-                feedback.save(update_fields=["telegram_error"])
+                _save_telegram_state(feedback, sent=False, error=str(exc))
+            except Exception as exc:
+                # Telegram or its bookkeeping is best-effort after the feedback
+                # has been safely stored in MongoDB.
+                logger.exception("Unexpected feedback Telegram notification error")
+                _save_telegram_state(feedback, sent=False, error=str(exc))
         else:
-            feedback.telegram_error = "FEEDBACK_CHAT_ID/OPERATOR_CHAT_ID is not configured."
-            feedback.save(update_fields=["telegram_error"])
+            _save_telegram_state(
+                feedback,
+                sent=False,
+                error="FEEDBACK_CHAT_ID/OPERATOR_CHAT_ID is not configured.",
+            )
 
         return Response(
             {
                 "ok": True,
                 "message": "Fikringiz uchun rahmat!",
-                "feedback": FeedbackSerializer(feedback).data,
+                "feedback_id": str(feedback.pk),
             },
             status=status.HTTP_201_CREATED,
         )
